@@ -1,6 +1,6 @@
 ---
 title: External Agents - Zed
-description: Install and use ACP-integrated External Agents such as Claude, Codex, OpenCode, Copilot, Cursor, and Pi Coding Agent in Zed.
+description: Install and use ACP-integrated External Agents such as Claude, Codex, Antigravity, OpenCode, Copilot, Cursor, and Pi Coding Agent in Zed.
 ---
 
 # External Agents
@@ -27,6 +27,8 @@ Common External Agents include:
 
 - Claude
 - Codex
+- Antigravity
+- Gemini CLI
 - OpenCode
 - Copilot
 - Cursor
@@ -42,7 +44,7 @@ Use Claude Agent when you want Claude running as an ACP-integrated External Agen
 
 Install Claude Agent from the [ACP Registry](#registry), then start a Claude Agent thread from the Agent Panel or Threads Sidebar. Claude Agent owns its own authentication and billing. An Anthropic API key configured for [Zed Agent](./zed-agent.md) does not automatically configure Claude Agent.
 
-To choose your billing method, open a Claude Agent thread, run `/login`, and authenticate with an API key or with Claude Code where supported. Claude-specific files such as `CLAUDE.md` may be read by Claude Agent directly.
+To choose your billing method, open a Claude Agent thread, run `/login`, and authenticate with an API key or with Claude Code where supported. Claude-specific files such as `CLAUDE.md` and `.claude/skills/` may be read by Claude Agent directly.
 
 ## Codex {#codex-cli}
 
@@ -50,7 +52,15 @@ Use Codex when you want Codex running as an ACP-integrated External Agent in Zed
 
 Install Codex from the [ACP Registry](#registry), then start a Codex thread from the Agent Panel or Threads Sidebar. Codex owns its own authentication and billing. An OpenAI API key configured for [Zed Agent](./zed-agent.md) does not automatically configure Codex.
 
-Codex may support ChatGPT login, Codex API keys, OpenAI API keys, or Codex-native configuration depending on the installed version and environment. To change authentication, use the Codex thread's native login/logout flow.
+Codex may support ChatGPT login, Codex API keys, OpenAI API keys, or Codex-native configuration depending on the installed version and environment. To change authentication, use the Codex thread's native login/logout flow. Codex scans `AGENTS.md` and repository `skills/` directories for project rules.
+
+## Antigravity {#antigravity}
+
+Use Antigravity when you want Google Antigravity running as an ACP-integrated External Agent in Zed.
+
+Install Antigravity from the [ACP Registry](#registry) (agent ID `antigravity-acp`), then start an Antigravity thread from the Agent Panel or Threads Sidebar. Antigravity runs its proprietary ACP binary (`agy_acp_server`) and owns its own authentication (`oauth-personal`, `oauth-business`, or Gemini API key). It is distinct from Gemini CLI.
+
+Antigravity scans global skills directories (`~/.gemini/antigravity-cli/skills`), project skill directories (`.agents/skills`, `.gemini/skills`), and supports custom subagents (`research`, `self`).
 
 ## Gemini CLI {#gemini-cli}
 
@@ -120,20 +130,23 @@ Open the [Agent Panel](./agent-panel.md), then use the agent selector or the new
 
 You can also create keybindings for specific agents with {#action agent::NewExternalAgentThread}.
 
-## Configuration Boundaries {#configuration-boundaries}
+## Configuration & Runtime Boundaries {#configuration-boundaries}
 
-External Agents run as separate processes that communicate with Zed over ACP. This creates a boundary between Zed configuration and agent-native configuration.
+External Agents run as separate processes that communicate with Zed over ACP. This creates important boundaries regarding configuration, skills, tools, and permissions:
 
-| Capability                                | Behavior in External Agent threads                                                         |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Model/provider config                     | Usually owned by the External Agent                                                        |
-| Auth/API keys/subscriptions               | Usually owned by the External Agent                                                        |
-| [Zed Agent profiles](./agent-profiles.md) | Do not apply unless the integration says otherwise                                         |
-| Zed Skills                                | Do not apply as Zed Skills                                                                 |
-| Native agent skills/instructions          | Depends on the agent                                                                       |
-| Zed MCP servers                           | May be forwarded over ACP                                                                  |
-| Native MCP config                         | May also be read by the agent                                                              |
-| Tool permissions                          | Zed ACP/tool forwarding permissions may apply; native tool permissions depend on the agent |
+| Capability | Behavior in External Agent threads |
+| --- | --- |
+| Model/provider config | Usually owned by the External Agent |
+| Auth/API keys/subscriptions | Usually owned by the External Agent |
+| [Zed Agent profiles](./agent-profiles.md) | Do not apply unless the integration says otherwise |
+| Zed Skills | Do not apply as Zed Skills; Zed does not expose its skill tool over ACP |
+| Native agent skills/instructions | Scanned directly by the agent (`CLAUDE.md`, `AGENTS.md`, `SKILL.md`) |
+| Built-in command execution | Executed in agent's own process/sandbox (agents do not call Zed's `terminal/create`) |
+| Client FS tools (`fs/read`, `fs/write`) | Forwarded to Zed over ACP; verified against workspace boundaries and logged to `ActionLog` |
+| Zed MCP servers | Forwarded over ACP in `session/new` (`stdio` filtered for local/remote; `http` headers preserved) |
+| Native MCP config | Read independently by the agent (`~/.claude/mcp.json`, `~/.codex/mcp.json`) |
+| [Zed tool permissions](./tool-permissions.md) | Regex rules in settings **only** apply to native agent; ACP relies entirely on `session/request_permission` |
+| Human Gate approval | Displayed in Zed UI when agent sends `session/request_permission` (bypassed if agent runs in bypass/yolo mode) |
 
 For Zed's native agent configuration, see [Zed Agent](./zed-agent.md).
 
@@ -145,6 +158,7 @@ Examples:
 
 - Claude Agent may use Claude Code auth and Claude-native config.
 - Codex may use ChatGPT login, Codex API keys, OpenAI API keys, or Codex-native config.
+- Antigravity uses Google OAuth / API keys and independent tool permission modes (`default`, `auto_edit`, `yolo`).
 - Cursor subscriptions do not configure Zed's LLM provider settings; use Cursor's agent or CLI setup where available.
 - Pi Coding Agent is an agent harness. Configure provider auth in Pi.
 
@@ -198,6 +212,10 @@ Only configured External Agents appear in the import dialog. Sessions without an
 Zed-configured [MCP servers](./mcp.md) may be forwarded to External Agents over ACP. External Agents may also read their own native MCP configuration.
 
 If an MCP tool does not appear in an External Agent, check both Zed's MCP server configuration and the agent's native MCP configuration.
+
+## Interactive Architecture Diagram {#interactive-diagram}
+
+For an interactive, end-to-end swimlane diagram modeling session setup and restore, skills resolution, tools execution matrix, and human gate permissions across Claude Agent, Codex, and Antigravity, open [external-agents.html](./external-agents.html).
 
 ## Debugging {#debugging-agents}
 

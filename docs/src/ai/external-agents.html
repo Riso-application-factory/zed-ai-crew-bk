@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>External Agents · Zed → ACP (Skills, Tools & Permissions)</title>
+  <style>
+    :root { color-scheme: light; --ink: #172b3a; --muted: #657786; --line: #dde5ea; --blue: #1769a0; --paper: #f5f7f9; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #ffb454; outline-offset: 4px; }
+    .page { width: 100%; margin: auto; padding: 36px 28px; }
+    .eyebrow { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.15; letter-spacing: -.04em; margin: 10px 0 12px; }
+    .intro { max-width: 980px; color: var(--muted); font-size: 15px; margin: 0; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 25px 0 16px; }
+    .tabs { display: flex; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: white; gap: 4px; }
+    .tabs button { border: 0; padding: 10px 18px; background: transparent; color: var(--muted); border-radius: 8px; font-weight: 650; }
+    .tabs button[aria-pressed="true"] { background: var(--ink); color: white; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: 12px; }
+    .legend span { display: flex; align-items: center; gap: 7px; }
+    .sample { width: 26px; border-top: 2px solid #486d85; }
+    .sample.optional { border-top-style: dashed; border-color: #83929e; }
+    .sample.permission { border-top: 2px solid #e06c75; }
+    .hint { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+    .viewport { overflow: auto; border: 1px solid var(--line); border-radius: 16px; background: white; }
+    .diagram { width: 100%; min-width: 1590px; height: 3600px; position: relative; isolation: isolate; }
+    .lanes { display: grid; grid-template-columns: repeat(6, 1fr); height: 100%; position: absolute; inset: 0; }
+    .lane { border-right: 1px solid var(--line); background: var(--tint); }
+    .lane:last-child { border-right: 0; }
+    .lane-heading { height: 86px; padding: 18px 22px; background: white; border-bottom: 3px solid var(--accent); }
+    .lane-heading strong { display: block; font-size: 15px; }
+    .lane-heading span { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .lane-number { font-size: 10px; letter-spacing: .06em; color: var(--accent); margin-right: 5px; }
+    .node { position: absolute; width: calc(100% / 6 - 42px); background: white; border: 1px solid #ccd8e1; border-top: 3px solid var(--accent); border-radius: 11px; box-shadow: 0 3px 10px #22384c08; padding: 14px; text-align: left; color: var(--ink); z-index: 3; transition: box-shadow .15s, border-color .15s; }
+    .node:hover { box-shadow: 0 6px 20px #22384c18; border-color: var(--accent); }
+    .node[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .node.optional { border-style: dashed; }
+    .node.alert-node { border-top-color: #d9534f; }
+    .node .tag { display: block; font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 7px; }
+    .node strong { display: block; font-size: 14px; line-height: 1.35; }
+    .node .description { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .node code { display: block; white-space: normal; overflow-wrap: anywhere; margin-top: 9px; padding: 6px 8px; border-radius: 5px; font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: #f0f4f7; color: #31546a; }
+    .node .parameters { display: block; margin-top: 10px; }
+    .node .parameter { display: block; padding: 7px 0; border-top: 1px solid var(--line); }
+    .node .parameter code { margin: 0 0 2px; padding: 0; background: transparent; font-weight: 700; color: var(--blue); }
+    .node .parameter span { display: block; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+    .node .wire { white-space: pre-wrap; }
+    .inactive { position: absolute; left: calc(100% / 6 * 3 + 21px); width: calc(100% / 6 - 42px); padding: 22px 14px; text-align: center; color: #83919a; border: 1px dashed #cfd9df; border-radius: 10px; font-size: 12px; z-index: 2; }
+    svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 1; pointer-events: none; }
+    .edge { fill: none; stroke: #486d85; stroke-width: 2; stroke-linejoin: round; }
+    .edge.optional { stroke: #83929e; stroke-dasharray: 6 5; }
+    .edge.permission-edge { stroke: #d9534f; stroke-width: 2.2; }
+    .edge-label { fill: #476173; font: 10px system-ui, sans-serif; paint-order: stroke; stroke: white; stroke-width: 5px; stroke-linejoin: round; }
+    .phase { position: absolute; left: calc(100% / 6 * 2 + 20px); color: #83929e; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; z-index: 2; }
+    .phase::before { content: ""; display: inline-block; vertical-align: middle; width: 24px; border-top: 1px solid #bac8d1; margin-right: 9px; }
+    .lower { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; }
+    .panel { border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: white; }
+    .panel h2 { font-size: 16px; margin: 0 0 10px; }
+    .panel p { margin: 0 0 12px; color: var(--muted); }
+    pre { margin: 14px 0 0; padding: 16px; overflow: auto; background: #102838; color: #d9edf8; border-radius: 9px; font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; max-height: 520px; }
+    .boundary { padding: 12px 0; border-top: 1px solid var(--line); }
+    .boundary strong { display: block; font-size: 12px; margin-bottom: 4px; color: #172b3a; }
+    .boundary span { font-size: 12px; color: var(--muted); line-height: 1.55; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-right: 6px; }
+    .badge-info { background: #e2f0fb; color: #1769a0; }
+    .badge-warning { background: #fff3cd; color: #856404; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+    footer { color: var(--muted); font-size: 12px; margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+    a { color: var(--blue); }
+    .print { background: white; border: 1px solid var(--line); border-radius: 7px; padding: 6px 12px; color: var(--ink); }
+    @media (max-width: 800px) { .page { padding: 24px 14px; } .lower { grid-template-columns: 1fr; } .toolbar { align-items: flex-start; } }
+    @media print { @page { size: A3 landscape; margin: 10mm; } body { background: white; } .page { padding: 0; } .diagram { zoom: .45; } .viewport { overflow: visible; } .hint, .print { display: none; } .node { box-shadow: none; } .lower { break-before: page; } * { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="eyebrow">Zed / External Agents / ACP Deep Research</div>
+    <h1>Vòng đời External Agents: Khởi tạo, Skills, Tools & Cổng Permission</h1>
+    <p class="intro">Khảo sát chuyên sâu kiến trúc tích hợp giữa Zed (<code>crates/agent_servers</code>, <code>crates/acp_thread</code>, <code>crates/agent_ui</code>), giao thức Agent Client Protocol (ACP) và runtime của 3 dòng external agents tiêu biểu: <strong>Claude Agent</strong> (<code>claude-agent-acp</code> 0.86.0), <strong>Codex</strong> (<code>codex-acp</code> 2.1.1) và <strong>Antigravity</strong> (<code>agy_acp_server</code> 1.3.0). Phân tích chi tiết ranh giới phân giải <strong>Skills</strong>, ma trận thực thi <strong>Tools</strong> (Native process vs Client FS vs Forwarded MCP) và cơ chế kiểm soát <strong>Permission</strong> / phê duyệt Human Gate.</p>
+    <div class="toolbar">
+      <div class="tabs" role="group" aria-label="Chọn luồng session">
+        <button type="button" data-mode="new" aria-pressed="true">session/new</button>
+        <button type="button" data-mode="load" aria-pressed="false">session/load</button>
+      </div>
+      <div class="legend">
+        <span><i class="sample"></i>Luồng chính</span>
+        <span><i class="sample optional"></i>Phụ thuộc agent / Tùy chọn</span>
+        <span><i class="sample permission"></i>Kiểm soát quyền & Duyệt Human</span>
+      </div>
+    </div>
+    <p class="hint">Cuộn ngang để xem đủ 6 lane swimlane. Click vào từng node để kiểm tra chi tiết tham số, mã Rust và payload JSON tương ứng. Các nhánh Claude, Codex và Antigravity thể hiện sự khác biệt kỹ thuật rõ nét giữa 3 adapter.</p>
+    <div class="viewport" tabindex="0" role="region" aria-label="Sơ đồ swimlane tương tác">
+      <div class="diagram" id="diagram">
+        <div class="lanes" id="lanes"></div>
+        <svg id="connections" viewBox="0 0 1590 3600" aria-hidden="true"></svg>
+        <div id="nodes"></div>
+        <div id="prepare-phase" class="phase" style="top: 160px">01 · Chuẩn bị môi trường phiên</div>
+        <div id="request-phase" class="phase" style="top: 520px">02 · Gửi request qua ACP</div>
+        <div id="response-phase" class="phase" style="top: 800px">03 · Replay lịch sử & Response</div>
+        <div id="configuration-phase" class="phase" style="top: 1040px">04 · Thỏa thuận cấu hình & Mode</div>
+        <div id="skills-phase" class="phase" style="top: 1540px">05 · Phân giải Skills & Quy tắc ngữ cảnh</div>
+        <div id="tools-phase" class="phase" style="top: 2040px">06 · Ma trận Tools: Native, Client FS & MCP</div>
+        <div id="permissions-phase" class="phase" style="top: 2540px">07 · Cổng kiểm soát Permission & Duyệt lệnh Human</div>
+      </div>
+    </div>
+    <div class="lower">
+      <section class="panel" aria-live="polite" aria-atomic="true">
+        <div class="eyebrow" id="detail-category">Payload</div>
+        <h2 id="detail-title" style="margin-top: 8px">session/new</h2>
+        <p id="detail-description"></p>
+        <pre id="detail-payload"></pre>
+      </section>
+      <section class="panel">
+        <h2>Ranh giới dữ liệu & Cơ chế Zed Code</h2>
+        <div class="boundary">
+          <strong><span class="badge badge-danger">Phát hiện mấu chốt</span>Cổng Human Gate & Sự thật về tool_permissions trong Zed</strong>
+          <span>Trong Zed, cài đặt <code>agent.tool_permissions</code> (với các bộ lọc regex như <code>always_allow</code>, <code>always_deny</code>, <code>always_confirm</code>) <strong>CHỈ ÁP DỤNG CHO ZED NATIVE AGENT</strong>. Khi kết nối với External Agent qua ACP, hàm <code>handle_request_permission</code> trong <code>crates/agent_servers/src/acp.rs:6431</code> chuyển thẳng request vào UI mà không hề kiểm tra hay áp dụng bộ lọc regex này! Việc người dùng có được hỏi duyệt hay không hoàn toàn phụ thuộc vào việc agent runtime có gửi RPC <code>session/request_permission</code> hay không.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-warning">Nguy cơ an ninh</span>Các chế độ Bypass hoàn toàn cổng duyệt Human</strong>
+          <span>Nếu External Agent được cấu hình ở các mode không yêu cầu xác nhận:
+          <br>• <strong>Claude:</strong> <code>bypassPermissions</code> — SDK tự động duyệt trước khi gọi <code>canUseTool</code>, không gửi RPC nào tới Zed (có thể chặn bằng <code>allowDangerouslySkipPermissions: false</code>).
+          <br>• <strong>Codex:</strong> <code>agent-full-access</code> — Áp dụng <code>approvalPolicy: never</code> và <code>dangerFullAccess</code>, không bao giờ hỏi duyệt. Chế độ <code>agent</code> (mặc định) dựa vào <code>auto_review</code> tự đánh giá.
+          <br>• <strong>Antigravity:</strong> <code>yolo</code> — Tự động chấp thuận mọi công cụ, bao gồm cả lệnh thực thi terminal rủi ro cao.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-info">Kiến trúc</span>Ma trận Tools: Tại sao Claude & Codex không dùng terminal/create của Zed?</strong>
+          <span>Khảo sát mã nguồn cả hai adapter <code>claude-agent-acp</code> và <code>codex-acp</code> cho thấy: <strong>Không adapter nào gọi RPC terminal/create của Zed</strong>. Cả hai tự chạy tiến trình shell cục bộ trong runtime/sandbox của mình, sau đó stream stdout/stderr ngược về Zed thông qua notification <code>session/update</code> kèm metadata <code>terminal_info</code>. Zed chỉ nhận và hiển thị cửa sổ terminal ở chế độ display-only (<code>TerminalBuilder::new_display_only</code>). Do đó, Zed không thể chặn lệnh nguy hiểm ở tầng terminal của mình.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-info">Phân giải</span>Ranh giới Skills: Zed Skills vs External Agent Skills</strong>
+          <span>Zed Skills (từ <code>skills.sh</code>, <code>~/.agents/skills/</code>) <strong>KHÔNG ĐƯỢC CHUYỂN</strong> sang External Agents qua giao thức ACP. Zed không mở endpoint <code>skill</code> tool cho ACP agents. Thay vào đó, mỗi agent tự quét filesystem theo quy ước riêng:
+          <br>• <strong>Claude:</strong> Đọc <code>CLAUDE.md</code>, thư mục <code>.claude/skills/</code>, hỗ trợ nhận instructions qua <code>_meta.systemPrompt</code>.
+          <br>• <strong>Codex:</strong> Đọc <code>AGENTS.md</code> chuẩn ACP, thư mục <code>skills/</code> (chứa <code>SKILL.md</code>); adapter 2.1.1 <em>không</em> đọc <code>_meta</code> cho instructions.
+          <br>• <strong>Antigravity:</strong> Quét các thư mục skill toàn cục <code>~/.gemini/antigravity-cli/skills</code>, <code>.agents/skills</code>, hỗ trợ đầy đủ gói <code>SKILL.md</code> (YAML frontmatter + body) và lọc công cụ qua <code>_meta.agy.enabledTools</code>.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-warning">Đính chính</span>Phân định rõ ràng: Antigravity ACP vs Gemini CLI</strong>
+          <span>Mã nguồn Zed có xử lý đặc biệt cho <code>GEMINI_ID = "gemini"</code> (bơm <code>SURFACE="zed"</code>, auth <code>spawn-gemini-cli</code>). Tuy nhiên, <strong>Google Antigravity là một ACP agent độc lập</strong> trong registry (<code>antigravity-acp</code> 1.3.0, binary độc quyền <code>agy_acp_server</code>), không đồng nhất với Gemini CLI. Antigravity sử dụng bộ công cụ và hệ thống quyền riêng (<code>default</code>, <code>auto_edit</code>, <code>yolo</code>).</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-info">Điều phối</span>Client FS Tools (fs/read_text_file & fs/write_text_file)</strong>
+          <span>Khi external agent cần đọc hoặc chỉnh sửa buffer trực tiếp trong Zed, agent gọi ngược RPC <code>fs/read_text_file</code> và <code>fs/write_text_file</code>. Zed kiểm tra nghiêm ngặt ranh giới workspace (path containment), đồng bộ buffer đang mở và tự động ghi nhận thay đổi vào <code>ActionLog</code> để người dùng có thể xem diff và undo an toàn.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-info">RPC</span>Deduplication & Concurrency (open_or_create_session)</strong>
+          <span>Zed quản lý <code>pending_sessions: HashMap&lt;SessionId, PendingAcpSession&gt;</code>. Khi nhiều yêu cầu mở lại cùng một session đồng thời, tất cả dùng chung <code>Shared&lt;Task&lt;...&gt;&gt;</code> để đảm bảo chỉ có 1 RPC <code>session/load</code> duy nhất trên wire.</span>
+        </div>
+        <div class="boundary">
+          <strong><span class="badge badge-info">Giao thức</span>Ưu tiên Cấu hình V2 (config_options thay thế modes)</strong>
+          <span>Nếu agent phản hồi mảng <code>configOptions</code>, Zed chuyển đổi sang chuẩn V2 và gán <code>modes = None</code>. Cơ chế <code>modes</code> legacy chỉ được kích hoạt khi <code>configOptions</code> hoàn toàn vắng mặt. Zed áp dụng cấu hình bằng vòng lặp bất đồng bộ <code>apply_default_config_options</code> có bảo vệ chống lặp chu kỳ <code>attempted_defaults</code>.</span>
+        </div>
+      </section>
+    </div>
+    <footer>
+      <span>Phạm vi: Đối chiếu trực tiếp mã nguồn Zed (crates/agent_servers, crates/acp_thread, crates/agent_ui, crates/agent), adapters (@agentclientprotocol/claude-agent-acp 0.86.0, codex-acp 2.1.1, antigravity-acp 1.3.0) và ACP Specification.</span>
+      <span><a href="crates/agent_servers/src/acp.rs">crates/agent_servers/src/acp.rs</a> · <a href="crates/acp_thread/src/acp_thread.rs">crates/acp_thread/src/acp_thread.rs</a> · <a href="docs/src/sdlc/research-acp-delegation.md">research-acp-delegation.md</a> · <button class="print" type="button" id="print">In / lưu PDF</button></span>
+    </footer>
+  </main>
+  <script>
+    const laneDefinitions = [
+      { name: 'Zed', caption: 'Workspace · ContextServerStore · AcpThread', accent: '#1769a0', tint: '#f2f7fb' },
+      { name: 'ACP server / adapter', caption: 'JSON-RPC 2.0 · Dispatch · Notifications', accent: '#6853a1', tint: '#f7f5fb' },
+      { name: 'Runtime agent', caption: 'Claude / Codex / Antigravity', accent: '#138778', tint: '#f1f8f6' },
+      { name: 'Kho session', caption: 'Checkpoints · Rollouts · Local SQLite / Cloud', accent: '#a0752a', tint: '#faf8f2' },
+      { name: 'Filesystem', caption: 'Workspace root · Chỉ dẫn native · Client FS Tools', accent: '#68798a', tint: '#f5f7f9' },
+      { name: 'MCP servers', caption: 'Stdio (local/remote) · HTTP Transports · Tools', accent: '#a45e70', tint: '#fbf5f7' }
+    ];
+    const workspace = '/Users/binn/Projects/app-factory/zed-ai-crew';
+    let currentMode = 'new';
+    let currentNodes = [];
+    const nodesElement = document.getElementById('nodes');
+    const svg = document.getElementById('connections');
+    const namespace = 'http://www.w3.org/2000/svg';
+
+    laneDefinitions.forEach((lane, index) => {
+      const element = document.createElement('div');
+      element.className = 'lane';
+      element.style.setProperty('--accent', lane.accent);
+      element.style.setProperty('--tint', lane.tint);
+      const heading = document.createElement('div');
+      heading.className = 'lane-heading';
+      const title = document.createElement('strong');
+      title.textContent = `${String(index + 1).padStart(2, '0')}  ${lane.name}`;
+      const caption = document.createElement('span');
+      caption.textContent = lane.caption;
+      heading.append(title, caption);
+      element.append(heading);
+      document.getElementById('lanes').append(element);
+    });
+
+    function requestPayload() {
+      const params = { cwd: workspace, mcpServers: [] };
+      if (currentMode === 'load') params.sessionId = 'sess_01J9ABCDEF1234567890XYZ';
+      return { jsonrpc: '2.0', id: currentMode === 'new' ? 123 : 124, method: `session/${currentMode}`, params };
+    }
+
+    function definitions() {
+      const loading = currentMode === 'load';
+      const nodes = [
+        // ==================== PHASE 01: CHUẨN BỊ MÔI TRƯỜNG ====================
+        {
+          id: 'start',
+          lane: 0,
+          top: 115,
+          tag: 'Khởi đầu · UI & Store',
+          title: loading ? 'Mở lại thread đã lưu' : 'Tạo thread mới',
+          description: loading ? 'Kiểm tra capabilities, deduplicate và tái sử dụng thread sống.' : 'Khởi tạo AcpThread, nạp workspace và xác thực kết nối.',
+          code: loading ? 'ConversationView::load_session()' : 'ConversationView::new_session()',
+          parameters: loading ? [
+            ['sessionId → SessionId', 'Khôi phục từ saved thread state trong KVP.'],
+            ['supports_load_session()', 'Kiểm tra agent_capabilities.load_session. Nếu true, gọi load_session (replay qua session/update).'],
+            ['supports_resume_session()', 'Nếu agent chỉ hỗ trợ resume (resume.is_some()), gọi resume_session (resumed_without_history = true).'],
+            ['pending_sessions', 'Deduplication qua HashMap<SessionId, PendingAcpSession>. Nhiều caller dùng chung Shared<Task<...>>.'],
+            ['live_thread_reuse', 'Nếu AcpThread còn sống trong memory (sessions.get()), trả về ngay không gửi RPC mới.']
+          ] : [
+            ['agent_id → AgentId', 'ID agent từ Registry hoặc settings (claude-acp, codex-acp, antigravity-acp, gemini).'],
+            ['work_dirs → PathList', 'Danh sách thư mục làm việc mở trong workspace.'],
+            ['initialize handshake', 'Đã hoàn tất InitializeRequest; thương lượng capabilities fs (read/write), terminal, elicitation, auth.'],
+            ['credential injection', 'Tự động nạp API key từ macOS Keychain / Env (GEMINI_API_KEY, OPENAI_API_KEY).']
+          ],
+          detail: loading
+            ? 'Luồng load session trong crates/agent_ui/src/conversation_view.rs và crates/agent_servers/src/acp.rs. Zed kiểm tra capabilities: nếu hỗ trợ load_session thì phát lại lịch sử qua session/update; nếu chỉ hỗ trợ resume thì khôi phục phiên không lịch sử. Concurrency guard bằng pending_sessions đảm bảo không trùng lặp Task.'
+            : 'Luồng tạo mới session từ Agent Panel hoặc Threads Sidebar. Kết nối AcpConnection đã hoàn tất handshake InitializeRequest với các client capabilities (fs read/write, terminal display, boolean config options, elicitation). Zed tự nạp credentials phù hợp vào môi trường agent trước khi yêu cầu tạo phiên.',
+          payload: loading ? {
+            rust_function: 'crates/agent_ui/src/conversation_view.rs::load_session',
+            session_id: 'sess_01J9ABCDEF1234567890XYZ',
+            agent_capabilities: {
+              load_session: true,
+              session_capabilities: { additional_directories: true, resume: false }
+            },
+            in_flight_deduplication: 'pending_sessions.get(&session_id) -> Shared<Task<...>>'
+          } : {
+            rust_function: 'crates/agent_ui/src/conversation_view.rs::new_session',
+            agent_id: 'claude-acp',
+            work_dirs: [workspace, '/projects/shared-library'],
+            negotiated_capabilities: {
+              fs: { read_text_file: true, write_text_file: true },
+              terminal: true,
+              auth: { terminal: true },
+              session: { config_options: { boolean: true }, additional_directories: true }
+            }
+          }
+        },
+        {
+          id: 'prepare',
+          lane: 0,
+          top: 310,
+          tag: 'Chuẩn bị · Store & FS',
+          title: 'Tập hợp workspace + MCP',
+          description: 'session_directories_from_work_dirs + mcp_servers_for_project.',
+          code: 'session_directories_from_work_dirs()\nmcp_servers_for_project()',
+          parameters: [
+            ['cwd → PathBuf', 'Đường dẫn đầu tiên work_dirs.ordered_paths().next(). Bắt buộc không rỗng (lỗi nếu rỗng).'],
+            ['additional_directories', 'Các thư mục còn lại. CHỈ gửi nếu agent_capabilities.session_capabilities.additional_directories.is_some().'],
+            ['mcpServers (stdio)', 'Đọc từ ContextServerStore. CHỈ gửi nếu is_local || *remote (dự án remote chỉ nhận server có cờ remote: true).'],
+            ['mcpServers (http)', 'Gửi { type: "http", name, url, headers }. Zed chủ động loại bỏ timeout và oauth trước khi serialize.'],
+            ['extra_env injection', 'Gemini CLI: bơm SURFACE="zed", GEMINI_API_KEY (từ keychain nếu thiếu). Codex: bơm OPENAI_API_KEY.']
+          ],
+          detail: 'Triển khai chi tiết tại crates/agent_servers/src/acp.rs::session_directories_from_work_dirs và mcp_servers_for_project. cwd là thư mục gốc đầu tiên. Các root bổ sung chỉ được serialize khi agent thông báo hỗ trợ additional_directories. MCP stdio được kiểm tra ràng buộc remote nghiêm ngặt.',
+          payload: {
+            cwd: workspace,
+            additionalDirectories: ['/projects/shared-library'],
+            mcpServers: [
+              {
+                name: 'github',
+                command: '/usr/local/bin/mcp-server-github',
+                args: ['--stdio'],
+                env: [{ name: 'GITHUB_TOKEN', value: '<gia-tri-thuc-te>' }]
+              },
+              {
+                type: 'http',
+                name: 'internal-docs',
+                url: 'https://mcp.internal.company.com/sse',
+                headers: [{ name: 'Authorization', value: 'Bearer <gia-tri-thuc-te>' }]
+              }
+            ],
+            injected_env: {
+              SURFACE: 'zed',
+              GEMINI_API_KEY: '<tu-keychain-hoac-env>'
+            }
+          }
+        },
+
+        // ==================== PHASE 02: REQUEST QUA ACP ====================
+        {
+          id: 'send',
+          lane: 0,
+          top: 540,
+          tag: 'Request · JSON-RPC 2.0',
+          title: `Gửi session/${currentMode}`,
+          description: loading ? 'acp::LoadSessionRequest qua kênh RPC stdio/ipc.' : 'acp::NewSessionRequest qua kênh RPC stdio/ipc.',
+          code: `acp::${loading ? 'LoadSessionRequest' : 'NewSessionRequest'}\nconnection.send_request(...).block_task()`,
+          parameters: [
+            ['method', `session/${currentMode} (JSON-RPC 2.0 request)`],
+            ['params', loading ? '{ sessionId, cwd, mcpServers, additionalDirectories? }' : '{ cwd, mcpServers, additionalDirectories? }'],
+            ['_meta field', 'Vắng mặt trong request session setup; Zed không đính kèm metadata ở bước này.'],
+            ['task lifecycle', 'Thực thi bất đồng bộ; kết quả được bọc trong Task<Result<Entity<AcpThread>>>.']
+          ],
+          detail: 'Yêu cầu RPC được gửi qua AcpConnection::send_request. Nếu luồng bị hủy hoặc view bị đóng giữa chừng, Zed sẽ hủy task và gọi close_session_and_drain để giải phóng tài nguyên phía agent server an toàn.',
+          payload: requestPayload()
+        },
+        {
+          id: 'receive',
+          lane: 1,
+          top: 540,
+          tag: 'ACP Server / Adapter',
+          title: 'Nhận & giải mã request',
+          description: `Phân giải params từ Zed qua session/${currentMode}.`,
+          code: loading ? '{ sessionId, cwd, mcpServers,\n  additionalDirectories? }' : '{ cwd, mcpServers,\n  additionalDirectories? }',
+          parameters: [
+            ...(loading ? [['sessionId → string', 'Bắt buộc khi load: ID phiên agent đã cấp từ trước.']] : []),
+            ['cwd → string', 'Đường dẫn tuyệt đối của thư mục làm việc đầu tiên.'],
+            ['mcpServers → array', 'Danh sách MCP chuyển tiếp; [] nếu không có server hợp lệ.'],
+            ['MCP stdio', '{ name, command, args, env: [{ name, value }] } (không có discriminator type).'],
+            ['MCP HTTP', '{ type: "http", name, url, headers: [{ name, value }] } (đã bỏ timeout & oauth).'],
+            ['additionalDirectories', 'Chỉ xuất hiện nếu agent công bố hỗ trợ và workspace có nhiều hơn 1 folder.'],
+            ['_meta', 'Zed không gán; trường này vắng mặt trong request khởi tạo.']
+          ],
+          detail: 'Params ACP nhận được trên kênh giao tiếp trước khi adapter chuyển giao tới runtime. Mọi đường dẫn thư mục là đường dẫn filesystem, không chứa dữ liệu file. Giá trị biến môi trường và headers HTTP được truyền nguyên bản.',
+          payload: {
+            jsonrpc: '2.0',
+            id: loading ? 124 : 123,
+            method: `session/${currentMode}`,
+            params: {
+              ...(loading ? { sessionId: 'sess_01J9ABCDEF1234567890XYZ' } : {}),
+              cwd: workspace,
+              mcpServers: [
+                { name: 'github', command: '/usr/local/bin/mcp-server-github', args: ['--stdio'], env: [{ name: 'GITHUB_TOKEN', value: '<gia-tri-thuc-te>' }] },
+                { type: 'http', name: 'internal-docs', url: 'https://mcp.internal.company.com/sse', headers: [{ name: 'Authorization', value: 'Bearer <gia-tri-thuc-te>' }] }
+              ],
+              additionalDirectories: ['/projects/shared-library']
+            }
+          }
+        },
+        {
+          id: 'execute',
+          lane: 2,
+          top: 540,
+          tag: 'Runtime Agent',
+          title: loading ? 'Khôi phục phiên & kết nối MCP' : 'Tạo runtime & cấp sessionId',
+          description: loading ? 'Tra cứu ID, khởi tạo MCP client, sẵn sàng phát replay.' : 'Khởi tạo context mới, cấp sessionId, khởi động MCP stdio/HTTP.',
+          code: loading ? 'runtime.load_session(sessionId)' : 'runtime.new_session(cwd, mcpServers)',
+          parameters: [
+            ['sessionId', loading ? 'Tra cứu state từ kho lưu trữ của agent.' : 'Sinh UUID / token định danh duy nhất cho phiên mới.'],
+            ['MCP connections', 'Runtime kích hoạt process MCP stdio hoặc mở kết nối HTTP từ danh sách mcpServers.'],
+            ['Sandbox context', 'Thiết lập phạm vi quyền truy cập filesystem tương ứng với cwd và additionalDirectories.']
+          ],
+          detail: loading
+            ? 'Runtime của agent nhận sessionId và cấu hình MCP hiện tại từ Zed. Nó đọc lại lịch sử cuộc trò chuyện từ kho lưu trữ của chính mình, tái tạo context model và chuẩn bị phát lại lịch sử qua các notification session/update.'
+            : 'Runtime khởi tạo phiên làm việc mới. Nó sinh ra một sessionId duy nhất, cấu hình sandbox và khởi chạy các process kết nối MCP server được chỉ định trong payload.',
+          payload: {
+            runtime_action: loading ? 'restore_context_and_prepare_replay' : 'allocate_new_session',
+            session_id: 'sess_01J9ABCDEF1234567890XYZ',
+            mcp_client_status: 'connecting_to_stdio_and_http_servers',
+            workspace_scope: [workspace, '/projects/shared-library']
+          }
+        },
+
+        // ==================== PHASE 03: REPLAY & RESPONSE ====================
+        {
+          id: 'response',
+          lane: 1,
+          top: 780,
+          tag: loading ? 'Replay + Response' : 'Response · NewSessionResponse',
+          title: loading ? 'Phát session/update & trả response' : 'Trả NewSessionResponse',
+          description: loading ? 'Stream chuỗi notification cập nhật lịch sử, sau đó trả RPC response.' : 'Trả sessionId mới cùng danh sách modes / configOptions.',
+          code: loading ? 'session/update (replay)* → acp::LoadSessionResponse' : 'acp::NewSessionResponse { sessionId, configOptions?, modes? }',
+          parameters: loading ? [
+            ['UserMessageChunk', 'Chunks của user (Zed đối chiếu khử trùng lặp với message optimistic trong memory).'],
+            ['AgentMessage / ThoughtChunk', 'Chunks phản hồi của trợ lý và khối suy nghĩ (thinking).'],
+            ['ToolCall (+ terminal_info)', 'Thông tin gọi tool. Nếu mang terminal_info, Zed dựng terminal display-only.'],
+            ['ToolCallUpdate (+ terminal_out)', 'Kết quả tool; stream stdout qua terminal_output và mã thoát qua terminal_exit.'],
+            ['CompactionUpdate', 'Thông báo cắt gọn ngữ cảnh / nén hội thoại.'],
+            ['LoadSessionResponse', 'Sau khi replay xong, trả { modes?, configOptions? } kết thúc RPC load.'],
+            ['Quy tắc ưu tiên cấu hình', 'Trong Zed: nếu có configOptions, Zed đặt modes = None. configOptions thay thế hoàn toàn modes!']
+          ] : [
+            ['sessionId → string', 'Bắt buộc: ID phiên mới do agent cấp (ví dụ sess_01J9...).'],
+            ['configOptions? → array', 'ƯU TIÊN CAO NHẤT trong Zed. Nếu có, modes bị bỏ qua (None).'],
+            ['modes? → object', 'Chỉ dùng khi configOptions hoàn toàn vắng mặt (cơ chế legacy).']
+          ],
+          detail: loading
+            ? 'ĐẶC TÍNH THEN CHỐT TRONG ACP & ZED: Trước khi trả về response cho session/load, agent stream toàn bộ lịch sử qua chuỗi notification session/update. Zed bắt từng notification trong crates/agent_servers/src/acp.rs::handle_session_notification và cập nhật vào AcpThread entity. Đặc biệt, ToolCall mang metadata terminal_info sẽ tự động kích hoạt TerminalBuilder::new_display_only trong Zed.'
+            : 'Agent phản hồi NewSessionResponse chứa sessionId, kèm danh sách modes và/hoặc configOptions. Hàm config_state trong acp.rs kiểm tra: nếu agent cung cấp configOptions thì Zed sẽ ưu tiên dùng configOptions và gán modes = None.',
+          payload: loading ? {
+            replayed_notifications: [
+              { method: 'session/update', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', update: { sessionUpdate: 'user_message_chunk', messageId: 'msg_001', content: { type: 'text', text: 'Kiểm tra external agents data flow' } } } },
+              { method: 'session/update', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', update: { sessionUpdate: 'agent_thought_chunk', messageId: 'msg_002', content: { type: 'text', text: 'Đang phân tích mã nguồn crates/agent_servers...' } } } },
+              { method: 'session/update', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', update: { sessionUpdate: 'tool_call', toolCallId: 'call_001', title: 'cargo check', meta: { terminal_info: { terminal_id: 'term_01', cwd: workspace } } } } }
+            ],
+            rpc_response: {
+              jsonrpc: '2.0',
+              id: 124,
+              result: {
+                configOptions: [
+                  { id: 'model', name: 'Model', kind: 'select', currentValue: 'claude-3-7-sonnet-latest', options: [{ value: 'claude-3-7-sonnet-latest', name: 'Claude 3.7 Sonnet' }] },
+                  { id: 'fast', name: 'Fast Mode', kind: 'boolean', currentValue: false }
+                ]
+              }
+            }
+          } : {
+            jsonrpc: '2.0',
+            id: 123,
+            result: {
+              sessionId: 'sess_01J9ABCDEF1234567890XYZ',
+              configOptions: [
+                { id: 'model', name: 'Model', kind: 'select', currentValue: 'claude-3-7-sonnet-latest', options: [{ value: 'claude-3-7-sonnet-latest', name: 'Claude 3.7 Sonnet' }] },
+                { id: 'mode', name: 'Permission Mode', kind: 'select', currentValue: 'default', options: [{ value: 'default', name: 'Default' }, { value: 'acceptEdits', name: 'Accept Edits' }] }
+              ]
+            }
+          }
+        },
+        {
+          id: 'ready',
+          lane: 0,
+          top: 780,
+          tag: 'Giao diện · AcpThread',
+          title: 'Dựng thread & đăng ký session',
+          description: 'Tạo ActionLog, AcpThread, gắn sessionId và kết nối UI.',
+          code: 'AcpThread::new() · register_session()',
+          parameters: [
+            ['AcpThread::new()', 'Thực thể GPUI quản lý entries hội thoại, action log của project, và kênh watch prompt_capabilities().'],
+            ['register_session()', 'Lưu session vào ctx.sessions: HashMap<SessionId, AcpSession> để định tuyến notifications.'],
+            ['TerminalProvider', 'Đăng ký listener quản lý terminal do agent tạo qua tool call (TerminalProviderEvent::Created/Output).'],
+            ['drain_foreground_queue', 'Nếu load thất bại, Zed dùng barrier drain_foreground_queue để triệt tiêu thông báo rác, không rò rỉ sang thread mới.']
+          ],
+          detail: 'Zed khởi tạo thực thể AcpThread và đăng ký vào bảng quản lý session của kết nối. Thread được gắn vào Agent Panel hoặc Conversation View; giao diện hiển thị danh sách tin nhắn đã phát lại, thanh chọn mode và các picker cấu hình.',
+          payload: {
+            registered_session: {
+              session_id: 'sess_01J9ABCDEF1234567890XYZ',
+              thread_entity: 'Entity<AcpThread>',
+              action_log: 'Entity<ActionLog>',
+              config_precedence: 'config_options prioritized over modes',
+              terminal_provider: 'Active (handles terminal_info and output streaming)',
+              prompt_capabilities: { image: true, streaming: true }
+            }
+          }
+        },
+
+        // ==================== PHASE 04: CẤU HÌNH & MODE ====================
+        {
+          id: 'defaults',
+          lane: 0,
+          top: 1100,
+          tag: 'Cấu hình tự động · Zed',
+          title: 'Áp dụng default cấu hình',
+          description: 'Tự động áp dụng default_mode và duyệt vòng lặp apply_default_config_options.',
+          code: 'apply_default_config_options()\nsession/set_mode?',
+          parameters: [
+            ['default_mode', 'Đọc từ AllAgentServersSettings. Nếu modes khả dụng (configOptions = None), cập nhật UI lạc quan và gửi session/set_mode ngầm.'],
+            ['apply_default_config_options()', 'Vòng lặp trong acp.rs:1333: duyệt từng option chưa khớp với cấu hình của user trong settings.json.'],
+            ['Select & Boolean kind', 'Hỗ trợ khớp option value (cả ungrouped lẫn grouped) và boolean value.'],
+            ['attempted_defaults guard', 'Ghi nhớ (config_id, current_options) đã thử để tránh rơi vào vòng lặp vô hạn khi có xung đột cấu hình phụ thuộc.'],
+            ['defaults.observe_settings()', 'Zed lắng nghe SettingsStore để tự động gửi set_config_option ngay khi người dùng sửa file settings.']
+          ],
+          optional: true,
+          detail: 'Sau khi nhận NewSessionResponse hoặc LoadSessionResponse, Zed tự động đồng bộ các giá trị mặc định mà người dùng đã thiết lập trong settings.json thông qua apply_default_config_options trong acp.rs với cơ chế phòng ngừa lặp vô hạn.',
+          payload: {
+            settings_source: 'settings.json -> agent_servers.claude-acp',
+            execution_loop: [
+              { step: 1, method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'model', value: 'claude-3-7-sonnet-latest' }, outcome: 'Agent trả catalog configOptions cập nhật' },
+              { step: 2, method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'fast', type: 'boolean', value: true }, outcome: 'Áp dụng boolean option thành công' }
+            ],
+            mode_fallback: {
+              method: 'session/set_mode',
+              params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', modeId: 'acceptEdits' },
+              condition: 'Chỉ gửi khi configOptions vắng mặt và modes khả dụng'
+            }
+          }
+        },
+        {
+          id: 'config-claude',
+          lane: 1,
+          top: 940,
+          tag: 'Claude ACP · 0.86.0',
+          title: 'Claude: params cấu hình',
+          description: 'Mỗi request đổi một configId. Chỉ dùng option phiên công bố.',
+          code: 'session/set_config_option\n{ sessionId, configId, value }\nBoolean thêm type: "boolean"',
+          parameters: [
+            ['model → string', 'ID từ configOptions của phiên; có thể có "default". SDK: setModel(model).'],
+            ['mode → string', 'default | acceptEdits | plan | auto; bypassPermissions chỉ khi được cho phép. SDK: setPermissionMode(effectiveMode).'],
+            ['effort → string', 'Mức từ supportedEffortLevels của model. SDK flags: effortLevel = value.'],
+            ['fast → boolean', 'true | false; adapter cũng nhận "on" | "off". SDK flags: fastMode = enabled.'],
+            ['agent → string', 'ID subagent từ catalog hoặc "default". SDK flags: agent = ID.'],
+            ['session/set_mode', '{ sessionId, modeId }; modeId dùng cùng catalog mode ở trên.']
+          ],
+          optional: true,
+          detail: 'Đối chiếu adapter Claude tag v0.86.0 (@agentclientprotocol/claude-agent-acp). Các flags SDK được áp dụng qua applyFlagSettings; agent là lựa chọn subagent cho turn tiếp theo. Response set_config_option trả configOptions mới.',
+          payload: [
+            { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'model', value: 'claude-3-7-sonnet-latest' } },
+            { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'mode', value: 'plan' } },
+            { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'fast', type: 'boolean', value: true } },
+            { method: 'session/set_mode', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', modeId: 'acceptEdits' } }
+          ]
+        },
+        {
+          id: 'config-codex',
+          lane: 1,
+          top: 1140,
+          tag: 'Codex ACP · 2.1.1',
+          title: 'Codex: params cấu hình',
+          description: 'Mỗi request đổi một configId. Native fields do adapter tạo.',
+          code: 'session/set_config_option\n{ sessionId, configId, value }\nBoolean thêm type: "boolean"',
+          parameters: [
+            ['model → string', 'ID từ availableModels/catalog phiên. turn/start: model.'],
+            ['reasoning_effort → string', 'Mức từ supportedReasoningEfforts của model. turn/start: effort.'],
+            ['mode → string', 'read-only | workspace-write | agent | agent-full-access. turn/start: approvalPolicy + sandboxPolicy.'],
+            ['collaboration_mode → string', 'default | plan. thread/settings/update: threadId, collaborationMode.'],
+            ['fast-mode → boolean', 'true | false; turn/start: serviceTier = "fast" nếu bật và được hỗ trợ.'],
+            ['session/set_mode', '{ sessionId, modeId }; modeId dùng bốn giá trị mode ở trên.']
+          ],
+          optional: true,
+          detail: 'Đối chiếu bản codex-acp 2.1.1 đã tích hợp trong Zed. model, reasoning_effort, mode và fast-mode cập nhật trạng thái adapter, rồi đi vào turn/start khi có prompt tiếp theo; collaboration_mode gọi thread/settings/update ngay. mode ánh xạ sandboxPolicy nghiêm ngặt.',
+          payload: {
+            acp_requests: [
+              { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'mode', value: 'agent' } },
+              { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'collaboration_mode', value: 'plan' } },
+              { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'fast-mode', type: 'boolean', value: true } }
+            ],
+            native_mode_mapping: {
+              'read-only': { approvalPolicy: 'on-request', approvalsReviewer: 'user', sandboxPolicy: { type: 'readOnly', networkAccess: false } },
+              'workspace-write': { approvalPolicy: 'on-request', approvalsReviewer: 'user', sandboxPolicy: { type: 'workspaceWrite', writableRoots: [], networkAccess: false } },
+              agent: { approvalPolicy: 'on-request', approvalsReviewer: 'auto_review', sandboxPolicy: { type: 'workspaceWrite', writableRoots: [], networkAccess: false } },
+              'agent-full-access': { approvalPolicy: 'never', approvalsReviewer: 'user', sandboxPolicy: { type: 'dangerFullAccess' } }
+            }
+          }
+        },
+        {
+          id: 'config-antigravity',
+          lane: 1,
+          top: 1340,
+          tag: 'Antigravity / Gemini CLI',
+          title: 'Antigravity / Gemini: cấu hình & auth',
+          description: 'Định danh GEMINI_ID trong Zed; auth terminal spawn-gemini-cli và env injection.',
+          code: 'session/set_config_option\n{ sessionId, configId, value }\nBoolean thêm type: "boolean"',
+          parameters: [
+            ['GEMINI_ID = "gemini"', 'Định danh agent chính thức trong crates/agent_servers/src/custom.rs.'],
+            ['spawn-gemini-cli', 'GEMINI_TERMINAL_AUTH_METHOD_ID: mở terminal chạy gemini /auth (tự động loại bỏ cờ --acp).'],
+            ['Env SURFACE="zed"', 'Zed tự động inject SURFACE="zed" vào biến môi trường agent process.'],
+            ['Keychain API Key', 'Tự nạp GEMINI_API_KEY từ macOS Keychain (ApiKey::load_from_system_keychain) nếu chưa export.'],
+            ['PR #6656 workaround', 'acp.rs:1919: bắt và triệt tiêu thông báo lỗi giả khi hủy prompt ("This operation was aborted").'],
+            ['configOptions schema', 'Tiếp nhận catalog configOptions phản hồi từ Antigravity/Gemini (Select & Boolean).']
+          ],
+          optional: true,
+          detail: 'Khi cấu hình agent Gemini / Antigravity, Zed hỗ trợ auth terminal thông qua phương thức spawn-gemini-cli (chạy gemini /auth và tự động strip cờ --acp). Khóa API được tự động trích xuất từ hệ thống Keychain của máy.',
+          payload: {
+            zed_registration: {
+              agent_id: 'gemini',
+              constant: 'GEMINI_ID in crates/agent_servers/src/custom.rs',
+              auth_method_id: 'spawn-gemini-cli',
+              auth_terminal_command: 'gemini /auth (strips --acp / --experimental-acp)'
+            },
+            runtime_env: {
+              SURFACE: 'zed',
+              GEMINI_API_KEY: '<tu-dong-nap-tu-macos-keychain>'
+            },
+            acp_config_schema: [
+              { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'model', value: 'gemini-2.5-pro' } },
+              { method: 'session/set_config_option', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', configId: 'thinking', type: 'boolean', value: true } },
+              { method: 'session/set_mode', params: { sessionId: 'sess_01J9ABCDEF1234567890XYZ', modeId: '<mode-id-neu-co>' } }
+            ]
+          }
+        },
+        {
+          id: 'apply',
+          lane: 2,
+          top: 1140,
+          tag: 'Runtime Agent',
+          title: 'Áp dụng vào runtime đã chọn',
+          description: 'Claude, Codex hoặc Antigravity; trả kết quả qua ACP.',
+          optional: true,
+          detail: 'Điểm kết thúc của nhánh cấu hình ứng với agent của thread. Runtime áp dụng cờ cấu hình (model, permission policies, thinking, subagent) và ACP adapter phản hồi kết quả về Zed để cập nhật giao diện.',
+          payload: {
+            status: 'configurations_applied',
+            session_id: 'sess_01J9ABCDEF1234567890XYZ',
+            active_options_reflected: true
+          }
+        },
+
+        // ==================== PHASE 05: PHÂN GIẢI SKILLS & QUY TẮC ====================
+        {
+          id: 'skills-boundary',
+          lane: 0,
+          top: 1560,
+          tag: 'Ranh giới Zed Skills',
+          title: 'Không tự động nạp Zed Skills',
+          description: 'Zed Skills (~/.agents/skills) KHÔNG chuyển qua ACP; Zed không mở skill tool cho external agent.',
+          code: 'crates/agent_servers/src/acp.rs\nNewSessionRequest (no skills catalog)',
+          parameters: [
+            ['Zed Skills Isolation', 'Các skill cài từ skills.sh hay ~/.agents/skills chỉ phục vụ native agent.'],
+            ['No skill tool over ACP', 'Zed không công bố tool "skill" trong InitializeRequest capabilities.'],
+            ['Prompt Prepend Workaround', 'Nếu muốn external agent dùng skill của Zed, phải đưa nội dung Markdown vào message đầu tiên.']
+          ],
+          optional: true,
+          detail: 'Khác với Native Agent vốn có tool "skill" tự động tìm kiếm trong ~/.agents/skills và project .agents/skills, giao thức ACP không có trường chuẩn để truyền danh mục skill trong session/new hay session/load. Zed hoàn toàn không chia sẻ runtime skill của mình cho external agent.',
+          payload: {
+            zed_skills_propagation: false,
+            exposed_client_capabilities: ['fs', 'terminal', 'auth', 'elicitation'],
+            skill_injection_workaround: 'Prepend skill Markdown directly into conversation prompt'
+          }
+        },
+        {
+          id: 'skills-fs',
+          lane: 4,
+          top: 1560,
+          tag: 'Filesystem Workspace',
+          title: 'Thư mục cấu hình & Skills',
+          description: 'Agent tự động quét các tệp hướng dẫn và thư mục skill trên đĩa theo quy ước riêng.',
+          code: 'Disk Scan: cwd & ~/.<agent>/\nCLAUDE.md · AGENTS.md · SKILL.md',
+          parameters: [
+            ['CLAUDE.md & .claude/skills/', 'Tệp chỉ dẫn và thư mục skill riêng của Claude Code.'],
+            ['AGENTS.md & .codex/skills/', 'Đặc tả chỉ dẫn chung chuẩn ACP & thư mục skill của Codex.'],
+            ['~/.gemini/antigravity-cli/skills', 'Thư mục skill toàn cục & .gemini/skills của Antigravity.'],
+            ['SKILL.md format', 'Cấu trúc YAML frontmatter (name, description) kèm phần thân Markdown.']
+          ],
+          optional: true,
+          detail: 'Mỗi external agent chịu trách nhiệm tự truy cập filesystem để nạp các tệp hướng dẫn riêng. Quá trình này diễn ra độc lập trong runtime của agent, không thông qua trung gian dữ liệu của Zed.',
+          payload: {
+            scanned_locations: {
+              claude: ['CLAUDE.md', '.claude/rules/*.md', '~/.claude/skills/'],
+              codex: ['AGENTS.md', '.codex/instructions.md', 'skills/*/SKILL.md', '~/.codex/skills/'],
+              antigravity: ['~/.gemini/antigravity-cli/skills/', '~/.gemini/config/skills/', '.agents/skills/', '.gemini/skills/']
+            }
+          }
+        },
+        {
+          id: 'skills-claude',
+          lane: 2,
+          top: 1460,
+          tag: 'Claude Skills · 0.86.0',
+          title: 'Claude: Nạp Skills & Chỉ dẫn',
+          description: 'Quét CLAUDE.md, thư mục .claude/skills/, nhận _meta.systemPrompt từ ACP.',
+          code: '_meta.systemPrompt { append: "..." }\nCLAUDE.md · ~/.claude/skills/',
+          parameters: [
+            ['_meta.systemPrompt', 'Hỗ trợ chuỗi thay thế hoặc object { append: "..." } nối thêm vào preset claude_code.'],
+            ['CLAUDE.md & rules', 'Tự động đọc hướng dẫn dự án từ CLAUDE.md và thư mục .claude/rules/.'],
+            ['Native Skills', 'Đọc các skill trong ~/.claude/skills/ hoặc kích hoạt qua slash commands riêng.'],
+            ['_meta.claudeCode.options', 'Nhận options SDK bổ sung: disallowedTools, hooks, custom presets.']
+          ],
+          optional: true,
+          detail: 'Adapter claude-agent-acp (0.86.0) kiểm tra _meta.systemPrompt trong session/new: nếu là string thì thay toàn bộ prompt, nếu là { append: string } thì nối vào prompt mặc định claude_code. Đồng thời SDK tự nạp CLAUDE.md từ cwd.',
+          payload: {
+            system_prompt_handling: {
+              raw_string: 'Replaces preset claude_code completely',
+              append_object: 'Appends custom instructions to claude_code preset'
+            },
+            auto_loaded_files: ['CLAUDE.md', '.claude/rules/*.md'],
+            native_skills_directory: '~/.claude/skills/'
+          }
+        },
+        {
+          id: 'skills-codex',
+          lane: 2,
+          top: 1640,
+          tag: 'Codex Skills · 2.1.1',
+          title: 'Codex: Nạp Skills & Rules',
+          description: 'Quét AGENTS.md chuẩn ACP, skills/*/SKILL.md; KHÔNG đọc _meta instructions.',
+          code: 'AGENTS.md · skills/ · .codex/skills/\nNo _meta instructions support',
+          parameters: [
+            ['AGENTS.md', 'Tệp chuẩn theo đặc tả Agent Client Protocol đặt tại thư mục gốc dự án.'],
+            ['skills/ directory', 'Quét các gói skill chứa SKILL.md trong workspace và ~/.codex/skills/.'],
+            ['Không hỗ trợ _meta', 'Adapter codex-acp 2.1.1 KHÔNG đọc _meta để nạp instructions từ RPC session/new.'],
+            ['Developer instructions', 'Chỉ có thể truyền qua AGENTS.md hoặc chèn trực tiếp vào prompt tin nhắn.']
+          ],
+          optional: true,
+          detail: 'Mã nguồn @agentclientprotocol/codex-acp 2.1.1 gọi App Server threadStart nhưng không map bất kỳ trường _meta nào vào developerInstructions hay baseInstructions. Vì vậy mọi hướng dẫn chuyên biệt và skill cho Codex phải được tổ chức thành tệp AGENTS.md hoặc đặt trong thư mục skills/.',
+          payload: {
+            instruction_sources: ['AGENTS.md', '.codex/instructions.md', 'skills/*/SKILL.md'],
+            meta_instructions_read: false,
+            recommended_injection: 'Write to AGENTS.md in worktree or prepend to first message'
+          }
+        },
+        {
+          id: 'skills-antigravity',
+          lane: 2,
+          top: 1820,
+          tag: 'Antigravity Skills · 1.3.0',
+          title: 'Antigravity: Nạp Skills & Packages',
+          description: 'Quét user-global skill dirs và workspace .agents/skills; quản lý subagents.',
+          code: 'SKILL.md (YAML frontmatter + body)\n_meta.agy.enabledTools / disabledTools',
+          parameters: [
+            ['Global Skill Dirs', 'Quét ~/.gemini/antigravity-cli/skills và ~/.gemini/config/skills.'],
+            ['Workspace Skills', 'Tự động quét .agents/skills và .gemini/skills trong workspace.'],
+            ['SKILL.md package', 'Đọc package SKILL.md chuẩn YAML frontmatter (name, description, disable-model-invocation).'],
+            ['Tool filtering', 'Nhận _meta.agy.enabledTools và disabledTools để lọc công cụ khả dụng.'],
+            ['Subagents delegation', 'Hỗ trợ các subagent chuyên trách (research, self, define_subagent).']
+          ],
+          optional: true,
+          detail: 'Binary độc quyền agy_acp_server 1.3.0 tự động quét các thư mục skill toàn cục của người dùng và thư mục dự án. Antigravity phân giải các gói skill chuẩn SKILL.md và quản lý danh mục công cụ linh hoạt thông qua metadata.',
+          payload: {
+            scanned_skill_paths: [
+              '~/.gemini/antigravity-cli/skills',
+              '~/.gemini/config/skills',
+              '/workspace/.agents/skills',
+              '/workspace/.gemini/skills'
+            ],
+            metadata_support: {
+              tool_filtering: ['_meta.agy.enabledTools', '_meta.agy.disabledTools'],
+              subagent_types: ['research', 'self', 'custom']
+            }
+          }
+        },
+
+        // ==================== PHASE 06: MA TRẬN TOOLS ====================
+        {
+          id: 'tools-client-zed',
+          lane: 0,
+          top: 2060,
+          tag: 'Dịch vụ Client Zed',
+          title: 'Xử lý FS an toàn & ActionLog',
+          description: 'Kiểm tra ranh giới workspace, ghi buffer/disk và lưu lịch sử hoàn tác ActionLog.',
+          code: 'crates/agent_servers/src/acp.rs\nhandle_read_text_file · handle_write_text_file',
+          parameters: [
+            ['Workspace Boundary Check', 'Từ chối đọc/ghi nếu đường dẫn nằm ngoài các work_dirs đã cấu hình.'],
+            ['Buffer Synchronization', 'Đồng bộ trực tiếp với Buffer Entity nếu file đang mở trong editor.'],
+            ['ActionLog Tracking', 'Mọi thao tác ghi tệp được lưu vào ActionLog để hỗ trợ tính năng Undo/Diff.'],
+            ['Elicitation Store', 'Mở modal form/URL tương tác để thu thập input của người dùng.']
+          ],
+          detail: 'Các hàm handle_read_text_file và handle_write_text_file trong acp.rs xử lý bảo mật nghiêm ngặt. Nếu agent yêu cầu ghi file, Zed kiểm tra quyền hạn, cập nhật buffer và tích hợp vào hệ thống ActionLog để người dùng có thể xem diff và khôi phục khi cần.',
+          payload: {
+            security_checks: 'Strict workspace boundary containment',
+            editor_integration: 'Live buffer update + Project ActionLog undo entry',
+            elicitation_handling: 'Interactive GPUI prompt / form dialog'
+          }
+        },
+        {
+          id: 'tools-client-acp',
+          lane: 1,
+          top: 2060,
+          tag: 'RPC Client Tools',
+          title: 'Điều phối fs/read & fs/write',
+          description: 'RPC ngược từ Agent sang Zed: fs/read_text_file, fs/write_text_file, elicitation.',
+          code: 'fs/read_text_file · fs/write_text_file\nelicitation/create (Agent → Client)',
+          parameters: [
+            ['fs/read_text_file', 'Đọc nội dung tệp tin hoặc dải dòng cụ thể trong workspace.'],
+            ['fs/write_text_file', 'Ghi nội dung mới vào tệp hoặc buffer đang mở trong editor.'],
+            ['elicitation/create', 'Hiển thị form nhập liệu hoặc URL tương tác trên giao diện Zed.'],
+            ['ForegroundWork channel', 'Điều phối luồng bất đồng bộ sang Foreground App thread an toàn.']
+          ],
+          detail: 'Zed công bố các client capabilities tương ứng trong quá trình initialize handshake. Khi agent muốn tương tác với filesystem của editor, agent gửi các request RPC này về Zed qua kênh kết nối ACP.',
+          payload: {
+            rpc_direction: 'Agent -> Zed (Client)',
+            supported_methods: ['fs/read_text_file', 'fs/write_text_file', 'elicitation/create'],
+            concurrency: 'ForegroundWork channel to AsyncApp executor'
+          }
+        },
+        {
+          id: 'tools-native',
+          lane: 2,
+          top: 2060,
+          tag: 'Công cụ thực thi',
+          title: 'Native Tools (Tiến trình riêng)',
+          description: 'Claude Bash, Codex Exec, Antigravity run_command: Tự chạy lệnh, KHÔNG gọi terminal/create.',
+          code: 'Child Process Exec · Sandbox Engine\nStream: session/update + terminal_info',
+          parameters: [
+            ['Không dùng terminal/create', 'Cả Claude và Codex đều KHÔNG gọi RPC terminal/create của Zed.'],
+            ['Tự chạy lệnh cục bộ', 'Lệnh shell được thực thi trực tiếp trong tiến trình agent hoặc container/sandbox riêng.'],
+            ['Terminal output streaming', 'Stream stdout/stderr qua session/update mang terminal_info để Zed hiển thị display-only.'],
+            ['Các tool tích hợp', 'FileRead, FileEdit, FileWrite, Grep, Glob, WebSearch, v.v.']
+          ],
+          detail: 'Phát hiện quan trọng từ việc khảo sát mã nguồn adapter: Không có adapter nào gọi terminal/create để chạy lệnh qua Terminal tab của Zed. Thay vào đó, agent tự chạy child process, sau đó stream log ra session/update. Zed chỉ nhận và vẽ terminal ở chế độ display-only (TerminalBuilder::new_display_only).',
+          payload: {
+            execution_architecture: 'Autonomous process / local sandbox execution',
+            calls_zed_terminal_create: false,
+            output_display_mechanism: 'Streams via session/update with meta.terminal_info -> Zed display-only terminal',
+            native_tool_suites: {
+              claude: ['Bash', 'FileRead', 'FileEdit', 'FileWrite', 'Glob', 'Grep', 'WebSearch'],
+              codex: ['Exec', 'ApplyPatch', 'FileEdit', 'FileRead', 'DirectorySearch'],
+              antigravity: ['run_command', 'view_file', 'client_view_file', 'client_edit_file', 'search_web', 'subagents']
+            }
+          }
+        },
+        {
+          id: 'tools-mcp',
+          lane: 5,
+          top: 2060,
+          tag: 'MCP Chuyển tiếp',
+          title: 'Thực thi công cụ MCP',
+          description: 'Agent kết nối trực tiếp Stdio/HTTP servers từ mcpServers; gọi tools/list & tools/call.',
+          code: 'tools/list → Schema catalog\ntools/call → Execution & Result',
+          parameters: [
+            ['Truyền trực tiếp qua session', 'Danh sách mcpServers từ session/new được runtime agent kết nối trực tiếp.'],
+            ['Lọc Remote Security', 'Server Stdio local bị Zed chặn khi làm việc qua SSH/Collab trừ khi remote: true.'],
+            ['Dọn dẹp Headers', 'Zed chủ động loại bỏ trường timeout và oauth nội bộ trước khi serialize.'],
+            ['Tool Discovery & Call', 'Agent tự gửi tools/list tới MCP server, đưa tool schema vào context model.']
+          ],
+          detail: 'Zed chỉ đóng vai trò chuyển tiếp cấu hình kết nối MCP trong session/new. Bản thân tiến trình agent sẽ trực tiếp kết nối tới MCP server qua Stdio child process hoặc HTTP stream, tự gọi tools/list để khám phá công cụ và gọi tools/call khi sinh prompt.',
+          payload: {
+            forwarded_transports: ['stdio (process)', 'http (streaming endpoint)'],
+            security_filtering: 'Local stdio stripped in remote sessions unless remote=true',
+            agent_role: 'Direct client connection, autonomous schema discovery and invocation'
+          }
+        },
+
+        // ==================== PHASE 07: PERMISSIONS & HUMAN GATE ====================
+        {
+          id: 'perm-engine',
+          lane: 2,
+          top: 2360,
+          tag: 'Đánh giá quyền hạn',
+          title: 'Kiểm tra độ an toàn lệnh',
+          description: 'Runtime agent đánh giá mức độ nhạy cảm của tool call và đối chiếu với active mode.',
+          code: 'canUseTool() · auto_review reviewer\nDetect potentially unsafe actions',
+          parameters: [
+            ['Claude: canUseTool', 'Kiểm tra permission mode; gọi canUseTool nếu hành động yêu cầu xác nhận.'],
+            ['Codex: auto_review', 'Bộ đánh giá auto_review tự phân tích lệnh bash/viết file nguy hiểm.'],
+            ['Antigravity: security flag', 'Gán cờ _meta["agy.security.warning"] cho các lệnh exec nguy cơ cao.'],
+            ['Bypass filter', 'Nếu mode là bypassPermissions / agent-full-access / yolo, bỏ qua xác nhận!']
+          ],
+          detail: 'Quy trình kiểm soát an toàn bắt đầu từ chính runtime của agent. Agent phân tích lệnh định chạy (ví dụ git push, xóa file, sửa mã nguồn). Nếu cấu hình active mode cho phép chạy tự do (bypass), agent sẽ thực thi ngay mà KHÔNG hề hỏi Zed!',
+          payload: {
+            safety_evaluator: 'Autonomous agent runtime policy engine',
+            evaluation_target: 'Bash commands, file modifications, network requests',
+            bypass_detection: 'If active mode is bypass/yolo/full-access, skip RPC and execute immediately'
+          }
+        },
+        {
+          id: 'perm-modes',
+          lane: 2,
+          top: 2620,
+          tag: 'So sánh Modes 3 Agent',
+          title: 'Ma trận Permission & Bypass',
+          description: 'Chi tiết các cấp độ Mode và hành vi hỏi duyệt của Claude, Codex và Antigravity.',
+          code: 'Claude: bypassPermissions\nCodex: agent-full-access\nAntigravity: yolo',
+          parameters: [
+            ['Claude Modes', 'default (hỏi mọi lệnh), acceptEdits (tự duyệt file), plan (chỉ đọc), bypassPermissions (bỏ qua mọi hỏi quyền).'],
+            ['Codex Modes', 'read-only, workspace-write, agent (mặc định: auto_review), agent-full-access (approvalPolicy=never: KHÔNG BAO GIỜ HỎI).'],
+            ['Antigravity Modes', 'default (hỏi xác nhận thông thường), auto_edit (tự duyệt sửa file), yolo (tự động chấp thuận mọi tool).'],
+            ['Headless non-interactive', 'Codex exec ép approvalPolicy=Never (tự chối); Antigravity -p soft-deny; Claude cần hook defer.']
+          ],
+          detail: 'Mỗi agent có hệ thống mode độc lập được ánh xạ từ settings hoặc configOptions. Đáng lưu ý nhất là các chế độ "yolo" / "agent-full-access" / "bypassPermissions" sẽ hoàn toàn vô hiệu hóa cổng kiểm soát của Human.',
+          payload: {
+            claude_modes: {
+              'default': 'Prompts for all sensitive tools',
+              'acceptEdits': 'Auto-approves file writes, prompts for commands',
+              'bypassPermissions': 'Silently bypasses ALL prompts (can disable via allowDangerouslySkipPermissions=false)'
+            },
+            codex_modes: {
+              'read-only': 'approvalPolicy: on-request, sandbox: readOnly',
+              'workspace-write': 'approvalPolicy: on-request, sandbox: workspaceWrite',
+              'agent': 'approvalPolicy: on-request, reviewer: auto_review (Default)',
+              'agent-full-access': 'approvalPolicy: never, sandbox: dangerFullAccess (Never asks!)'
+            },
+            antigravity_modes: {
+              'default': 'Standard interactive confirmation flow',
+              'auto_edit': 'Auto-approves editor edits',
+              'yolo': 'Auto-approves all tools including bash commands'
+            }
+          }
+        },
+        {
+          id: 'perm-request',
+          lane: 1,
+          top: 2380,
+          tag: 'RPC session/request_permission',
+          title: 'Gửi yêu cầu phê duyệt',
+          description: 'RPC từ Agent gửi về Zed kèm thông tin toolCall và danh sách lựa chọn options.',
+          code: 'session/request_permission\n{ sessionId, toolCall, options, _meta }',
+          parameters: [
+            ['toolCall → object', 'Chi tiết lệnh: title, input, metadata (terminal_info, rủi ro).'],
+            ['options → array', 'Danh sách lựa chọn quyền: allow_once, allow_always, reject_once, reject_always.'],
+            ['_meta → object', 'Thông tin phụ trợ (ví dụ _meta["agy.security.warning"] cảnh báo rủi ro cao).'],
+            ['Cancellation handle', 'Hỗ trợ responder.cancellation() nếu user hoặc agent hủy giữa chừng.']
+          ],
+          detail: 'Nếu runtime quyết định hành động cần được người dùng phê duyệt, nó đóng gói thông tin vào JSON-RPC Request session/request_permission và gửi qua kẹp kết nối ACP tới Zed.',
+          payload: {
+            jsonrpc: '2.0',
+            id: 456,
+            method: 'session/request_permission',
+            params: {
+              sessionId: 'sess_01J9ABCDEF1234567890XYZ',
+              toolCall: {
+                toolCallId: 'call_git_push_01',
+                title: 'git push origin feature-branch',
+                input: { command: 'git push origin feature-branch' },
+                meta: { terminal_info: { cwd: workspace } }
+              },
+              options: [
+                { id: 'opt_allow_once', kind: 'allow_once', name: 'Allow Once' },
+                { id: 'opt_allow_always', kind: 'allow_always', name: 'Allow Always' },
+                { id: 'opt_reject_once', kind: 'reject_once', name: 'Reject' }
+              ]
+            }
+          }
+        },
+        {
+          id: 'perm-gate-zed',
+          lane: 0,
+          top: 2750,
+          tag: 'Human Gate · Zed UI',
+          title: 'Cổng Human Gate tại Zed',
+          description: 'Hiển thị banner xác nhận, phát âm thanh; tool_permissions regex KHÔNG áp dụng!',
+          code: 'crates/agent_servers/src/acp.rs::handle_request_permission\nAcpThread::request_tool_call_authorization_with_id()',
+          parameters: [
+            ['handle_request_permission', 'Nhận request RPC, tìm AcpThread theo sessionId, gọi request_tool_call_authorization.'],
+            ['Waiting for confirmation', 'UI Zed hiển thị banner "Waiting for tool confirmation" kèm chuông âm thanh cảnh báo.'],
+            ['tool_permissions KHÔNG ÁP DỤNG', 'CẢNH BÁO QUAN TRỌNG: Quy tắc regex trong settings.json CHỈ áp dụng cho native agent, KHÔNG áp dụng cho ACP agents!'],
+            ['Tương tác Human', 'Người dùng bấm nút chọn Allow Once / Allow Always hoặc Từ chối trên thanh banner.']
+          ],
+          detail: 'Mã nguồn trong crates/agent_servers/src/acp.rs:6431 trực tiếp chuyển tiếp request sang AcpThread mà không hề đi qua lớp kiểm tra tool_permissions của Zed. Zed chỉ đóng vai trò giao diện hiển thị để người dùng tương tác.',
+          payload: {
+            rust_handler: 'crates/agent_servers/src/acp.rs::handle_request_permission',
+            routing: 'session_thread(ctx, &args.session_id) -> AcpThread::request_tool_call_authorization_with_id',
+            ui_event: 'ToolAuthorizationRequested -> ConversationView displays confirmation banner',
+            vital_fact: 'Zed settings tool_permissions regex rules DO NOT apply to External ACP Agents'
+          }
+        },
+        {
+          id: 'perm-response',
+          lane: 1,
+          top: 3100,
+          tag: 'RPC Response',
+          title: 'Trả kết quả phê duyệt',
+          description: 'RPC trả về kết quả lựa chọn của người dùng: outcome.selected hoặc outcome.cancelled.',
+          code: 'RequestPermissionResponse\n{ outcome: { outcome: "selected", optionId: "opt_allow_once" } }',
+          parameters: [
+            ['outcome: selected', 'Người dùng đã chấp thuận một lựa chọn (kèm optionId tương ứng).'],
+            ['outcome: cancelled', 'Người dùng đóng luồng hoặc hủy bỏ yêu cầu thực thi.'],
+            ['RequestCancelled error', 'Nếu kết nối bị đứt, Zed tự hủy request trong AcpThread (cancel_permission_request).']
+          ],
+          detail: 'Sau khi người dùng đưa ra quyết định trên UI, task bất đồng bộ trong acp.rs hoàn thành và responder gửi lại RequestPermissionResponse cho agent.',
+          payload: {
+            jsonrpc: '2.0',
+            id: 456,
+            result: {
+              outcome: {
+                outcome: 'selected',
+                optionId: 'opt_allow_once'
+              }
+            }
+          }
+        },
+        {
+          id: 'perm-resume',
+          lane: 2,
+          top: 3100,
+          tag: 'Quyết định thực thi',
+          title: 'Chạy hoặc Từ chối lệnh',
+          description: 'Runtime agent nhận kết quả từ Zed: nếu được phép thì thực thi tool, nếu từ chối thì báo lỗi.',
+          code: 'Resume execution / Return tool error\nRecord permission grant to memory',
+          parameters: [
+            ['Thực thi tool call', 'Tiếp tục chạy lệnh trong tiến trình riêng hoặc gọi các API cần thiết.'],
+            ['Ghi nhớ allow_always', 'Nếu người dùng chọn allow_always, agent ghi nhớ để không hỏi lại trong phiên.'],
+            ['Xử lý từ chối', 'Nếu bị từ chối, agent trả về lỗi quyền hạn và điều chỉnh kế hoạch hành động.']
+          ],
+          detail: 'Agent nhận phản hồi từ Zed và tiếp tục chu trình xử lý tin nhắn. Kết quả thực thi tool sau đó sẽ được stream lại về Zed qua các notification session/update tiếp theo.',
+          payload: {
+            permission_outcome: 'Granted (Allow Once)',
+            execution_status: 'Executing child process in agent runtime',
+            subsequent_action: 'Stream tool output back to Zed UI via session/update'
+          }
+        }
+      ];
+
+      if (loading) {
+        nodes.push({
+          id: 'storage',
+          lane: 3,
+          top: 540,
+          tag: 'Kho session · Persistent',
+          title: 'Lấy trạng thái đã lưu',
+          description: 'Session state + transcript lịch sử do agent quản lý.',
+          code: 'Storage Lookup by sessionId',
+          parameters: [
+            ['Claude Agent', 'Thư mục ~/.claude/projects/ & SQLite SDK database.'],
+            ['Codex CLI', 'Thư mục ~/.codex/sessions/ rollouts & SQLite database.'],
+            ['Antigravity / Gemini', 'Local session cache & Cloud checkpoints theo tài khoản Google.']
+          ],
+          detail: 'Kho trạng thái do agent quản lý độc lập. Zed không lưu trữ transcript của external agent; khi load, toàn bộ dữ liệu lịch sử được agent đọc ra từ kho này và phát lại về Zed qua notifications.',
+          payload: {
+            session_lookup_id: 'sess_01J9ABCDEF1234567890XYZ',
+            storage_type: 'local_database_or_cloud_rollout',
+            history_blocks_found: 14
+          }
+        });
+      }
+
+      return nodes;
+    }
+
+    function selectNode(node) {
+      nodesElement.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.id === node.id)));
+      document.getElementById('detail-category').textContent = laneDefinitions[node.lane].name + ' · ' + node.tag;
+      document.getElementById('detail-title').textContent = node.title;
+      document.getElementById('detail-description').textContent = node.detail;
+      const payload = document.getElementById('detail-payload');
+      payload.hidden = !node.payload;
+      payload.textContent = node.payload ? JSON.stringify(node.payload, null, 2) : '';
+    }
+
+    function svgElement(name, attributes) {
+      const element = document.createElementNS(namespace, name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+      return element;
+    }
+
+    function drawConnections() {
+      svg.replaceChildren();
+      const defs = svgElement('defs', {});
+      for (const [id, color] of [['arrow', '#486d85'], ['optional-arrow', '#83929e'], ['permission-arrow', '#d9534f']]) {
+        const marker = svgElement('marker', { id, markerWidth: 8, markerHeight: 8, refX: 7, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse' });
+        marker.append(svgElement('path', { d: 'M 0 0 L 8 4 L 0 8 Z', fill: color }));
+        defs.append(marker);
+      }
+      svg.append(defs);
+
+      const edges = [
+        ['start', 'prepare', 'down', false],
+        ['prepare', 'send', 'down', false],
+        ['send', 'receive', 'right', false],
+        ['receive', 'execute', 'right', false],
+        ['execute', 'response', 'return', false],
+        ['response', 'ready', 'left', false],
+        ['ready', 'defaults', 'down', true],
+        ['defaults', 'config-claude', 'right', true],
+        ['config-claude', 'apply', 'right', true],
+        ['defaults', 'config-codex', 'right', true],
+        ['config-codex', 'apply', 'right', true],
+        ['defaults', 'config-antigravity', 'right', true],
+        ['config-antigravity', 'apply', 'right', true],
+
+        // Phase 05: Skills
+        ['apply', 'skills-fs', 'branch', true, 'Quét tệp chỉ dẫn'],
+        ['skills-fs', 'skills-claude', 'left', true, 'CLAUDE.md / .claude'],
+        ['skills-fs', 'skills-codex', 'left', true, 'AGENTS.md / skills'],
+        ['skills-fs', 'skills-antigravity', 'left', true, 'SKILL.md / .gemini'],
+        ['skills-boundary', 'skills-claude', 'right', true, 'Không truyền Zed skills'],
+
+        // Phase 06: Tools
+        ['skills-claude', 'tools-native', 'down', true],
+        ['skills-codex', 'tools-native', 'down', true],
+        ['skills-antigravity', 'tools-native', 'down', true],
+        ['tools-native', 'tools-client-acp', 'left', true, 'fs/read & fs/write'],
+        ['tools-client-acp', 'tools-client-zed', 'left', true, 'Kiểm tra boundary'],
+        ['tools-native', 'tools-mcp', 'right', true, 'tools/list & call'],
+
+        // Phase 07: Permissions
+        ['tools-native', 'perm-engine', 'down', false, 'Lệnh nhạy cảm / sửa file'],
+        ['perm-engine', 'perm-modes', 'down', true, 'Đối chiếu active mode'],
+        ['perm-engine', 'perm-request', 'left', false, 'session/request_permission'],
+        ['perm-request', 'perm-gate-zed', 'left', false, 'Hiển thị banner chờ duyệt'],
+        ['perm-gate-zed', 'perm-response', 'right', false, 'Người dùng chọn option'],
+        ['perm-response', 'perm-resume', 'right', false, 'Tiếp tục / Chặn tool']
+      ];
+
+      if (currentMode === 'load') {
+        edges.push(
+          ['execute', 'storage', 'right', false],
+          ['storage', 'execute', 'storage-return', false]
+        );
+      }
+
+      for (const [from, to, route, optional, label] of edges) {
+        const source = document.getElementById(from);
+        const target = document.getElementById(to);
+        if (!source || !target) continue;
+        const sourceBox = { x: source.offsetLeft, y: source.offsetTop, width: source.offsetWidth, height: source.offsetHeight };
+        const targetBox = { x: target.offsetLeft, y: target.offsetTop, width: target.offsetWidth, height: target.offsetHeight };
+        let path;
+        let labelPosition;
+
+        const isPerm = from.startsWith('perm') || to.startsWith('perm');
+
+        if (route === 'right' || route === 'left') {
+          const right = route === 'right';
+          const startX = sourceBox.x + (right ? sourceBox.width : 0);
+          const endX = targetBox.x + (right ? 0 : targetBox.width);
+          const startY = sourceBox.y + sourceBox.height / 2;
+          const endY = targetBox.y + targetBox.height / 2;
+          const middleX = (startX + endX) / 2;
+          path = `M ${startX} ${startY} H ${middleX} V ${endY} H ${endX}`;
+          labelPosition = [(startX + endX) / 2, startY - 11];
+        } else if (route === 'storage-return') {
+          const startX = sourceBox.x + sourceBox.width / 2;
+          const endX = targetBox.x + targetBox.width;
+          const endY = targetBox.y + targetBox.height - 16;
+          const bottom = Math.max(sourceBox.y + sourceBox.height, targetBox.y + targetBox.height) + 24;
+          path = `M ${startX} ${sourceBox.y + sourceBox.height} V ${bottom} H ${endX + 12} V ${endY} H ${endX}`;
+        } else if (route === 'branch') {
+          const startX = sourceBox.x + sourceBox.width / 2;
+          const startY = sourceBox.y + sourceBox.height;
+          const endX = targetBox.x;
+          const endY = targetBox.y + targetBox.height / 2;
+          path = `M ${startX} ${startY} V ${endY} H ${endX}`;
+          labelPosition = [(startX + endX) / 2, endY - 11];
+        } else {
+          const startX = sourceBox.x + sourceBox.width / 2;
+          const endX = targetBox.x + targetBox.width / 2;
+          const startY = sourceBox.y + sourceBox.height;
+          const endY = targetBox.y;
+          const middleY = (startY + endY) / 2;
+          path = `M ${startX} ${startY} V ${middleY} H ${endX} V ${endY}`;
+          if (label) labelPosition = [middleX || ((startX + endX) / 2), middleY - 8];
+        }
+
+        let edgeClass = 'edge';
+        if (optional) edgeClass += ' optional';
+        if (isPerm) edgeClass += ' permission-edge';
+
+        const markerId = isPerm ? 'permission-arrow' : (optional ? 'optional-arrow' : 'arrow');
+        svg.append(svgElement('path', { d: path, class: edgeClass, 'marker-end': `url(#${markerId})` }));
+        if (label && labelPosition) {
+          const text = svgElement('text', { x: labelPosition[0], y: labelPosition[1], 'text-anchor': 'middle', class: 'edge-label' });
+          text.textContent = label;
+          svg.append(text);
+        }
+      }
+    }
+
+    function render() {
+      nodesElement.replaceChildren();
+      currentNodes = definitions();
+      currentNodes.forEach(node => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.id = node.id;
+        button.className = 'node' + (node.optional ? ' optional' : '') + (node.id.startsWith('perm') ? ' alert-node' : '');
+        button.style.left = `calc(100% / 6 * ${node.lane} + 21px)`;
+        button.style.top = `${node.top}px`;
+        button.style.setProperty('--accent', node.id.startsWith('perm') ? '#d9534f' : laneDefinitions[node.lane].accent);
+        button.setAttribute('aria-pressed', 'false');
+
+        const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = node.tag;
+        const title = document.createElement('strong'); title.textContent = node.title;
+        const description = document.createElement('span'); description.className = 'description'; description.textContent = node.description;
+        button.append(tag, title, description);
+
+        if (node.code) {
+          const code = document.createElement('code');
+          code.className = 'wire';
+          code.textContent = node.code;
+          button.append(code);
+        }
+
+        if (node.parameters) {
+          const parameters = document.createElement('span');
+          parameters.className = 'parameters';
+          node.parameters.forEach(([name, value]) => {
+            const row = document.createElement('span'); row.className = 'parameter';
+            const key = document.createElement('code'); key.textContent = name;
+            const desc = document.createElement('span'); desc.textContent = value;
+            row.append(key, desc);
+            parameters.append(row);
+          });
+          button.append(parameters);
+        }
+
+        button.addEventListener('click', () => selectNode(node));
+        nodesElement.append(button);
+      });
+
+      if (currentMode === 'new') {
+        const inactive = document.createElement('div');
+        inactive.className = 'inactive';
+        inactive.textContent = 'Không cần khôi phục lịch sử cũ trong luồng tạo phiên mới.';
+        nodesElement.append(inactive);
+      }
+
+      const requestNode = currentNodes.find(node => node.id === 'send');
+      if (requestNode) selectNode(requestNode);
+      layoutConfigurationNodes();
+      drawConnections();
+    }
+
+    function layoutConfigurationNodes() {
+      // Phase 01: Chuẩn bị
+      const start = document.getElementById('start');
+      const prepare = document.getElementById('prepare');
+      if (start && prepare) {
+        prepare.style.top = `${start.offsetTop + start.offsetHeight + 45}px`;
+        const preparePhase = document.getElementById('prepare-phase');
+        if (preparePhase) preparePhase.style.top = `${prepare.offsetTop - 55}px`;
+      }
+
+      // Phase 02: Request
+      const send = document.getElementById('send');
+      if (send && prepare) {
+        const sendTop = prepare.offsetTop + prepare.offsetHeight + 65;
+        ['send', 'receive', 'execute'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.top = `${sendTop}px`;
+        });
+        const storage = document.getElementById('storage');
+        if (storage) storage.style.top = `${sendTop}px`;
+        const inactive = document.querySelector('.inactive');
+        if (inactive) inactive.style.top = `${sendTop}px`;
+        const requestPhase = document.getElementById('request-phase');
+        if (requestPhase) requestPhase.style.top = `${sendTop - 55}px`;
+      }
+
+      // Phase 03: Response
+      const receive = document.getElementById('receive');
+      const execute = document.getElementById('execute');
+      const storage = document.getElementById('storage');
+      const sendEl = document.getElementById('send');
+      const baseTops = [
+        receive ? receive.offsetTop + receive.offsetHeight : 0,
+        execute ? execute.offsetTop + execute.offsetHeight : 0,
+        sendEl ? sendEl.offsetTop + sendEl.offsetHeight : 0,
+        storage ? storage.offsetTop + storage.offsetHeight : 0
+      ];
+      const responseTop = Math.max(...baseTops) + 75;
+
+      ['response', 'ready'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.top = `${responseTop}px`;
+      });
+      const responsePhase = document.getElementById('response-phase');
+      if (responsePhase) responsePhase.style.top = `${responseTop - 55}px`;
+
+      // Phase 04: Cấu hình
+      const response = document.getElementById('response');
+      const ready = document.getElementById('ready');
+      let nextTop = Math.max(
+        response ? response.offsetTop + response.offsetHeight : responseTop,
+        ready ? ready.offsetTop + ready.offsetHeight : responseTop
+      ) + 85;
+
+      const configPhase = document.getElementById('configuration-phase');
+      if (configPhase) configPhase.style.top = `${nextTop - 55}px`;
+
+      ['config-claude', 'config-codex', 'config-antigravity'].forEach(id => {
+        const node = document.getElementById(id);
+        if (node) {
+          node.style.top = `${nextTop}px`;
+          nextTop += node.offsetHeight + 35;
+        }
+      });
+
+      const configCodex = document.getElementById('config-codex');
+      const middleTop = configCodex ? configCodex.offsetTop : nextTop - 200;
+      ['defaults', 'apply'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.top = `${middleTop}px`;
+      });
+
+      // Phase 05: Skills
+      const apply = document.getElementById('apply');
+      let skillsTop = Math.max(nextTop, apply ? apply.offsetTop + apply.offsetHeight : 0) + 75;
+      const skillsPhase = document.getElementById('skills-phase');
+      if (skillsPhase) skillsPhase.style.top = `${skillsTop - 55}px`;
+
+      let skillStackTop = skillsTop;
+      ['skills-claude', 'skills-codex', 'skills-antigravity'].forEach(id => {
+        const node = document.getElementById(id);
+        if (node) {
+          node.style.top = `${skillStackTop}px`;
+          skillStackTop += node.offsetHeight + 35;
+        }
+      });
+
+      const skillsCodex = document.getElementById('skills-codex');
+      const skillMidTop = skillsCodex ? skillsCodex.offsetTop : skillsTop + 80;
+      ['skills-boundary', 'skills-fs'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.top = `${skillMidTop}px`;
+      });
+
+      // Phase 06: Tools
+      let toolsTop = Math.max(
+        skillStackTop,
+        skillsCodex ? skillsCodex.offsetTop + skillsCodex.offsetHeight : 0
+      ) + 65;
+      const toolsPhase = document.getElementById('tools-phase');
+      if (toolsPhase) toolsPhase.style.top = `${toolsTop - 55}px`;
+
+      ['tools-client-zed', 'tools-client-acp', 'tools-native', 'tools-mcp'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.top = `${toolsTop}px`;
+      });
+
+      const toolsMaxHeight = Math.max(
+        ...['tools-client-zed', 'tools-client-acp', 'tools-native', 'tools-mcp'].map(id => {
+          const el = document.getElementById(id);
+          return el ? el.offsetTop + el.offsetHeight : 0;
+        })
+      );
+
+      // Phase 07: Permissions & Human Gate
+      let permTop = toolsMaxHeight + 75;
+      const permPhase = document.getElementById('permissions-phase');
+      if (permPhase) permPhase.style.top = `${permTop - 55}px`;
+
+      // 1. perm-engine (Lane 2)
+      const permEngine = document.getElementById('perm-engine');
+      if (permEngine) permEngine.style.top = `${permTop}px`;
+
+      // 2. perm-request (Lane 1) ngang hang voi perm-engine
+      const permRequest = document.getElementById('perm-request');
+      if (permRequest && permEngine) {
+        permRequest.style.top = `${permEngine.offsetTop + 20}px`;
+      }
+
+      // 3. perm-modes (Lane 2) nam DUOI perm-engine
+      const permModes = document.getElementById('perm-modes');
+      if (permModes && permEngine) {
+        permModes.style.top = `${permEngine.offsetTop + permEngine.offsetHeight + 40}px`;
+      }
+
+      // 4. perm-resume (Lane 2) nam DUOI perm-modes (tinh ca offsetHeight de khong bi de len nhau)
+      const permResume = document.getElementById('perm-resume');
+      let permResumeTop = permTop + 550;
+      if (permResume && permModes) {
+        permResumeTop = permModes.offsetTop + permModes.offsetHeight + 45;
+        permResume.style.top = `${permResumeTop}px`;
+      }
+
+      // 5. perm-response (Lane 1) ngang hang voi perm-resume
+      const permResponse = document.getElementById('perm-response');
+      if (permResponse && permResume) {
+        permResponse.style.top = `${permResume.offsetTop + 15}px`;
+      }
+
+      // 6. perm-gate-zed (Lane 0) nam giua perm-request va perm-response
+      const permGate = document.getElementById('perm-gate-zed');
+      if (permGate && permRequest && permResponse) {
+        const midY = (permRequest.offsetTop + permResponse.offsetTop) / 2;
+        permGate.style.top = `${midY - 20}px`;
+      }
+
+      const permMaxBottom = Math.max(
+        ...['perm-engine', 'perm-modes', 'perm-request', 'perm-gate-zed', 'perm-response', 'perm-resume'].map(id => {
+          const el = document.getElementById(id);
+          return el ? el.offsetTop + el.offsetHeight : 0;
+        })
+      );
+
+      const height = permMaxBottom + 70;
+      document.querySelector('.diagram').style.height = `${height}px`;
+      document.getElementById('connections').setAttribute('viewBox', `0 0 ${document.querySelector('.diagram').offsetWidth} ${height}`);
+    }
+
+    document.querySelectorAll('[data-mode]').forEach(button => {
+      button.addEventListener('click', () => {
+        currentMode = button.dataset.mode;
+        document.querySelectorAll('[data-mode]').forEach(tab => tab.setAttribute('aria-pressed', String(tab === button)));
+        render();
+      });
+    });
+
+    document.getElementById('print').addEventListener('click', () => window.print());
+    function refreshLayout() { layoutConfigurationNodes(); drawConnections(); }
+    window.addEventListener('resize', refreshLayout);
+    window.addEventListener('beforeprint', refreshLayout);
+    render();
+    if (document.fonts) document.fonts.ready.then(refreshLayout);
+    setTimeout(refreshLayout, 100);
+    setTimeout(refreshLayout, 300);
+  </script>
+</body>
+</html>
