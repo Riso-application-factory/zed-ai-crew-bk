@@ -27,6 +27,10 @@
   });
   ```
 
+# HTML artifacts
+
+* HTML documents and review artifacts must use the full available viewport width. Set the main container to `width: 100%` and `max-width: none`, with responsive padding.
+
 # Timers in tests
 
 * In GPUI tests, prefer GPUI executor timers over `smol::Timer::after(...)` when you need timeouts, delays, or to drive `run_until_parked()`:
