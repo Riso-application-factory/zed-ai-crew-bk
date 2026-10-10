@@ -96,15 +96,13 @@
         position: relative;
         width: 100%;
         min-width: 1200px;
-        height: 910px;
         isolation: isolate;
       }
       .stages {
-        position: absolute;
-        inset: 0;
+        position: relative;
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
-        grid-template-rows: repeat(2, 350px);
+        grid-template-rows: repeat(2, auto);
         column-gap: 19px;
         row-gap: 90px;
         padding: 40px 18px 80px;
@@ -112,7 +110,6 @@
       .stage {
         position: relative;
         min-width: 0;
-        height: 350px;
         border: 1px solid var(--line);
         border-radius: 12px;
         background: #f6fafb;
@@ -143,8 +140,6 @@
         background: white;
         color: var(--ink);
         text-align: left;
-        font: inherit;
-        cursor: pointer;
         position: relative;
         z-index: 2;
         margin-top: 12px;
@@ -165,10 +160,48 @@
       .node:hover {
         background: #eaf4f7;
       }
-      .node[aria-pressed="true"] {
+      .node.selected {
         outline: 2px solid var(--blue);
         outline-offset: 2px;
         background: #eaf4f7;
+      }
+      .node-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .copy-chip {
+        flex: 1 1 auto;
+        padding: 3px 8px;
+        border: 1px solid #b5d2df;
+        border-radius: 6px;
+        background: #f3f9fb;
+        color: var(--blue);
+        font: 600 11px/1.6 system-ui, sans-serif;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .copy-chip:hover {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+      }
+      .copy-chip.request {
+        border-color: #e4c79f;
+        background: #fffaf1;
+        color: #955c20;
+      }
+      .copy-chip.request:hover {
+        background: #ae6923;
+        border-color: #ae6923;
+        color: white;
+      }
+      .copy-chip.copied,
+      .copy-chip.copied:hover {
+        background: #17603d;
+        border-color: #17603d;
+        color: white;
       }
       button:focus-visible,
       textarea:focus-visible {
@@ -215,7 +248,7 @@
       .workspace {
         margin-top: 20px;
         display: grid;
-        grid-template-columns: minmax(250px, 1fr) minmax(0, 2fr);
+        grid-template-columns: minmax(250px, 1fr) minmax(0, 2fr) minmax(0, 2fr);
         gap: 24px;
         padding: 24px;
         border: 1px solid var(--line);
@@ -329,6 +362,13 @@
       .step-note {
         font-size: 12px;
       }
+      .step-phase {
+        color: #ae6923;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
       .workflow-notes {
         margin: 16px 0 0;
         padding: 14px 16px;
@@ -360,12 +400,31 @@
         margin: 0;
       }
       #status {
-        min-height: 28px;
-        color: #17603d;
-        margin: 10px 0 0;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 10;
+        max-width: min(440px, calc(100% - 40px));
+        margin: 0;
+        padding: 10px 14px;
+        border-radius: 8px;
+        background: #17603d;
+        color: white;
+        font-size: 13px;
+        box-shadow: 0 6px 20px rgb(24 47 61 / 0.2);
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+        pointer-events: none;
+      }
+      #status.visible {
+        opacity: 1;
+        transform: none;
       }
       #status.error {
-        color: #a53720;
+        background: #a53720;
       }
       footer {
         color: var(--muted);
@@ -396,10 +455,12 @@
       <div class="eyebrow">Agile / Scrum · Full development lifecycle</div>
       <h1>Từ ý tưởng đến vận hành.<br />Chọn đúng bước, giữ đúng context.</h1>
       <p class="intro">
-        Bấm vào một role để sao chép <strong>system_prompt</strong>, rồi dùng
-        prompt làm chỉ dẫn cho session AI. Kickoff dự án và brainstorm feature
-        cùng đi từ vấn đề → quyết định → spec → ticket; chọn role theo câu hỏi
-        cần giải quyết. Có thể đổi góc nhìn role trong cùng session để giữ mạch
+        Mỗi node có hai nút sao chép ngay tại chỗ: <strong>⧉ System</strong>
+        biến thread thành ROLE, <strong>⧉ Request</strong> là tin nhắn đầu
+        tiên giao việc của node đó. Kickoff dự án làm bài tập nội bộ (domain +
+        technical) trước khi gặp khách; brainstorm feature bắt đầu từ hành vi
+        hiện có. Cả hai đi tới quyết định → spec → ticket; chọn role theo câu
+        hỏi cần giải quyết. Có thể đổi góc nhìn role trong cùng session để giữ mạch
         lập luận trước khi triển khai.
       </p>
       <div class="toolbar">
@@ -429,19 +490,24 @@
       <section class="kickoff" aria-labelledby="kickoff-heading">
         <h2 id="kickoff-heading">Quy trình kickoff dự án</h2>
         <p>
-          Chuẩn bị repo một lần, làm rõ nhu cầu bằng các vòng hỏi có khuyến nghị,
-          rồi tổng hợp spec. Mỗi bước có prompt, đầu ra và tiêu chí hoàn tất.
-          Bước nét đứt chỉ dùng khi đúng điều kiện; HLD / LLD được bổ sung khi
-          cần chốt kiến trúc hoặc interface, theo phạm vi đang bàn.
+          Làm như một team tư vấn thật: đọc hết những gì đã có, tự học domain
+          và khảo sát kỹ thuật, chuẩn bị giả thuyết và câu hỏi, rồi mới gặp
+          khách hàng. Sau discovery, playback để khách xác nhận nền chung, rồi
+          mới định hình giải pháp và viết spec. Bước nét đứt chỉ dùng khi đúng
+          điều kiện.
         </p>
         <ol class="kickoff-flow" id="kickoff-flow"></ol>
         <div class="workflow-notes">
-          <p><strong>Nhánh khảo sát:</strong> thiếu dữ kiện → research; kiến thức
-            nằm ở người khác → questionnaire; cần thấy UI hoặc chạy state model
-            → prototype. Đưa kết quả trở lại vòng làm rõ trước khi chốt spec.</p>
-          <p><strong>Nhánh quy mô:</strong> dự án quá mơ hồ cho một session →
-            wayfinder để giải các ticket quyết định. Khi bản đồ đã rõ, quay về
-            spec → ticket xây dựng. Việc nhỏ đã rõ có thể sang triển khai ngay.</p>
+          <p><strong>Nội bộ (1–4):</strong> AI tự nghiên cứu và trích nguồn;
+            điều suy ra từ ngành chỉ là giả thuyết về khách hàng này. Bước 2 và 3
+            độc lập, có thể chạy song song. Gửi danh sách xin quyền truy cập sớm
+            vì chờ lâu nhất.</p>
+          <p><strong>Cùng khách hàng (5–6):</strong> Human dẫn buổi gặp, AI tổng
+            hợp từ ghi chép thật. Hỏi về việc đã xảy ra, không hỏi “anh/chị có
+            dùng không”. Lặp đến khi giả thuyết rủi ro cao có bằng chứng.</p>
+          <p><strong>Định hình (7–9):</strong> còn thiếu dữ kiện → research,
+            questionnaire hoặc prototype rồi quay lại. Quá lớn cho một session →
+            wayfinder. HLD / LLD chỉ viết khi cần chốt một câu hỏi kiến trúc.</p>
         </div>
       </section>
       <section class="kickoff" aria-labelledby="feature-heading">
@@ -537,8 +603,9 @@
           <div class="eyebrow">Role session</div>
           <h2 id="selected-role">Chọn một role trên sơ đồ</h2>
           <p id="role-focus">
-            Mỗi prompt gồm nhiệm vụ, đầu vào, đầu ra, phối hợp và giới hạn thẩm
-            quyền.
+            System prompt định nghĩa ROLE: nhiệm vụ, đầu vào, đầu ra, phối hợp
+            và giới hạn thẩm quyền. First request giao việc cụ thể của node:
+            bước, đầu ra, tiêu chí hoàn tất và đường đi tiếp.
           </p>
           <p id="role-partners"></p>
           <p>
@@ -548,38 +615,52 @@
           </p>
           <p>
             AI hỗ trợ công việc của role; accountability và quyết định có thẩm
-            quyền vẫn thuộc con người. Dán vào tin nhắn thông thường chỉ cung
-            cấp chỉ dẫn cho session, không thay thế system message do nền tảng
-            quản lý.
+            quyền vẫn thuộc con người. Dán system prompt vào system prompt /
+            custom instructions của thread; nếu nền tảng không hỗ trợ, gửi nó
+            làm tin nhắn đầu tiên. Gửi first request sau đó, điền phần MY
+            REQUEST AND CONTEXT.
           </p>
-          <p id="status" role="status" aria-live="polite"></p>
         </div>
         <div>
-          <label for="prompt">system_prompt · nội dung sẽ được sao chép</label
+          <label for="system-prompt">system_prompt · định nghĩa ROLE</label
           ><textarea
-            id="prompt"
+            id="system-prompt"
             lang="en"
             readonly
-            placeholder="Bấm vào một node để xem và sao chép prompt."
+            placeholder="Bấm ⧉ System hoặc ⧉ Request trên một node để xem prompt."
           ></textarea
-          ><button id="copy" class="copy" type="button" disabled>
-            Sao chép lại prompt
+          ><button id="copy-system" class="copy" type="button" disabled>
+            Sao chép system prompt
+          </button>
+        </div>
+        <div>
+          <label for="request-prompt">first_request · tin nhắn đầu tiên</label
+          ><textarea
+            id="request-prompt"
+            lang="en"
+            readonly
+            placeholder="Bấm ⧉ System hoặc ⧉ Request trên một node để xem prompt."
+          ></textarea
+          ><button id="copy-request" class="copy" type="button" disabled>
+            Sao chép first request
           </button>
         </div>
       </section>
+      <p id="status" role="status" aria-live="polite"></p>
       <footer>
         Dựa trên bản đồ vai trò SDLC hiện có và các SKILL.md trong bộ skills
         của Matt Pocock (engineering/ask-matt, grilling, domain-modeling,
         wayfinder, to-spec, to-tickets và các skill xây dựng) · Tên skill trên
         card là nguồn phương pháp; prompt đã chứa chỉ dẫn để dùng trực tiếp.
+        Kickoff tham khảo Agile Inception Deck, Lean Inception, bốn rủi ro
+        sản phẩm của Marty Cagan, shaping trong Shape Up và The Mom Test.
         Mỗi role có thể tham gia nhiều
         giai đoạn. Kết thúc vòng đời gồm thông báo, migration, tắt dịch vụ và xử
         lý dữ liệu theo nghĩa vụ đã xác minh. Người điều phối được bổ sung làm
         đầu mối cho Human, không phải accountability chính thức của Scrum.
       </footer>
       <noscript
-        >Trang cần JavaScript để hiển thị role và sao chép system
-        prompt.</noscript
+        >Trang cần JavaScript để hiển thị role và sao chép prompt.</noscript
       >
     </main>
     <script>
@@ -984,62 +1065,180 @@
         },
       ];
       const workflowSteps = {
-        "setup": {
-          "id": "setup",
-          "title": "Chuẩn bị repo & nguồn sự thật",
+        "intake": {
+          "id": "intake",
+          "title": "Tiếp nhận & khung dự án",
+          "phase": "Nội bộ · trước khi gặp khách",
           "role": "coordinator",
-          "purpose": "Chốt nơi lưu spec, ticket, glossary, ADR và cách chạy kiểm chứng.",
+          "purpose": "Đọc hết những gì đã có, xác định ai quyết định, ràng buộc cứng và nơi lưu nguồn sự thật.",
           "partners": [
-            "lead",
-            "dev",
-            "po"
+            "pm",
+            "sponsor",
+            "lead"
           ],
           "skills": [
             "setup-matt-pocock-skills"
           ],
-          "when": "Chạy một lần khi repo chưa có cấu hình; dùng lại cấu hình hiện có.",
-          "inputs": "The current repository, existing agent instructions, remote and tracker conventions, domain documents, check commands and available tools. If no repository is accessible, use the supplied project context and draft a setup brief.",
-          "duties": "Inspect before proposing configuration. Establish the actual issue tracker (existing remote tracker or local Markdown), where specs and one-file-per-ticket records live, the glossary and ADR layout, and the existing verification commands. Reuse existing instructions and document locations; do not create a second competing source of truth. Default to one glossary and an ADR directory; use multiple contexts only when the repository actually needs them. Configure triage vocabulary only if incoming-issue triage will be used. Present concrete configuration drafts and resolve only choices not already settled. Apply authorized local changes; otherwise deliver ready-to-save content. Do not install language-specific hooks into a repository using another stack.",
-          "outputs": "A setup brief with tracker and document locations, actual or proposed check commands, ready-to-save configuration where missing, and a distinction between configured, proposed and unavailable capabilities.",
-          "completion": "The tracker and document layout are resolved or clearly identified as an external prerequisite; the next session can locate canonical decisions and knows how evidence will be checked. Do not claim setup is complete when only drafts exist.",
-          "handoff": "Continue to the problem brief using the resolved configuration. Carry forward only unresolved prerequisites; do not repeat setup for every feature.",
-          "session": "Continue in the planning session. Setup does not require a new role session.",
+          "when": "Ngay khi nhận dự án; phần cấu hình repo chỉ chạy một lần.",
+          "inputs": "The raw request and every artifact that came with it (pre-sales notes, emails, RFP, contract or SOW, call transcripts, links to the customer's current product), the customer's organization and industry, known people, deadline and budget signals, and the current repository if one exists.",
+          "duties": "Read every supplied artifact before asking anything. Extract what is already stated: customer organization and industry, what triggered the project now, stated goals, named stakeholders and their likely interests, hard constraints (dates, budget or appetite, mandated technology, compliance), existing systems mentioned and the commercial context. Build a stakeholder map: who sponsors, who decides, who uses, who operates, who can block and who holds domain knowledge. Write the engagement frame: what this kickoff must produce and by when. List access and documents to request from the customer (existing system access, documentation, data samples, analytics, brand assets), each with its reason, because access has the longest lead time. Resolve where canonical artifacts live: reuse the repository's tracker, spec, glossary and ADR layout, or propose one; never create a competing source of truth. Turn what is not yet known into research questions for domain research and technical discovery. Do not ask the human for facts the artifacts already contain, and do not start solution design.",
+          "outputs": "An intake brief: engagement frame, extracted facts with source references, stakeholder map with roles and influence, hard constraints, access and document request list, artifact layout (configured or proposed), and research questions for domain research and technical discovery.",
+          "completion": "Every supplied artifact has been read and cited; both groundwork steps have explicit research questions; the artifact layout is resolved or named as a prerequisite.",
+          "handoff": "Run domain research and technical discovery next. They are independent and may run in parallel sessions. Send the access request to the customer early.",
+          "session": "Planning session. Groundwork steps may run as separate research sessions that return cited artifacts.",
           "practices": [
+            "groundwork",
             "context"
           ]
         },
-        "request": {
-          "id": "request",
-          "title": "Nhu cầu → problem brief",
+        "domain-research": {
+          "id": "domain-research",
+          "title": "Nghiên cứu domain & thị trường",
+          "phase": "Nội bộ · trước khi gặp khách",
           "role": "ba",
-          "purpose": "Tách vấn đề, người hưởng lợi và kết quả mong muốn khỏi giải pháp đề xuất.",
+          "purpose": "Tự học ngành, nghiệp vụ chuẩn và từ vựng để không hỏi khách những điều người trong ngành coi là hiển nhiên.",
+          "partners": [
+            "pm",
+            "ux",
+            "legal"
+          ],
+          "skills": [
+            "research",
+            "domain-modeling"
+          ],
+          "when": "Sau tiếp nhận, trước mọi buổi nói chuyện với khách hàng.",
+          "inputs": "The intake brief and its research questions, the customer's public footprint (website, product, app store listings, public documents), industry sources, competitor and reference products, and applicable regulations or standards.",
+          "duties": "Build working knowledge of the domain from primary and reputable sources, as a consultant does before a first client meeting. Cover: how the customer's business makes money and where the requested system fits; the actors and standard end-to-end workflows of this industry, including common exceptions; industry vocabulary and terms likely to be overloaded; what competitor and reference products do, separating table-stakes capabilities from differentiators; regulations, standards and compliance obligations that typically apply in the relevant jurisdiction; typical pain points and known failure patterns. Walk through the customer's own public product or materials and describe the current journey as observed. Seed a draft glossary with every term marked hypothesis until the customer confirms it. Cite every claim and separate established industry practice from inference. Whatever is customer-specific and cannot be learned from public sources becomes an interview question, not an assumption. Keep the primer short and decision-relevant; omit encyclopedic background.",
+          "outputs": "One domain primer artifact: business model, actors, standard workflows with exceptions, competitor and reference capability table, regulatory checklist with applicability, typical pain points and a draft glossary marked hypothesis, all with sources; plus the list of customer-specific unknowns.",
+          "completion": "A newcomer could follow a conversation with a domain expert using this primer; every claim has a source or is labeled inference; customer-specific unknowns are listed rather than guessed.",
+          "handoff": "Feed the primer and unknowns into the discovery kit. Share regulatory and integration findings with technical discovery.",
+          "session": "May run as an independent research session; return the cited artifact to the planning session.",
+          "practices": [
+            "groundwork",
+            "domain"
+          ]
+        },
+        "tech-discovery": {
+          "id": "tech-discovery",
+          "title": "Technical discovery",
+          "phase": "Nội bộ · trước khi gặp khách",
+          "role": "architect",
+          "purpose": "Khảo sát hệ thống hiện có, tích hợp, dữ liệu, ràng buộc và rủi ro khả thi trước khi hứa hẹn gì với khách.",
+          "partners": [
+            "engineer",
+            "lead",
+            "platform",
+            "security"
+          ],
+          "skills": [
+            "research",
+            "codebase-design",
+            "prototype"
+          ],
+          "when": "Song song với nghiên cứu domain, trước buổi gặp khách hàng.",
+          "inputs": "The intake brief, any accessible repository or running system, public product surfaces and APIs, integration targets named or implied, the domain primer as it emerges, and mandated technology or hosting constraints.",
+          "duties": "Map the current technical landscape before requirements are discussed. Existing system: when code or a running product is accessible, audit architecture, stack, data model, quality, technical debt and operational setup from evidence; otherwise describe only what is observable (public site, APIs, app behavior) and label it. Integration inventory: every external system the solution must read from or write to, with direction, data, protocol, owner and whether documentation exists. Data landscape: sources of truth, volume, sensitivity and migration needs. Constraints: deployment model, identity, compliance-driven technical controls and mandated stack. Build versus buy: products, platforms or open-source components that already solve part of the problem. Quality attributes (performance, availability, scale, security, accessibility) phrased as questions to confirm, not invented targets. Feasibility and rabbit holes: for each likely capability, assess feasibility and name unknown technical territory, unclear dependencies and hard decisions; run a small time-boxed spike only when a cheap experiment settles a blocking question. Offer candidate architecture directions with trade-offs, not a decided architecture. Turn every technical unknown that only the customer can answer into a question explaining why it matters.",
+          "outputs": "A technical landscape report: current-state system and integration inventory (source, target, data, protocol, owner, docs), data landscape, constraints, build-versus-buy notes, feasibility and rabbit-hole list with severity, candidate architecture directions with trade-offs, spike results if run, and technical questions and access requests for the customer.",
+          "completion": "Each likely capability has a feasibility assessment with evidence or a named unknown; integrations and constraints are inventoried; nothing is presented as decided architecture; customer-only technical questions are explicit.",
+          "handoff": "Feed feasibility risks and technical questions into the discovery kit. Architecture decisions wait for shaping, after customer facts are known.",
+          "session": "May run as an independent research session; return the report to the planning session.",
+          "practices": [
+            "groundwork",
+            "design"
+          ]
+        },
+        "discovery-kit": {
+          "id": "discovery-kit",
+          "title": "Giả thuyết & bộ câu hỏi discovery",
+          "phase": "Nội bộ · trước khi gặp khách",
+          "role": "ba",
+          "purpose": "Biến hiểu biết nền thành giả thuyết cần kiểm chứng và kịch bản phỏng vấn cho từng nhóm stakeholder.",
+          "partners": [
+            "pm",
+            "ux",
+            "architect",
+            "coordinator"
+          ],
+          "skills": [
+            "to-questionnaire",
+            "grilling"
+          ],
+          "when": "Khi domain primer và technical landscape đã có bản nháp đủ dùng.",
+          "inputs": "The intake brief, stakeholder map, domain primer, technical landscape report and their customer-specific unknowns.",
+          "duties": "Write a provisional problem hypothesis and solution hypotheses, explicitly unconfirmed. Build an assumption map across value (will they use or buy it), usability (can they use it), feasibility (can it be built within the constraints) and viability (does it work for the customer's business, legal, cost and operations); rank by impact if wrong times uncertainty. Give each top assumption a test method: interview, document or data request, questionnaire, observation or prototype. Prepare one interview guide per stakeholder type, ordered opening, context, walkthrough of the current workflow, pains, constraints, success and a wrap-up that asks for a concrete next step. Ask about specific past events and current behavior, not opinions about hypothetical features; add follow-up probes; never pitch the solution during discovery. Include questions that confirm or refute the draft glossary and the observed current journey. Use the primer to skip what the industry already answers and to ask sharper customer-specific questions. Prepare a questionnaire for knowledge holders who will not attend. Propose a kickoff workshop agenda: why we are here, outcome and success signals, what is out of scope, neighbors and dependencies, what keeps us up at night, and what gives first among scope, time, budget and quality. Ask the human to approve or edit the kit before it is used.",
+          "outputs": "A discovery kit: problem and solution hypotheses, ranked assumption map with test methods, interview guide per stakeholder type, questionnaire for absent stakeholders, data and access request, kickoff workshop agenda and a note template separating quotes, observed facts, opinions and decisions.",
+          "completion": "Every high-risk assumption maps to at least one question or evidence request; guides are ordered and free of leading or hypothetical questions; the human has approved or edited the kit.",
+          "handoff": "The human runs the sessions with the customer and brings back notes, transcripts and documents for synthesis.",
+          "session": "Continue in the planning session.",
+          "practices": [
+            "groundwork",
+            "grilling",
+            "context"
+          ]
+        },
+        "stakeholder-discovery": {
+          "id": "stakeholder-discovery",
+          "title": "Discovery cùng khách hàng",
+          "phase": "Cùng khách hàng",
+          "role": "ba",
+          "purpose": "Tổng hợp từ buổi gặp thật: xác nhận hoặc bác bỏ giả thuyết, chốt từ vựng, lộ mâu thuẫn.",
           "partners": [
             "customer",
-            "pm",
-            "coordinator"
+            "sponsor",
+            "po",
+            "ux",
+            "architect"
           ],
           "skills": [
             "grill-with-docs",
             "domain-modeling"
           ],
-          "when": "Khi bắt đầu dự án hoặc yêu cầu chưa nói rõ vấn đề cần giải quyết.",
-          "inputs": "The raw request, previous conversations, existing workflows and evidence, business goals, constraints and any resolved setup choices.",
-          "duties": "Establish the beneficiary, current workflow, exact pain, why now, desired outcome and what observable evidence would count as success. Separate quoted customer facts, product hypotheses and solution suggestions. Look up accessible facts yourself. Interview only the current decision frontier, beginning with the outcome and scope before implementation questions. Resolve overloaded domain terms as they arise. Identify which knowledge must come from a different stakeholder and prepare a targeted questionnaire instead of asking this human to guess. Do not turn a proposed feature or technology into an agreed requirement.",
-          "outputs": "A problem brief containing problem, actors, current scenario, desired outcome, success signal (baseline and target when known), constraints, initial scope and exclusions, evidence references and unanswered decision questions. Keep an unknown baseline explicit rather than inventing it.",
-          "completion": "The human has confirmed the intended problem, beneficiary and outcome; remaining unknowns are named with the decision they block. Previous explicit confirmations count.",
-          "handoff": "Continue to the design interview with this brief and the original reasoning. Use research, questionnaire or prototype only for a named gap.",
-          "session": "Keep this interview, the design interview, spec synthesis and ticket slicing in the same context when they fit.",
+          "when": "Sau mỗi buổi gặp khách; lặp đến khi giả thuyết rủi ro cao đã có bằng chứng.",
+          "inputs": "The discovery kit, session notes or transcripts, documents and data received from the customer, questionnaire answers, the domain primer and the technical landscape report.",
+          "duties": "Work only from actual session records; never simulate customer answers. When the human is the domain expert and no customer session exists, interview the human with the guides and label each answer by source. For each session extract quoted facts, the observed current workflow, pains with frequency and impact, constraints, success signals and decisions, attributed to the speaker. Update every assumption to confirmed, refuted, partially supported or open, with its evidence. Confirm, correct or reject draft glossary terms, preferring the customer's vocabulary when it differs from the industry's. Surface conflicts between stakeholders and between stated and observed behavior, and route each to the person with decision rights. Revise the technical landscape with newly disclosed systems and constraints. Name the gaps that need another session, questionnaire or document, and prepare targeted follow-ups.",
+          "outputs": "A synthesis per discovery round: attributed facts, current-state workflow, pains, constraints, assumption status table with evidence, glossary updates, conflicts with owners, technical landscape revisions and follow-up questions.",
+          "completion": "High-impact assumptions are confirmed or refuted by actual evidence, or carried as accepted risks with an owner; no customer statement is invented.",
+          "handoff": "When the high-risk assumptions are resolved, play back the problem brief. Low-risk unknowns travel with the brief.",
+          "session": "Continue in the planning session; one synthesis per discovery round.",
           "practices": [
-            "grilling",
+            "domain",
+            "context"
+          ]
+        },
+        "playback": {
+          "id": "playback",
+          "title": "Playback: problem brief & hiện trạng",
+          "phase": "Cùng khách hàng",
+          "role": "ba",
+          "purpose": "Trình lại vấn đề, hiện trạng và mục tiêu theo cách team hiểu để khách xác nhận nền chung.",
+          "partners": [
+            "customer",
+            "pm",
+            "sponsor",
+            "architect"
+          ],
+          "skills": [
+            "domain-modeling",
+            "grill-with-docs"
+          ],
+          "when": "Sau các vòng discovery, trước khi định hình giải pháp.",
+          "inputs": "All discovery syntheses, the assumption status table, domain primer, technical landscape report and stakeholder map.",
+          "duties": "Synthesize; do not re-interview. State the problem, beneficiaries, current workflow as observed, pains with evidence, desired outcome, success signal with baseline and target when known, business, regulatory and technical constraints, initial scope and explicit exclusions, top risks across value, usability, feasibility and viability, and what is still unknown with the decision it blocks. Use the customer's confirmed vocabulary. Keep unknown baselines explicit rather than inventing them. Separate confirmed facts from the team's interpretation. Shape it as a short readout the human can present to the customer, with specific confirmation questions.",
+          "outputs": "A problem brief and current-state readout: problem, actors, current workflow, pains and evidence, desired outcome, success signal, constraints, scope and exclusions, risk summary, confirmed glossary and open decisions; plus the playback confirmation questions.",
+          "completion": "The customer or responsible human has confirmed or corrected the problem, beneficiaries, outcome and constraints; corrections are applied; remaining unknowns name the decision they block.",
+          "handoff": "Continue to solution shaping with the confirmed brief, domain primer and technical landscape as inputs.",
+          "session": "Keep playback, shaping, spec and ticket slicing in the same context when they fit.",
+          "practices": [
             "domain",
             "context"
           ]
         },
         "requirements": {
           "id": "requirements",
-          "title": "Grill ý tưởng & mô hình domain",
+          "title": "Định hình giải pháp & phạm vi",
+          "phase": "Định hình & chốt",
           "role": "ba",
-          "purpose": "Chốt hành vi, phạm vi và quyết định bằng các vòng hỏi theo phụ thuộc.",
+          "purpose": "Chốt hành vi, phạm vi và quyết định trên nền domain, hiện trạng kỹ thuật và brief đã xác nhận.",
           "partners": [
             "po",
             "ux",
@@ -1053,9 +1252,9 @@
             "domain-modeling",
             "codebase-design"
           ],
-          "when": "Sau problem brief; còn lựa chọn về workflow, business rule hoặc interface.",
-          "inputs": "The problem brief, decision tree and answers so far, existing glossary and relevant ADRs, repository evidence and any research or prototype results.",
-          "duties": "Build a design tree of decisions and their prerequisites. Work through users, main and alternate flows, business rules, permissions, invalid input, failure behavior, meaningful quality constraints and the smallest valuable scope. Compare viable options with trade-offs. Recompute the question frontier after each round; resolve accessible facts independently and reserve actual choices for the human. Use concrete scenarios to expose ambiguity. Record resolved terms in the glossary and decision rationale separately. Ask an architect for HLD or an engineer for LLD only when a named architecture, interface, state or data question requires it; constrain that document to the unresolved scope. Choose test seams with engineering and QA, reusing the highest existing public interface possible. Do not prescribe a full technical design before knowing the behavior. Route a runnable question to validation and return with its answer.",
+          "when": "Sau playback đã được xác nhận; còn lựa chọn về workflow, business rule hoặc interface.",
+          "inputs": "The confirmed problem brief, domain primer, technical landscape report, assumption status table, decision tree and answers so far, existing glossary and relevant ADRs, repository evidence and any research or prototype results.",
+          "duties": "Shape on top of the groundwork: start from the domain primer's standard workflows and table-stakes capabilities, the technical landscape's feasibility, rabbit holes and candidate directions, and the confirmed brief; do not ask what those artifacts already answer. Make the appetite explicit and state what gives first among scope, time, budget and quality. Build a design tree of decisions and their prerequisites. Work through users, main and alternate flows, business rules, permissions, invalid input, failure behavior, meaningful quality constraints and the smallest valuable scope. Compare viable options with trade-offs. Recompute the question frontier after each round; resolve accessible facts independently and reserve actual choices for the human. Use concrete scenarios to expose ambiguity. Record resolved terms in the glossary and decision rationale separately. Ask an architect for HLD or an engineer for LLD only when a named architecture, interface, state or data question requires it; constrain that document to the unresolved scope. Choose test seams with engineering and QA, reusing the highest existing public interface possible. Do not prescribe a full technical design before knowing the behavior. Route a runnable question to validation and return with its answer.",
           "outputs": "A resolved decision tree, user flows with examples and failure cases, scope and exclusions, glossary updates, justified ADRs where necessary, proposed test seams with what each catches and misses, and an explicit list of unresolved blockers.",
           "completion": "Every in-scope branch needed for planning is resolved and shared understanding is confirmed. Deferred details are explicitly out of scope or non-blocking. Unresolved blocking choices prevent a ready-to-build claim.",
           "handoff": "If the effort is too large and unclear for one session, chart a wayfinder map. Otherwise synthesize the spec in this context; for a small, fully understood change with agreed test seams, continue directly to implementation when requested.",
@@ -1115,7 +1314,7 @@
           ],
           "when": "Có điều kiện: đã chốt build và cần nhiều session; việc nhỏ có thể sang implement, hoãn / dừng thì kết thúc.",
           "conditional": true,
-          "inputs": "The current conversation, confirmed problem or feature decision brief, glossary, relevant ADRs, repository understanding, validation results and linked wayfinder decisions if present. HLD / LLD are inputs only when produced to settle a real question.",
+          "inputs": "The current conversation, confirmed problem or feature decision brief, domain primer and technical landscape report when produced at kickoff, glossary, relevant ADRs, repository understanding, validation results and linked wayfinder decisions if present. HLD / LLD are inputs only when produced to settle a real question.",
           "duties": "Synthesize what is already known; do not restart the interview or invent unresolved decisions. Describe the problem and solution from the user's perspective. Write numbered stories in the form \"As an <actor>, I want <feature>, so that <benefit>\", comprehensive within the chosen scope. Add concrete acceptance scenarios covering main flow, alternatives and meaningful failures. Record implementation decisions (modules, interfaces, state/data changes, contracts, compatibility and rollout where relevant) and testing decisions (public seams, modules tested and prior art). Prefer the highest existing seam and keep the seam count small. If seam agreement is missing, surface that specific decision without reopening the whole discovery. Omit volatile file paths and implementation snippets, except a concise decision-rich prototype excerpt with its source. Save to the configured canonical location when authorized, otherwise produce a ready-to-save body. Label confirmed unresolved blockers and route them back to discovery.",
           "outputs": "A spec with Problem Statement, Solution, numbered User Stories and acceptance criteria, Implementation Decisions, Testing Decisions, Out of Scope and Further Notes. Include source links, success signal, resolved decisions and any pending blockers. Mark ready-for-agent only when agent-ready; specs produced here do not need incoming-request triage.",
           "completion": "Every in-scope story has observable acceptance criteria and confirmed testing decisions; no blocking behavior or interface choice is silently assumed. A draft with blockers stays a draft.",
@@ -1373,8 +1572,12 @@
           "container": "kickoff-flow",
           "title": "Kickoff dự án",
           "steps": [
-            "setup",
-            "request",
+            "intake",
+            "domain-research",
+            "tech-discovery",
+            "discovery-kit",
+            "stakeholder-discovery",
+            "playback",
             "requirements",
             "wayfinding",
             "specification"
@@ -1404,6 +1607,8 @@
         }
       ];
       const stepPractices = {
+        groundwork:
+          "GROUNDWORK BEFORE CONVERSATION: Learn before you ask, as an experienced consultant does before meeting a client. Research the industry, the customer's public footprint and the technical landscape from primary sources first; ask people only for what cannot be learned elsewhere: their specific workflow, priorities, constraints, data and decisions. Cite every source, mark confidence and separate established practice, observation and inference. Public research yields hypotheses about this customer, never facts about them; never present a researched or inferred statement as something the customer said. Go deep on what changes a question, risk or option rather than broad background, and stop a research thread when the next finding would not change any of them.",
         grilling:
           "CLARIFY BY INTERVIEW: Build a design tree where each decision names its prerequisites. Work in rounds: ask only the current frontier, meaning decisions whose prerequisites are already settled. Number each question, explain why it matters and give a recommended answer with its trade-off, worded so that yes accepts the recommendation. Wait for actual answers, then recompute the frontier; dependent questions belong to a later round. Keep the round manageable, splitting a large frontier into coherent batches. Finding accessible facts is your job; inspect sources and continue independent work while a lookup is pending. Decisions belong to the human. Reuse recorded answers rather than asking again. The interview is complete when every in-scope planning branch is settled and shared understanding is confirmed; silence does not confirm a decision. Keep deferred scope explicit and do not silently assume blocking choices.",
         domain:
@@ -1414,16 +1619,35 @@
         context:
           "SESSION CONTEXT HYGIENE: Decide at phase boundaries. Continue first when the next phase needs the reasoning or fits the remaining context: keep clarification → spec → tickets together, and continue a small clarified task into implementation. Start fresh for each planned implementation ticket using its canonical spec, glossary, ADRs and test decisions, not only a summary. Clear only when the current reasoning is disposable; run retro before clearing, or read the actual session log afterward. Use a portable handoff for a tool, repository or person switch. Delegate a tightly scoped independent task only when tools and authorization permit. When staying no longer fits and the human still needs to steer, compact at a phase boundary with decisions, rationale, source links and unresolved questions; never infer that another session shares memory.",
       };
-      const promptField = document.getElementById("prompt");
+      const promptFields = {
+        system: document.getElementById("system-prompt"),
+        request: document.getElementById("request-prompt"),
+      };
+      const promptKindNames = {
+        system: "system prompt",
+        request: "first request",
+      };
       const status = document.getElementById("status");
       let selectionVersion = 0;
-      function systemPrompt(role, step) {
-        const stepTask = step
-          ? `
-PROCESS STEP TASK
-Current step: ${step.title}
-Act as the executing role: ${role.name}.
-This step narrows the general role responsibilities. Produce its requested result; do not expand a brainstorm into implementation or require unrelated lifecycle artifacts.
+      let selectedPromptName = "";
+      let statusTimer;
+      const requestPlaceholder = `MY REQUEST AND CONTEXT
+[Describe the outcome you want, paste links or relevant context, and list decisions already made.]`;
+      function firstRequest(role, step) {
+        if (!step)
+          return `TASK FOR ${role.name.toUpperCase()}
+Work on the request below from your role perspective. Inspect the available sources first, then produce only the relevant parts of: ${role.outputs}
+
+USEFUL INPUTS
+${role.inputs}
+Use what is available. Name any missing input that materially affects the result instead of guessing it.
+
+FIRST RESPONSE
+State your understanding of the goal and how completion will be recognized in one or two sentences. Then deliver the result, or ask the current question round with recommendations if a missing decision blocks it.
+
+${requestPlaceholder}`;
+        return `PROCESS STEP: ${step.title}
+Take this step from the ${role.name} perspective. It narrows your general role responsibilities: produce its requested result; do not expand a brainstorm into implementation or require unrelated lifecycle artifacts.
 
 WHEN TO USE
 ${step.when}
@@ -1463,8 +1687,10 @@ Continue using the full reasoning when staying in this session. For an actual ha
 
 STEP RESPONSE FORMAT
 During an interview, give a short established-facts summary and the current question round with recommendations; wait before dependent choices. When producing an artifact, lead with it, then evidence, decision status, unresolved blockers and the next route. Generate a portable handoff only when work actually moves. Revisiting a step is appropriate when new evidence changes its decisions; do not invent additional approval gates.
-`
-          : "";
+
+${requestPlaceholder}`;
+      }
+      function systemPrompt(role) {
         const coordination =
           role.id === "coordinator"
             ? `
@@ -1473,7 +1699,7 @@ COORDINATION PROTOCOL
 2. Make the outcome explicit. State "My understanding of your goal is ..." and describe the artifact, decision, or observable change that would satisfy it. Use information already supplied. If a missing detail would change the route, ask up to three focused questions and label any proposed route provisional. Otherwise proceed directly with the best-supported interpretation.
 3. Select roles by contribution. Use the catalog below and choose only roles needed to close a knowledge gap, produce an artifact, verify a result, or exercise an actual decision right. One role may be sufficient. Distinguish required roles from conditional roles and state the trigger for each conditional role. Multiple titles may be held by one person; ask about real ownership only when it affects routing. If expertise is missing from the catalog, name the gap and explain the additional expertise needed.
 4. Sequence the conversations. Put prerequisites before dependent work and mark independent consultations as parallel options. Prioritize active incidents according to impact and the established incident process. Route product value and ordering to the Product Owner, business-rule clarification to the Business Analyst, user evidence to UX and real users, implementation to engineering, quality evidence to QA and Developers, and reliability incidents to the service owner or SRE. Add architecture, security, legal, management, or release coordination only when the problem warrants their contribution. A small bug fix does not automatically require the full lifecycle or every role.
-5. Choose the working route. For a project kickoff, reuse or resolve repository setup, establish the problem brief, then clarify decisions. For a new feature, inspect existing behavior and related work, compare options and the smallest valuable scope, validate named uncertainty, then record a build/investigate/defer decision. Use research for accessible missing facts, a questionnaire for knowledge held by another person, and a prototype for a question requiring runnable UI or state behavior. For an effort too large and unclear for one session, use a wayfinder map of decision tickets, then collapse its resolved decisions into spec → build tickets. Incoming external requests may need triage; tickets created from a spec do not. A difficult bug needs a feedback loop that reproduces the actual symptom before theorizing. A clear small task can go directly to implementation when requested. A brainstorm-only request ends at its decision artifact; do not silently start coding. HLD / LLD are scoped tools for actual unresolved design questions, not mandatory documents for every route.
+5. Choose the working route. For a project kickoff, do the groundwork before involving the customer: intake every supplied artifact and resolve the artifact layout, research the domain and run technical discovery (independent, parallelizable), turn both into hypotheses and a discovery kit, synthesize actual customer sessions, play back a problem brief for confirmation, then shape the solution and clarify decisions. Never open a kickoff by interviewing the human about facts that research or supplied artifacts can answer. For a new feature, inspect existing behavior and related work, compare options and the smallest valuable scope, validate named uncertainty, then record a build/investigate/defer decision. Use research for accessible missing facts, a questionnaire for knowledge held by another person, and a prototype for a question requiring runnable UI or state behavior. For an effort too large and unclear for one session, use a wayfinder map of decision tickets, then collapse its resolved decisions into spec → build tickets. Incoming external requests may need triage; tickets created from a spec do not. A difficult bug needs a feedback loop that reproduces the actual symptom before theorizing. A clear small task can go directly to implementation when requested. A brainstorm-only request ends at its decision artifact; do not silently start coding. HLD / LLD are scoped tools for actual unresolved design questions, not mandatory documents for every route.
 6. Make the next step actionable. Prefer continuing within the current context while changing role perspective. Keep clarification → spec synthesis → ticket slicing together; spec synthesis reuses prior answers. Plan fresh implementation contexts for each ready ticket, carrying the canonical spec, glossary, ADRs and agreed test seams. At an actual tool/repo/person switch, provide a portable brief with goal, sources, decisions and rationale, exact task, constraints, expected output, completion criteria and return criteria. Do not imply shared memory or contacts that did not happen. Give a concrete next action instead of only a consultation plan when execution was requested.
 7. Track progress against evidence. Compare returned results with expected outputs and success criteria. Preserve actual decisions, distinguish hypotheses from facts and proposed from confirmed choices, identify blockers and revise the route. Ask missing material decisions at the current frontier with recommendations; do not ask accessible facts or re-ask settled choices. Stop an investigation route at a decision artifact, not a fictitious delivery claim. Run retro before clearing the session it reviews, or read its actual log later.
 8. Close against the requested outcome. Summarize achieved artifacts and supporting evidence. If incomplete, state exactly what remains and who should address it. A plan or brainstorming decision can complete a planning-only request; it does not complete a requested implementation. When assigned a specific process step, execute that step rather than outputting the entire route again.
@@ -1537,7 +1763,8 @@ WORKING METHOD
 4. Validate with the available tools or evidence. Report what you actually checked, the result, and material limits. Never present planned or simulated activity as executed work.
 5. Deliver the relevant artifact, key findings, remaining risks, and next steps. Suggest backlog changes or improvement experiments when supported by evidence.
 ${coordination}
-${stepTask}
+TASK INTAKE
+This message defines your role for the whole thread; tasks arrive in later user messages. When a message names a process step, that step narrows these responsibilities: produce its requested result and judge completion by its criteria. A message may ask you to take another role's perspective for one step; keep these boundaries while doing so.
 
 RESPONSE STYLE
 Use the user's language unless they request another; default to English only when no preference is evident. Lead with the result, or the next question round during discovery, and provide only detail needed to review it or take action. Use clear terminology and explain specialist terms when needed. Begin using available context; if no task has been supplied, ask what outcome the user wants this role to deliver.`;
@@ -1545,6 +1772,12 @@ Use the user's language unless they request another; default to English only whe
       function showStatus(message, failed = false) {
         status.textContent = message;
         status.classList.toggle("error", failed);
+        status.classList.add("visible");
+        clearTimeout(statusTimer);
+        statusTimer = setTimeout(
+          () => status.classList.remove("visible"),
+          failed ? 6000 : 2500,
+        );
       }
       function legacyCopy(text) {
         const previousFocus = document.activeElement;
@@ -1565,7 +1798,22 @@ Use the user's language unless they request another; default to English only whe
         }
         if (!copied) throw new Error("Clipboard unavailable");
       }
-      async function copyPrompt(text, roleName, version) {
+      const chipLabels = { system: "⧉ System", request: "⧉ Request" };
+      const chipTimers = new Map();
+      function markCopied(chip, kind) {
+        chip.textContent = "✓ Đã chép";
+        chip.classList.add("copied");
+        clearTimeout(chipTimers.get(chip));
+        chipTimers.set(
+          chip,
+          setTimeout(() => {
+            chip.textContent = chipLabels[kind];
+            chip.classList.remove("copied");
+          }, 1500),
+        );
+      }
+      async function copyPrompt(kind, promptName, version, chip) {
+        const text = promptFields[kind].value;
         try {
           try {
             if (!navigator.clipboard?.writeText)
@@ -1574,81 +1822,90 @@ Use the user's language unless they request another; default to English only whe
           } catch {
             legacyCopy(text);
           }
+          if (chip) markCopied(chip, kind);
           if (version === selectionVersion)
-            showStatus(`Đã sao chép system_prompt · ${roleName}`);
+            showStatus(`Đã sao chép ${promptKindNames[kind]} · ${promptName}`);
         } catch {
           if (version !== selectionVersion) return;
           showStatus(
-            "Trình duyệt chặn clipboard. Chọn nội dung prompt bên cạnh rồi nhấn Ctrl+C hoặc ⌘C.",
+            "Trình duyệt chặn clipboard. Chọn nội dung prompt trong ô bên dưới rồi nhấn Ctrl+C hoặc ⌘C.",
             true,
           );
-          promptField.focus();
-          promptField.select();
+          promptFields[kind].focus();
+          promptFields[kind].select();
         }
       }
-      function selectRole(identifier, step) {
+      function selectNode(node, identifier, step) {
         const role = roles[identifier];
         selectionVersion += 1;
-        const text = systemPrompt(role, step);
-        const promptName = step
-          ? `${step.title} · ${role.name}`
-          : role.name;
-        promptField.value = text;
-        document.getElementById("selected-role").textContent = promptName;
+        selectedPromptName = step ? `${step.title} · ${role.name}` : role.name;
+        promptFields.system.value = systemPrompt(role);
+        promptFields.request.value = firstRequest(role, step);
+        document.getElementById("selected-role").textContent =
+          selectedPromptName;
         document.getElementById("role-focus").textContent = step
           ? step.purpose
           : role.focus;
         document.getElementById("role-partners").textContent =
           `Phối hợp: ${step ? step.partners.map((identifier) => roles[identifier].name).join(", ") : role.partners}.`;
-        document.getElementById("copy").disabled = false;
+        document.getElementById("copy-system").disabled = false;
+        document.getElementById("copy-request").disabled = false;
         document
           .querySelectorAll(".node")
-          .forEach((button) =>
-            button.setAttribute(
-              "aria-pressed",
-              String(
-                button.dataset.role === identifier &&
-                  button.dataset.step === (step?.id ?? ""),
-              ),
-            ),
+          .forEach((element) =>
+            element.classList.toggle("selected", element === node),
           );
-        showStatus(`Đang sao chép · ${promptName}…`);
-        copyPrompt(text, promptName, selectionVersion);
       }
-      function roleButton(identifier, step) {
+      function roleNode(identifier, step) {
         const role = roles[identifier];
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "node";
-        button.dataset.role = identifier;
-        button.dataset.step = step?.id ?? "";
-        button.setAttribute("aria-pressed", "false");
-        button.setAttribute(
-          "aria-label",
-          `Sao chép system prompt: ${role.name}${step ? ` · ${step.title}` : ""}`,
-        );
+        const node = document.createElement("div");
+        node.className = "node";
         const title = document.createElement("strong");
         title.textContent = step ? `Thực hiện: ${role.name}` : role.name;
         const focus = document.createElement("small");
-        focus.textContent = step
-          ? "Xem và sao chép prompt cho bước này"
-          : role.focus;
-        button.append(title, focus);
-        button.addEventListener("click", () => selectRole(identifier, step));
-        return button;
+        focus.textContent = role.focus;
+        const actions = document.createElement("div");
+        actions.className = "node-actions";
+        const target = `${role.name}${step ? ` · ${step.title}` : ""}`;
+        [
+          ["system", `Sao chép system prompt định nghĩa ROLE: ${target}`],
+          ["request", `Sao chép first request: ${target}`],
+        ].forEach(([kind, label]) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = `copy-chip ${kind}`;
+          chip.textContent = chipLabels[kind];
+          chip.title = label;
+          chip.setAttribute("aria-label", label);
+          chip.addEventListener("click", () => {
+            selectNode(node, identifier, step);
+            copyPrompt(kind, selectedPromptName, selectionVersion, chip);
+          });
+          actions.append(chip);
+        });
+        node.append(title, focus, actions);
+        return node;
       }
       document.getElementById("role-count").textContent =
         `${Object.keys(roles).length} role / accountability`;
       document
         .getElementById("coordinator-entry")
-        .append(roleButton("coordinator"));
+        .append(roleNode("coordinator"));
       workflows.forEach((workflow) => {
         const container = document.getElementById(workflow.container);
+        let previousPhase;
         workflow.steps.forEach((identifier, index) => {
           const step = workflowSteps[identifier];
           const card = document.createElement("li");
           card.dataset.step = step.id;
           card.classList.toggle("conditional", step.conditional === true);
+          if (step.phase && step.phase !== previousPhase) {
+            const phase = document.createElement("div");
+            phase.className = "step-phase";
+            phase.textContent = step.phase;
+            card.append(phase);
+          }
+          previousPhase = step.phase ?? previousPhase;
           const heading = document.createElement("h3");
           heading.textContent = `${index + 1}. ${step.title}`;
           const purpose = document.createElement("p");
@@ -1665,7 +1922,7 @@ Use the user's language unless they request another; default to English only whe
           const partners = document.createElement("p");
           partners.className = "step-note";
           partners.textContent = `Phối hợp: ${step.partners.map((identifier) => roles[identifier].name).join(", ")}.`;
-          assignment.append(roleButton(step.role, step), partners);
+          assignment.append(roleNode(step.role, step), partners);
           card.append(heading, purpose, condition, skills, assignment);
           container.append(card);
         });
@@ -1687,14 +1944,14 @@ Use the user's language unless they request another; default to English only whe
         note.textContent = stage.note;
         section.append(heading, note);
         stage.roles.forEach((identifier) =>
-          section.append(roleButton(identifier)),
+          section.append(roleNode(identifier)),
         );
         document.getElementById("stages").append(section);
         stageElements.push(section);
       });
       ["sm", "em", "delivery", "coach", "security", "legal"].forEach(
         (identifier) =>
-          document.getElementById("cross-roles").append(roleButton(identifier)),
+          document.getElementById("cross-roles").append(roleNode(identifier)),
       );
       function drawConnections() {
         const svg = document.getElementById("connections");
@@ -1770,6 +2027,8 @@ Use the user's language unless they request another; default to English only whe
             );
           }
         });
+        const rowGapMiddle =
+          (bounds(stageElements[0]).bottom + bounds(stageElements[5]).top) / 2;
         const review = bounds(stageElements[8].querySelector(".node"));
         const backlog = bounds(stageElements[2].querySelector(".node"));
         const reviewGutter =
@@ -1779,17 +2038,17 @@ Use the user's language unless they request another; default to English only whe
           true,
           "Review + production feedback → Product Backlog → Sprint tiếp theo",
           diagramBounds.width * 0.247,
-          418,
+          rowGapMiddle - 17,
         );
         const quality = bounds(stageElements[5].querySelector(".node"));
         const build = bounds(stageElements[4].querySelectorAll(".node")[1]);
         const qualityGutter = diagramBounds.width - 12;
         edge(
-          `M ${quality.center} ${quality.top} L ${quality.center} 448 L ${qualityGutter} 448 L ${qualityGutter} ${build.middle} L ${build.right} ${build.middle}`,
+          `M ${quality.center} ${quality.top} L ${quality.center} ${rowGapMiddle + 13} L ${qualityGutter} ${rowGapMiddle + 13} L ${qualityGutter} ${build.middle} L ${build.right} ${build.middle}`,
           true,
           "Kiểm chứng ↔ xây dựng trong Sprint",
           diagramBounds.width * 0.7,
-          442,
+          rowGapMiddle + 7,
         );
         const renewal = bounds(stageElements[9].querySelector(".node"));
         const strategy = bounds(stageElements[0].querySelector(".node"));
@@ -1798,19 +2057,21 @@ Use the user's language unless they request another; default to English only whe
           true,
           "Tiếp tục: điều chỉnh chiến lược · Kết thúc: migration / tắt dịch vụ / xử lý dữ liệu",
           90,
-          890,
+          bounds(stageElements[9]).bottom + 60,
         );
       }
       drawConnections();
-      window.addEventListener("resize", drawConnections);
+      new ResizeObserver(drawConnections).observe(
+        document.getElementById("stages"),
+      );
       document.fonts?.ready.then(drawConnections);
-      document.getElementById("copy").addEventListener("click", () => {
-        copyPrompt(
-          promptField.value,
-          document.getElementById("selected-role").textContent,
-          selectionVersion,
-        );
-      });
+      ["system", "request"].forEach((kind) =>
+        document
+          .getElementById(`copy-${kind}`)
+          .addEventListener("click", () =>
+            copyPrompt(kind, selectedPromptName, selectionVersion),
+          ),
+      );
     </script>
   </body>
 </html>
