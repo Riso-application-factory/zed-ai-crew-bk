@@ -192,3 +192,17 @@ Rules emerge from validated patterns, not one-off observations. The workflow is:
 1. Agent notes a pattern during a session.
 2. Team validates the pattern in code review.
 3. A dedicated commit adds the rule with context on *why* it exists.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues of `Riso-application-factory/zed-ai-crew` via `gh -R Riso-application-factory/zed-ai-crew`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), already present on GitHub. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` at the repo root and `docs/adr/`, created lazily. HTML files under `artifacts/` are review views that link back to the canonical issue, glossary or ADR; they are not a source of truth. See `docs/agents/domain.md`.

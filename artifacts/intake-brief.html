@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Intake brief · Zed AI Crew</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --card: #ffffff; --accent: #2f6fdb; --warn: #b26b00; --ok: #1f8a4c; --chip: #eef2fb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --fg: #e8e8ea; --muted: #9a9aa2; --line: #2c2d31;
+      --card: #1f2023; --accent: #6ea0ff; --warn: #e0a040; --ok: #4cc27f; --chip: #23304a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { width: 100%; max-width: none; padding: clamp(16px, 3vw, 40px); }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 32px 0 10px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+    background: var(--chip); color: var(--accent); margin-right: 6px; }
+  .badge.warn { color: var(--warn); }
+  .badge.ok { color: var(--ok); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .card p { margin: 6px 0; }
+  .label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .rec { border-left: 3px solid var(--ok); padding-left: 10px; margin-top: 8px; }
+  .example { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); }
+  ol.opts { margin: 4px 0; padding-left: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  td:first-child { white-space: nowrap; font-weight: 600; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--chip); padding: 1px 4px; border-radius: 4px; }
+  pre { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--chip); padding: 10px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  .src { color: var(--accent); font-size: 12px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Intake brief · Zed AI Crew</h1>
+  <p class="meta">
+    <span class="badge ok">Complete · Q1–Q3 đã chốt 2026-10-10</span>
+    Bước: Tiếp nhận &amp; khung dự án · Coordinator · 2026-10-10 ·
+    Nguồn: <b>[R]</b> yêu cầu của Human · <b>[S]</b> <code>artifacts/sdlc.html</code> ·
+    <b>[U]</b> <code>zed-scrum-team/old-specs/orchestrator/ui-design.html</code> ·
+    <b>[O]</b> <code>zed-scrum-team/old-specs/README.md</code> · <b>[Z]</b> repo/GitHub đã kiểm tra
+  </p>
+
+  <h2>1 · Quyết định đã chốt (Human đồng ý cả 3 khuyến nghị, 2026-10-10)</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Q1 · Nơi lưu nguồn sự thật (artifact layout)</h3>
+      <p><span class="label">Ngữ cảnh</span> Các skill (to-spec, to-tickets, triage, wayfinder) cần biết ghi issue ở đâu và đọc glossary/ADR ở đâu. Hiện repo chưa có <code>GLOSSARY.md</code>, <code>docs/adr/</code>, và <code>.rules</code> chưa có mục “Agent skills”. 5 nhãn triage <b>đã có sẵn</b> trên GitHub. <span class="src">[Z]</span></p>
+      <p class="example"><span class="label">Ví dụ</span> Spec “Kickoff flow chạy tự động” là một GitHub issue; ticket con là sub-issue; bản HTML để bạn duyệt nằm ở <code>artifacts/kickoff-flow/spec.html</code> và trỏ ngược về issue.</p>
+      <div class="rec"><b>Đã chốt — đã ghi:</b> GitHub Issues của <code>Riso-application-factory/zed-ai-crew</code> + nhãn mặc định · single-context: <code>GLOSSARY.md</code> ở root + <code>docs/adr/</code> · thêm mục “Agent skills” vào <code>.rules</code> (cả 3 provider cùng đọc) · HTML trong <code>artifacts/</code> chỉ là bản xem, không phải nguồn · không dùng <code>docs/specs/</code> (đang trống) để tránh hai nguồn spec. Bản nháp các file ở mục 6.</div>
+    </div>
+    <div class="card">
+      <h3>Q2 · Vai trò của thiết kế cũ zed-scrum-team</h3>
+      <p><span class="label">Ngữ cảnh</span> Đã có bộ Contract 1.0 (2026-10-03) chưa triển khai: Orchestrator, Worker, SDLC (12 scenario / 33 cycle), Backlog riêng. Hai điểm lệch với yêu cầu mới: tracker giờ là GitHub Issues thay vì backlog.db, và worker chạy qua ACP thay vì native Zed Agent. <span class="src">[O][R]</span></p>
+      <p class="example"><span class="label">Ví dụ</span> D-ORC-04 “pipeline đọc trạng thái từ run store, không đọc từ chat” có thể giữ nguyên. Còn “Worker = native Zed Agent theo preset” thì phải mở lại.</p>
+      <ol class="opts">
+        <li><b>Input nghiên cứu</b>: technical discovery khai thác lại, mỗi quyết định giữ lại được ghi thành ADR mới ở repo này.</li>
+        <li>Coi là canonical rồi sửa dần các chỗ lệch.</li>
+        <li>Bỏ qua, chỉ dùng UI.</li>
+      </ol>
+      <div class="rec"><b>Đã chốt: 1.</b> Giữ được công sức cũ mà không kéo theo các hợp đồng đã lệch. UI ở [U] vẫn là hình mẫu đúng ý bạn.</div>
+    </div>
+    <div class="card">
+      <h3>Q3 · “Production-ready, bỏ MVP” nghĩa là gì khi giao hàng</h3>
+      <p><span class="label">Ngữ cảnh</span> Quyết định này đổi thứ tự route. Scrum vẫn giao theo Increment, và mỗi Increment phải đạt Definition of Done. <span class="src">[R]</span></p>
+      <p class="example"><span class="label">Ví dụ</span> Increment 1: luồng “Build theo ticket” chạy thật end-to-end với worker ACP + GitHub Issues + gate Human, đạt chuẩn production (test, xử lý lỗi, khôi phục sau restart), nhưng chưa có luồng incident.</p>
+      <ol class="opts">
+        <li><b>Product Goal = phủ 100% kịch bản</b>; giao theo lát dọc, lát nào cũng đạt chất lượng production, không có code thử nghiệm trong main.</li>
+        <li>Chỉ dùng khi đã phủ đủ mọi kịch bản (big-bang).</li>
+      </ol>
+      <div class="rec"><b>Đã chốt: 1.</b> Bạn dùng được thật từ sớm và có phản hồi thật. Phương án 2 dồn toàn bộ rủi ro về cuối.</div>
+    </div>
+  </div>
+
+  <h2>2 · Khung engagement</h2>
+  <div class="card">
+    <p><b>Vấn đề:</b> Human đang chạy SDLC trong [S] bằng tay: mở thread mới rồi dán system prompt và first request. Kết quả gặp hai vấn đề: code AI viết không theo kiến trúc nên khó bảo trì, và artifact lan man. <span class="src">[R][S]</span></p>
+    <p><b>Kết quả cuối:</b> Zed hoạt động như một development team Agile. Human chỉ đưa yêu cầu, trả lời câu hỏi clarify và duyệt ở gate. Orchestrator điều phối các worker (claude / codex / antigravity qua ACP) theo playbook <i>session › cycle › step</i>. Nguồn ngữ cảnh chung gồm GitHub Issues, glossary/ADR và artifact HTML. Chất lượng đo theo ISO/IEC 25010:2023. <span class="src">[R]</span></p>
+    <p><b>Kickoff này phải ra:</b> intake (bản này) → domain primer + technical landscape (chạy song song) → playback problem brief để bạn xác nhận → định hình giải pháp → spec → ticket. Hiện <b>chưa có deadline</b>, nên các bước chỉ được sắp theo phụ thuộc.</p>
+    <p><b>Chưa làm ở bước này:</b> thiết kế giải pháp, chọn kiến trúc.</p>
+  </div>
+
+  <h2>3 · Chi tiết</h2>
+
+  <details>
+    <summary>Facts đã trích (11) — kèm nguồn</summary>
+    <table>
+      <tr><th>ID</th><th>Fact</th><th>Nguồn</th></tr>
+      <tr><td>F1</td><td>Dùng 3 provider qua ACP: claude, codex (<code>codex-acp</code>), antigravity (<code>antigravity-acp</code>, binary <code>agy_acp_server</code>).</td><td class="src">[R] · crates/agent_servers/src/custom.rs:20 · docs/src/ai/external-agents.md</td></tr>
+      <tr><td>F2</td><td>Quy trình hiện tại: mỗi node có 2 prompt để copy, System (ROLE) và Request (step), dán vào thread mới.</td><td class="src">[R][S]</td></tr>
+      <tr><td>F3</td><td>[S] có 23 role, 10 giai đoạn vòng đời và 3 luồng: Kickoff 9 bước, Brainstorm feature 4 bước, Build theo ticket 5 bước (đã tính retro). Prompt = <code>systemPrompt(role)</code> + <code>firstRequest(role, step)</code>.</td><td class="src">[S] script: roles / stages / workflowSteps / workflows</td></tr>
+      <tr><td>F4</td><td>Luật context: làm rõ → spec → ticket ở chung một session; mỗi ticket dùng session sạch; chỉ chạy song song các ticket đã hết blocker; implement-spec làm trên nhánh riêng rồi gom vào integration branch.</td><td class="src">[S]</td></tr>
+      <tr><td>F5</td><td>Ý tưởng của Human: playbook phủ mọi kịch bản ngoài đời thật; mỗi việc là session › cycle › step có input/output; có gate để Human review; câu hỏi phải kèm ngữ cảnh và ví dụ; artifact ở dạng HTML; cấu hình chuẩn có thể override theo project; dùng GitHub Issues.</td><td class="src">[R]</td></tr>
+      <tr><td>F6</td><td>UI mong muốn: dải pipeline 32px nằm dưới ô chat của thread Orchestrator; mở rộng thành đồ thị, mỗi node là một cycle run chứa các step; fan-out theo làn; Run log là tab ở pane giữa; câu hỏi cho Human vẫn nằm trong hội thoại; không có nút Approve/Re-run; trạng thái đọc từ run store, không đọc từ chat.</td><td class="src">[U] §1, §3–5, §7, §9, §12</td></tr>
+      <tr><td>F7</td><td>Thiết kế cũ Contract 1.0 chưa triển khai: Worker là native Zed Agent; có backlog.db và sdlc.db riêng; Orchestrator là Claude qua ACP cộng MCP Bridge.</td><td class="src">[O]</td></tr>
+      <tr><td>F8</td><td>Repo là fork public của zed-industries/zed và đã bật Issues; đã có 5 nhãn triage; chưa có <code>GLOSSARY.md</code> và <code>docs/adr/</code>; <code>docs/agents/</code> đang trống.</td><td class="src">[Z] gh repo view · gh label list</td></tr>
+      <tr><td>F9</td><td><code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>GEMINI.md</code> đều là symlink tới <code>.rules</code>. Skills nằm ở <code>.agents/skills</code>; không có <code>.claude/skills</code>.</td><td class="src">[Z] ls -la</td></tr>
+      <tr><td>F10</td><td>Ranh giới ACP: Zed Skills không đi qua ACP; MCP server của Zed được forward lúc <code>session/new</code>; gate quyền chỉ chạy qua <code>session/request_permission</code> và bị bỏ qua khi agent ở chế độ bypass/yolo.</td><td class="src">docs/src/ai/external-agents.md</td></tr>
+      <tr><td>F11</td><td>Token <code>gh</code> có scope <code>repo</code> nhưng <b>không có <code>project</code></b>, nên muốn dùng GitHub Projects (board) thì phải chạy <code>gh auth refresh -s project</code>. Upstream có khoảng 165 commit vào agent_ui / acp_thread / agent_servers từ 2026-07-01 (theo lần fetch upstream gần nhất ở máy).</td><td class="src">[Z] gh auth status · git log upstream/main</td></tr>
+    </table>
+  </details>
+
+  <details>
+    <summary>Stakeholder map</summary>
+    <table>
+      <tr><th>Ai</th><th>Vai</th><th>Ảnh hưởng / lợi ích</th></tr>
+      <tr><td>Human</td><td>Sponsor, Product Owner, khách hàng, người dùng duy nhất, người vận hành</td><td>Có toàn quyền quyết định và duyệt gate. Muốn giảm thao tác tay, có code bảo trì được và artifact ngắn gọn.</td></tr>
+      <tr><td>Orchestrator / Workers (AI)</td><td>Tác nhân thực thi</td><td>Không có quyền quyết định sản phẩm (F6: không có nút Approve).</td></tr>
+      <tr><td>Upstream Zed</td><td>Bên ngoài, có thể gây cản trở</td><td>Thay đổi nhiều ở các crate agent (F11), nên mỗi lần sync tốn công nếu sửa sâu vào agent_ui.</td></tr>
+      <tr><td>Vendor ACP (Anthropic, OpenAI, Google)</td><td>Bên ngoài, có thể gây cản trở</td><td>Nắm capability của adapter, auth, rate limit, chế độ quyền và cách đọc skills.</td></tr>
+      <tr><td>GitHub</td><td>Nền tảng</td><td>API Issues, sub-issue, dependency. Repo đang public nên mọi nội dung ghi lên đều công khai.</td></tr>
+    </table>
+    <p class="meta">Ba góc nhìn đồng hành của bước này (PM, Sponsor, Tech Lead) đều do Human nắm; AI chỉ mô phỏng góc nhìn, không thay quyết định.</p>
+  </details>
+
+  <details>
+    <summary>Ràng buộc cứng &amp; giả định</summary>
+    <table>
+      <tr><th>ID</th><th>Nội dung</th><th>Trạng thái</th></tr>
+      <tr><td>C1</td><td>Hỗ trợ cả 3 provider ACP: claude, codex, antigravity</td><td>Đã nêu [R]</td></tr>
+      <tr><td>C2</td><td>Issue tracker là GitHub Issues</td><td>Đã nêu [R]</td></tr>
+      <tr><td>C3</td><td>Chuẩn chất lượng ISO/IEC 25010:2023</td><td>Đã nêu [R]</td></tr>
+      <tr><td>C4</td><td>Production-ready, chỉ một người dùng (không cần đa người dùng hay phân quyền)</td><td>Đã nêu [R]; cách giao hàng: Q3</td></tr>
+      <tr><td>C5</td><td>Xây trong fork Zed (Rust/GPUI), tuân theo <code>.rules</code> (luật Rust, PR hygiene, <code>./script/clippy</code>)</td><td>Đã nêu [R][Z]</td></tr>
+      <tr><td>A1</td><td>Worker là các thread ACP của 3 provider (suy từ “cả 3 đều thông qua ACP”)</td><td>Giả định, TD1/TD2 kiểm chứng</td></tr>
+      <tr><td>A2</td><td>Tracker của target-project là GitHub Issues của repo target; end-project dùng repo này</td><td>Giả định</td></tr>
+      <tr><td>C6</td><td>Có sync upstream Zed định kỳ, nên code của Crew phải nằm trong crate riêng và chỉ móc mỏng vào các crate upstream</td><td>Đã nêu (Human, 2026-10-10)</td></tr>
+      <tr><td>C7</td><td>Gói provider: Claude subscription $100, Codex subscription $20, Antigravity gói Ultra. Codex là gói thấp nhất, nhiều khả năng hạn mức cũng hẹp nhất; hạn mức thật do TD1 đo</td><td>Đã nêu (Human, 2026-10-10)</td></tr>
+      <tr><td>—</td><td>Deadline: không có. Thứ tự Increment chỉ dựa vào phụ thuộc và giá trị</td><td>Đã nêu (Human, 2026-10-10)</td></tr>
+    </table>
+  </details>
+
+  <details open>
+    <summary>Bằng chứng pain point từ Human</summary>
+    <p><b>E1 · Dự án text-to-speech (2026, Human kể lại):</b> yêu cầu là dựng frontend cho backend có sẵn (OmniVoice), lấy giao diện ElevenLabs làm hình mẫu. AI không tìm hiểu kỹ backend mà sao chép 100% UI của ElevenLabs. Kết quả là frontend và backend không khớp nhau, và sản phẩm thất bại.</p>
+    <p><b>Phân tích:</b> AI copy hình mẫu nhưng không đối chiếu với năng lực của hệ thống có sẵn. Cụ thể là bỏ qua ba việc: kiểm kê capability của backend, lập bảng ánh xạ từ tính năng của hình mẫu sang capability đó, và gate kiểm chứng tích hợp. Hướng xử lý giả định: playbook bắt buộc có contract trước UI, và phải kiểm chứng end-to-end trên backend thật. Hướng này cần DR4 và TD xác nhận.</p>
+    <p class="meta">Ràng buộc từ Human: <b>không nghiên cứu sản phẩm OmniVoice hay ElevenLabs</b>. Ví dụ chỉ dùng để phân tích end-product. Quy tắc này cũng áp dụng cho “Claude Design clone”.</p>
+  </details>
+
+  <details>
+    <summary>Artifact layout (đã ghi vào <code>.rules</code> và <code>docs/agents/</code>)</summary>
+    <p>Mục sẽ thêm vào <code>.rules</code> (cũng chính là CLAUDE.md, AGENTS.md, GEMINI.md):</p>
+<pre>## Agent skills
+
+### Issue tracker
+
+GitHub Issues of Riso-application-factory/zed-ai-crew via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five labels (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` at the root and `docs/adr/`. See `docs/agents/domain.md`.</pre>
+    <p>Các file sẽ tạo: <code>docs/agents/issue-tracker.md</code>, <code>docs/agents/triage-labels.md</code> và <code>docs/agents/domain.md</code>, chép từ template của skill, giữ cờ “PRs as request surface: no”. Không cần tạo nhãn mới vì cả 5 nhãn đã có.</p>
+    <table>
+      <tr><th>Loại</th><th>Nguồn sự thật</th><th>Bản xem cho Human</th></tr>
+      <tr><td>Spec, ticket, wayfinder map</td><td>GitHub issue / sub-issue</td><td><code>artifacts/&lt;chủ-đề&gt;/*.html</code>, có link về issue</td></tr>
+      <tr><td>Thuật ngữ, quyết định</td><td><code>GLOSSARY.md</code>, <code>docs/adr/NNNN-*.md</code> (chỉ tạo khi thực sự có thuật ngữ hoặc quyết định cần chốt)</td><td>Tham chiếu trong HTML</td></tr>
+      <tr><td>Nghiên cứu, bằng chứng</td><td><code>artifacts/research/</code>, <code>artifacts/evidence/</code> (đã có sẵn)</td><td>Chính file HTML đó</td></tr>
+    </table>
+  </details>
+
+  <details open>
+    <summary>Câu hỏi nghiên cứu cho hai bước groundwork</summary>
+    <h3>Domain research (góc nhìn BA)</h3>
+    <table>
+      <tr><th>ID</th><th>Câu hỏi</th><th>Trả lời xong sẽ thay đổi gì</th></tr>
+      <tr><td>DR1</td><td>Một team Agile thật gặp những kịch bản nào (kickoff, feature, bug, hotfix/incident, spike, refactor/nợ kỹ thuật, nâng dependency, lỗ hổng bảo mật, release, migration, brownfield onboarding…)? [S] (3 luồng) và catalog cũ (12/33) còn hở chỗ nào?</td><td>Phạm vi playbook (“phủ mọi kịch bản”)</td></tr>
+      <tr><td>DR2</td><td>Các hệ thống tương tự (Claude Code subagents/teams, Codex, GitHub Copilot coding agent, Spec Kit, BMAD, Kiro, MetaGPT/ChatDev, OpenHands) điều phối và đặt gate thế nào? Chúng có bằng chứng gì về chất lượng code và độ dài artifact?</td><td>Mẫu điều phối, giới hạn của nó, và các lỗi nên tránh</td></tr>
+      <tr><td>DR3</td><td>ISO/IEC 25010:2023 (9 đặc tính) chuyển thành tiêu chí DoD theo từng loại artifact như thế nào? Đặc tính nào AI kiểm được bằng tool, đặc tính nào cần Human?</td><td>Định nghĩa gate chất lượng</td></tr>
+      <tr><td>DR4</td><td>Cơ chế nào có bằng chứng giữ cho code AI theo đúng kiến trúc (ADR conformance, dependency rules, fitness functions, rubric review)? Còn cho artifact ngắn gọn (BLUF, ngân sách độ dài, rubric) thì sao?</td><td>Giải quyết hai pain point chính</td></tr>
+      <tr><td>DR5</td><td>Với người dùng solo, đặt gate Human ở đâu và hỏi câu hỏi thế nào (ngữ cảnh + ví dụ + khuyến nghị) để ít bị ngắt quãng mà vẫn giữ quyền quyết định?</td><td>Vị trí và hình thức của gate</td></tr>
+      <tr><td>DR6</td><td>Từ vựng: session / cycle / step / playbook / gate / run so với Scrum và registry cũ. Từ nào giữ, từ nào bỏ vì là từ đồng nghĩa?</td><td>Nội dung GLOSSARY.md</td></tr>
+    </table>
+    <h3>Technical discovery (góc nhìn Tech Lead / Architect)</h3>
+    <table>
+      <tr><th>ID</th><th>Câu hỏi</th><th>Trả lời xong sẽ thay đổi gì</th></tr>
+      <tr><td>TD1</td><td>Ma trận capability ACP của từng provider, đo bằng probe thật: đặt system prompt ở <code>session/new</code>, <code>session/load</code>/resume, chọn mode/model, chế độ quyền, MCP forwarding, cancel, plan, subagent.</td><td>Liệu worker có chạy được trên cả 3 provider không (A1)</td></tr>
+      <tr><td>TD2</td><td>Orchestrator tạo và điều khiển worker thread trong Zed bằng cách nào: MCP tool do Zed expose hay controller native? Cần những điểm móc nào trong agent / acp_thread / agent_ui / thread metadata?</td><td>Kiến trúc lõi</td></tr>
+      <tr><td>TD3</td><td>Playbook chạy bởi engine tất định (Rust), còn LLM chỉ phán đoán; hay LLM tự điều phối hoàn toàn? So sánh độ tin cậy, khả năng khôi phục sau restart và chi phí.</td><td>Mức tự động và độ bền</td></tr>
+      <tr><td>TD4</td><td>Hệ sinh thái ngữ cảnh chung: cái gì lưu ở Issues, ở file repo hay ở run store? Worker đọc qua <code>gh</code> hay GitHub MCP? Mỗi provider tìm skills ở đâu (<code>.agents/skills</code> so với <code>.claude/skills</code>)? Sub-issue và issue dependency có dùng được không?</td><td>Thiết kế ecosystem, tránh hai nguồn sự thật</td></tr>
+      <tr><td>TD5</td><td>Cô lập công việc song song (git worktree cho từng ticket, cwd riêng cho từng session ACP), cách merge và cách xử lý xung đột.</td><td>Khả năng chạy song song</td></tr>
+      <tr><td>TD6</td><td>Cấu hình chuẩn kèm override theo project: dùng Zed settings (<code>.zed/settings.json</code>) hay file playbook riêng? Validate schema, hot reload, pin version cho từng run.</td><td>Mô hình cấu hình</td></tr>
+      <tr><td>TD7</td><td>Mức khả thi của UI [U] trên code hiện tại (vị trí <code>thread_view.rs</code>, vẽ đồ thị bằng GPUI, Run log dạng <code>workspace::Item</code>). Zed có xem được HTML không, hay phải mở bằng trình duyệt?</td><td>Phạm vi UI và cách xem artifact</td></tr>
+      <tr><td>TD8</td><td>Bảo mật: repo public và agent đọc issue thì có nguy cơ prompt injection; chế độ bypass bỏ qua gate (F10); xử lý secrets thế nào.</td><td>Ràng buộc an toàn của gate</td></tr>
+      <tr><td>TD9</td><td>Rà lại contracts/registry cũ trên code hiện tại (baseline cũ <code>467034cc</code>): quyết định nào còn giữ được?</td><td>Tận dụng thiết kế cũ (nếu chọn Q2 = 1)</td></tr>
+    </table>
+  </details>
+
+  <details>
+    <summary>Route tiếp theo</summary>
+    <table>
+      <tr><th>Bước</th><th>Góc nhìn</th><th>Điều kiện bắt đầu</th><th>Đầu ra / tiêu chí xong</th><th>Session</th></tr>
+      <tr><td>0</td><td>Coordinator</td><td>Q1 đã chốt</td><td><b>Xong.</b> Mọi lệnh <code>gh</code> đều phải có <code>-R</code>, vì mặc định <code>gh</code> trỏ tới upstream</td><td>Session này</td></tr>
+      <tr><td>1a</td><td>BA · Domain research</td><td>Q2 đã chốt</td><td><code>artifacts/research/domain-primer.html</code> trả lời DR1–DR6, có trích nguồn và mức tin cậy</td><td>Session mới, song song với 1b</td></tr>
+      <tr><td>1b</td><td>Tech Lead · Technical discovery</td><td>Q2 đã chốt; gói provider (C7)</td><td><code>artifacts/research/technical-landscape.html</code> trả lời TD1–TD9, có bằng chứng probe</td><td>Session mới, song song với 1a</td></tr>
+      <tr><td>2</td><td>BA · Giả thuyết &amp; bộ câu hỏi</td><td>1a và 1b đã có bản nháp</td><td>Giả thuyết có xếp rủi ro và bộ câu hỏi discovery</td><td>—</td></tr>
+    </table>
+    <p class="meta">Q3 không chặn bước 1; nó chỉ cần có trước bước định hình giải pháp.</p>
+  </details>
+</main>
+</body>
+</html>
