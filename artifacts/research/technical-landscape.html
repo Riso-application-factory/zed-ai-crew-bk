@@ -48,7 +48,7 @@
 <main>
   <h1>Technical landscape · Zed AI Crew</h1>
   <p class="meta">
-    <span class="badge ok">Complete theo tiêu chí bước · chờ Human trả lời</span>
+    <span class="badge ok">Baseline technical discovery · 10/10</span>
     <span class="badge warn">3 kiểm chứng TD1 còn mở</span>
     Bước 1b: Technical discovery · Software / Solution Architect · 2026-10-10 ·
     Baseline: <a href="../intake-brief.html">intake brief</a> (Q1–Q3 đã chốt) · song song với <a href="domain-primer.html">domain primer</a>.
@@ -58,6 +58,24 @@
     Ký hiệu bằng chứng: <b>[P]</b> probe chạy thật · <b>[C]</b> đọc code fork · <b>[S]</b> nguồn adapter/tài liệu chính thức ·
     <b>[O]</b> thiết kế cũ <code>zed-scrum-team/old-specs</code> · <b>[I]</b> suy luận Architect, chưa kiểm chứng.
   </p>
+
+  <section id="discovery-update" class="card">
+    <h2>Cập nhật từ discovery · 2026-10-11</h2>
+    <p><b>R1–R9/F1 đã có câu trả lời trong bản ghi.</b> Bảng này thay thế các câu hỏi/ràng buộc cũ tương ứng ở phần baseline bên dưới. Nguồn: <a href="../discovery/questions.html">bản ghi hai vòng</a>; phân tích và giới hạn: <a href="../discovery/synthesis.md">synthesis</a> (<a href="../discovery/synthesis.html">bản xem</a>). BA đối chiếu tài liệu, không chạy probe mới hoặc chọn kiến trúc.</p>
+    <table>
+      <tr><th>Phạm vi</th><th>Lựa chọn đã được ghi / ảnh hưởng</th><th>Còn mở</th></tr>
+      <tr><td>R1 · điều khiển</td><td>Human dùng ngôn ngữ tự nhiên qua Zed.</td><td>D1/D2 hay phương án lai chưa chọn; không còn chờ hỏi R1.</td></tr>
+      <tr><td>R2/R4 · thực thi và tích hợp</td><td>Worker tự do trong worktree riêng; ngoài worktree qua Crew/gate. Human vắng thì phần phụ thuộc chờ, phần độc lập tiếp tục. Crew tích hợp vào integration branch; Human duyệt một PR vào main.</td><td>Chưa chứng minh gate cưỡng chế trên quyền thật; không suy thêm quyền deploy/release.</td></tr>
+      <tr><td>R3/F1 · repo và dữ liệu</td><td>Crew giữ public; private áp cho target-project. Project-onboarding là đề xuất M11, ngoài Increment 1.</td><td>M10 là mặc định, chưa xác minh kiểm soát; loại dữ liệu, quyền gửi và retention còn mở.</td></tr>
+      <tr><td>R5 · nguồn sự thật</td><td>Run store giữ trạng thái chạy; Crew ghi Issues; spec/ticket vẫn ở Issues theo Q1. Human ra lệnh qua Zed.</td><td>SQLite, schema, outbox và API là phương án kỹ thuật chưa chốt.</td></tr>
+      <tr><td>R6 · quota</td><td>Dừng phần việc liên quan, hỏi Human; không tự chuyển provider.</td><td>Chưa đo usage/chi phí và thời gian chờ.</td></tr>
+      <tr><td>R7/R8 · chất lượng và HTML</td><td>Mục tiêu production-ready của Crew; giao theo lát dọc Q3. HTML cho Human chỉ hiện điều bắt buộc biết, không có ngưỡng thời gian.</td><td>M2/M4 chưa là DoD được thông qua; M3 mở rộng sang câu gate trong chat vẫn là mặc định.</td></tr>
+      <tr><td>R9 · môi trường</td><td>Chỉ máy này, macOS và project local; không cần remote/OS khác.</td><td>Không hỏi lại OS ở baseline.</td></tr>
+      <tr><td>PAT · rủi ro đã chấp nhận</td><td>S2 ghi Human cố ý cấp PAT full quyền ngày 11/10. Đề nghị thu hẹp token ở baseline dưới đây đã được thay thế.</td><td>Chấp nhận credential rộng không xác nhận hiệu quả enforcement hay quyền gửi mọi dữ liệu. Không kiểm lại credential hiện tại.</td></tr>
+    </table>
+    <p><b>Giới hạn TD1 được giữ:</b> Claude 0.89.0 lỗi auth ở prompt; Codex 2.2.2 trả BANANA; Antigravity 1.3.0 trả OK dù role yêu cầu BANANA. Cancel đã probe khi rảnh, chưa khi đang chạy; load/resume lịch sử không chứng minh phục hồi Crew sau side effect. Fallback/compaction chưa thử. Không có hệ thống mới được tiết lộ trong bản ghi.</p>
+    <p class="meta">Phần 1–6 dưới đây là báo cáo baseline 10/10; dùng cập nhật này cho các lựa chọn mới hơn. Discovery đã dừng theo luật hỏi; không mở vòng 3. Bằng chứng high-risk vẫn chưa đủ, xem synthesis thay vì coi câu trả lời là kết quả kiểm chứng.</p>
+  </section>
 
   <h2>1 · Kết luận chính</h2>
   <div class="card">

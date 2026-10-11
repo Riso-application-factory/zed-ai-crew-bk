@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tổng hợp discovery · Zed AI Crew</title>
+<style>
+:root { color-scheme: light dark; --background: #fbfbfa; --foreground: #1d1d1f; --border: #d9dce2; --link: #2366c4; --surface: #fff; }
+@media (prefers-color-scheme: dark) { :root { --background: #17181a; --foreground: #e8e8ea; --border: #42454b; --link: #8ebaff; --surface: #202226; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: 100%; max-width: none; padding: clamp(16px, 3vw, 40px); }
+h1 { margin: 0 0 12px; font-size: clamp(23px, 3vw, 30px); }
+a { color: var(--link); overflow-wrap: anywhere; }
+p { margin: 12px 0; }
+details { margin: 12px 0; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+summary { cursor: pointer; font-weight: 650; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
+.table-scroll { overflow-x: auto; margin: 14px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); padding: 9px; overflow-wrap: anywhere; }
+code { font: .9em ui-monospace, monospace; overflow-wrap: anywhere; }
+.review { border-left: 4px solid #bf8b24; padding: 8px 16px; }
+</style>
+</head>
+<body><main>
+<h1>Tổng hợp discovery · Zed AI Crew</h1>
+<p><strong>Draft · 2026-10-11 · Business Analyst.</strong> <a href="synthesis.html">Bản xem HTML</a>. Tổng hợp riêng vòng 1 và vòng 2 từ bản ghi đã có; không có interview mới trong phiên này. Quyết định R1–R9/F1 được giữ nguyên. Discovery đã dừng theo luật hỏi cũ; tiêu chí bằng chứng high-risk của bước hiện tại <strong>chưa đủ để ghi complete</strong>. Không mở vòng 3 hoặc thêm gate duyệt kit.</p>
+<p><strong>Kết quả chính:</strong> nhu cầu đã ghi là giảm chuyển prompt thủ công, code khó bảo trì và công đọc HTML. Ranh giới điều khiển, tích hợp, quota và môi trường đã có lựa chọn Human. Chưa chứng minh điều phối tự động giảm rework, cưỡng chế được ranh giới worker hoặc phục hồi không lặp hành động. Có thể chuẩn bị playback problem brief với các giới hạn này; không tuyên bố giải pháp đã được chọn hay kiểm chứng.</p>
+<div class="review"><p><strong>Điều Human cần biết:</strong> R1–R9/F1 đã được giữ; không mở vòng 3. A1–A8 chưa đủ bằng chứng hoặc risk acceptance có owner. Repo Crew vẫn public; target-project private; rủi ro PAT rộng đã được chấp nhận theo bản ghi.</p><p><strong>Route đề xuất:</strong> playback problem brief với rủi ro và mặc định ghi rõ. Chưa chọn kiến trúc, tạo spec/ticket hoặc triển khai. <a href="synthesis.md">Bản ghi Markdown</a> · <a href="../../GLOSSARY.md">Glossary</a> · <a href="../research/technical-landscape.html#discovery-update">Landscape cập nhật</a>.</p></div>
+<details><summary>1. Nguồn và giới hạn</summary>
+<div class="table-scroll"><table><thead><tr><th scope="col">Mã</th><th scope="col">Nguồn đã đọc trong phiên này</th><th scope="col">Loại bằng chứng</th></tr></thead><tbody>
+<tr><td>S1</td><td><a href="../intake-brief.html">Intake</a>, Q1–Q3, F1–F11, C1–C7, E1</td><td>Bản ghi trước: lời kể và quyết định được gán cho Human. Không có transcript gốc để xác minh lời nói.</td></tr>
+<tr><td>S2</td><td><a href="questions.html">Bản ghi discovery</a>, R1–R9/F1, M1–M11, luật dừng</td><td>Hai vòng ngày 11/10. Trích dẫn dưới đây là nguyên văn <strong>trong bản ghi</strong>, không phải lời được BA trực tiếp nghe. Lựa chọn A/B/C được diễn giải theo hệ quả ghi kèm, không tự viết thành quote.</td></tr>
+<tr><td>S3</td><td><a href="discovery-kit.md">Discovery kit</a>, P1, H1–H4, A1–A12, G1–G4/E1–E9</td><td>Giả thuyết và guide đề xuất; không phải câu trả lời, owner đã nhận hay nghiên cứu đã chạy.</td></tr>
+<tr><td>S4</td><td><a href="../research/domain-primer.md">Domain primer</a>, §2–3/§9–10</td><td>Tổng hợp nghiên cứu trước, journey và glossary nháp. Không kiểm lại claim nguồn web trong phiên này.</td></tr>
+<tr><td>S5</td><td><a href="../research/technical-landscape.html">Technical landscape</a>, baseline 10/10</td><td>Báo cáo Architect trước; các lựa chọn đã có S2 thay thế những câu hỏi cũ tương ứng. Không coi báo cáo là bằng chứng Crew chạy end-to-end.</td></tr>
+<tr><td>S6</td><td><a href="../evidence/technical-discovery/td1/README.md">Phương pháp TD1</a>, <a href="../evidence/technical-discovery/td1/claude-2-prompt.jsonl">Claude</a>, <a href="../evidence/technical-discovery/td1/codex-2-prompt.jsonl">Codex</a>, <a href="../evidence/technical-discovery/td1/antigravity-2-prompt.jsonl">Antigravity</a></td><td>Transcript probe cũ đã đối chiếu trực tiếp: Claude lỗi auth, Codex BANANA, Antigravity OK. Không chạy probe mới.</td></tr>
+<tr><td>S7</td><td><a href="../sdlc.html">SDLC</a>, khai báo <code>workflows</code>; <a href="../../docs/src/ai/external-agents.md">fork docs ACP</a>, bảng permissions; <code>crates/agent_servers/src/custom.rs</code></td><td>Đã đọc cấu trúc workflow, tài liệu ranh giới quyền và đoạn cấu hình env. Không quan sát Human sử dụng hoặc kiểm sandbox thực tế.</td></tr>
+</tbody></table></div>
+<p>Repo baseline phiên này: <code>826ed60109a2505e3a1d9ba27292c793912c7549</code>. Đã truy vấn <code>gh issue list -R Riso-application-factory/zed-ai-crew --state all --limit 50</code>: trả <code>[]</code>; chưa có issue để dẫn làm spec/ticket hiện hành. Synthesis là bản ghi nghiên cứu, không thay thế GitHub Issues làm nguồn spec theo <a href="../../docs/agents/issue-tracker.md">quy ước tracker</a>.</p>
+</details>
+<details><summary>2. Tổng hợp vòng 1 · R1–R9</summary>
+<p>Ngày theo S2: 2026-10-11. Người trả lời được bản ghi gán: <strong>Human</strong>, kiêm khách hàng/người dùng, Sponsor/PO và vận hành theo S1. Chưa có người khác được xác định là đã tham dự; không dựng xung đột giữa các stakeholder giả định.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Câu</th><th scope="col">Lời/ lựa chọn của Human trong S2</th><th scope="col">Điều được giữ và giới hạn</th></tr></thead><tbody>
+<tr><td>R1</td><td>“Chỉ dùng ngôn ngữ tự nhiên.” Bản ghi mô tả lệnh “triển khai story #1111” khi đã có backlog.</td><td>Điều khiển qua hội thoại; nhiều trao đổi ở kickoff/grooming. D1/D2 hay phương án lai vẫn là suy luận Architect, chưa phải quyết định kiến trúc.</td></tr>
+<tr><td>R2</td><td>Chọn <strong>A</strong>.</td><td>Theo diễn giải ghi kèm: worker tự do trong worktree riêng; thao tác ngoài worktree qua Crew/gate. Human vắng thì phần phụ thuộc chờ, phần độc lập tiếp tục. Chưa có bằng chứng cưỡng chế.</td></tr>
+<tr><td>R3</td><td>Chọn <strong>C</strong>, lúc đó được ghi là đặt cả repo private.</td><td>Đã được vòng 2 làm rõ; không dùng cách hiểu này để đổi repo Crew sang private.</td></tr>
+<tr><td>R4</td><td>Chọn <strong>A</strong>.</td><td>Theo bản ghi: Crew tự merge vào integration branch; Human duyệt một PR vào main. Không suy thành quyền release/deploy/migration.</td></tr>
+<tr><td>R5</td><td>Chọn <strong>B</strong>.</td><td>Theo bản ghi: Human ra lệnh qua Zed, Crew giữ trạng thái chạy ở run store và là bên ghi lên Issues. Spec/ticket vẫn ở Issues theo Q1; không gộp hai loại dữ liệu. Store/schema/API chưa chốt.</td></tr>
+<tr><td>R6</td><td>Chọn <strong>A</strong>.</td><td>Theo bản ghi: hết quota dừng phần việc liên quan và hỏi Human, không tự đổi provider. Chưa biết tần suất hoặc thời gian chờ.</td></tr>
+<tr><td>R7</td><td>“Production-ready là mục tiêu của chính Crew: Crew phải hoàn thiện, phủ được mọi kịch bản Human mong muốn, code đạt chuẩn ISO. Target-project không có khái niệm này.”</td><td>Giữ mục tiêu Crew và Q3 giao lát dọc đạt chất lượng production. Chưa có ngưỡng chất lượng đã thông qua; M2/M4 là mặc định, không phải DoD được Scrum Team xác nhận.</td></tr>
+<tr><td>R8</td><td>““Ngắn” là chỉ hiện những gì Human bắt buộc phải biết. Chỉ áp dụng cho tài liệu HTML Human đọc; tài liệu AI chia sẻ cho nhau thì không quan tâm.”</td><td>Phạm vi đã nêu là HTML cho Human. Không đặt ngưỡng chữ/thời gian; M3 mở rộng sang câu hỏi gate trong chat vẫn là mặc định. Chưa kiểm việc Human quyết định đúng khi đọc bản rút gọn.</td></tr>
+<tr><td>R9</td><td>“Crew chỉ chạy trên máy này.”</td><td>Phạm vi ghi kèm: macOS, project local; không cần remote hoặc OS khác. Không cần hỏi lại OS.</td></tr>
+</tbody></table></div>
+<p><strong>Kết quả vòng 1:</strong> có đầu vào cho K1–K6; chưa xác nhận giá trị thực nghiệm của H1–H4 hoặc khả năng vận hành. R3 là điểm chưa rõ đã dẫn tới F1, không phải quyết định chưa giải quyết hiện tại. [S2]</p>
+</details>
+<details><summary>3. Tổng hợp vòng 2 · F1 và điểm dừng</summary>
+<p>Ngày theo S2: 2026-10-11; người trả lời được gán: <strong>Human</strong>. Quote trong bản ghi: “Bỏ qua việc chuyển private cho dự án này. Yêu cầu private chỉ áp cho target-project.” [S2 F1]</p>
+<ul>
+<li><strong>Đã làm rõ:</strong> target-project private; repo Crew giữ public. R3 không còn có nghĩa đổi repo Crew sang private. M10 là mặc định xử lý dữ liệu/injection cho repo public, chưa chứng minh kiểm soát đã chạy.</li>
+<li><strong>Đề xuất được ghi:</strong> project-onboarding, M11; deferred khỏi Increment 1. Không tạo ticket hoặc chọn thứ tự backlog trong bước này.</li>
+<li><strong>Rủi ro đã được chấp nhận theo bản ghi:</strong> Human cố ý cấp PAT full quyền. Giữ quyết định này, không đề nghị thu hẹp token. Việc Human chấp nhận credential rộng không tự xác nhận gate có tác dụng, quyền gửi mọi dữ liệu hoặc chấp nhận tất cả A3/A6.</li>
+<li><strong>Điểm dừng được giữ:</strong> không mở vòng 3. Các câu bỏ qua trở thành mặc định đã ghi hoặc deferred. Không dùng kit bổ sung để buộc trả lời lại.</li>
+</ul>
+<p><strong>Mặc định còn là mặc định:</strong> M2 check/DoD; M3 phạm vi tài liệu đọc; M4 chất lượng target-project; M6 phát hiện issue drift; M7 Actions; M8 provider Orchestrator; M10 kiểm soát dữ liệu. M5 scenario và M9 story để bước phù hợp giải nghĩa; M11 là đề xuất onboarding. Không có bằng chứng chúng đã được triển khai hoặc kiểm chứng. [S2]</p>
+</details>
+<details><summary>4. Hiện trạng, pains, ràng buộc và tín hiệu thành công</summary>
+<p><strong>Luồng hiện tại được Human kể qua S1:</strong> chọn công việc/step → mở thread → copy System (role) và Request (step) → AI tạo đầu ra → Human đọc, trả lời và chuyển ngữ cảnh → review/duyệt. Luật tài liệu giữ clarification → spec → tickets trong một session và một session sạch cho mỗi ticket. Đã thấy hàm tạo prompt/cấu trúc workflow trong S7; chưa quan sát các thao tác này hoặc đo thời gian.</p>
+<p><strong>Trường hợp lỗi được kể:</strong> S1 E1 gán cho Human sự kiện frontend text-to-speech sao chép giao diện tham chiếu nhưng không khớp backend có sẵn, kết quả sản phẩm thất bại. Đây là lời kể một sự kiện, không có diff, API mapping hay log để xác nhận nguyên nhân. Không nghiên cứu lại các sản phẩm TTS, theo ràng buộc S1.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Pain</th><th scope="col">Nguồn / loại</th><th scope="col">Tần suất</th><th scope="col">Tác động biết được / còn thiếu</th></tr></thead><tbody>
+<tr><td>Mở thread và chuyển prompt bằng tay</td><td>Human qua S1 F2; cấu trúc prompt khớp S7</td><td>Quy trình mô tả lặp theo node; chưa có số lần trong kỳ đo</td><td>Có thao tác tay; chưa đo số phút hoặc tỷ trọng tổng công.</td></tr>
+<tr><td>Code lệch kiến trúc, khó bảo trì</td><td>Human qua S1 §2</td><td>Chưa biết</td><td>Đánh giá của Human; chưa có mẫu code/rework để xác định mức tác động.</td></tr>
+<tr><td>Frontend không khớp backend</td><td>Human qua S1 E1</td><td>Một sự kiện được kể; không suy tỷ lệ lỗi</td><td>Human báo sản phẩm thất bại; chưa xác minh công sửa, chi phí hoặc nguyên nhân.</td></tr>
+<tr><td>HTML lan man</td><td>Human qua S1 §2, S2 R8</td><td>Chưa biết</td><td>Nhu cầu chỉ thấy thông tin bắt buộc; chưa quan sát mất thời gian hoặc quyết định sai.</td></tr>
+</tbody></table></div>
+<p><strong>Ràng buộc được ghi:</strong> ba provider qua ACP; GitHub Issues; Rust/GPUI trong fork Zed; crate Crew riêng và móc mỏng để sync upstream; chất lượng theo ISO/IEC 25010:2023; một Human; macOS/máy này/project local; target-project private và Crew public; không tự đổi provider khi quota cạn. Gói provider/chi phí trong S1 C7 là khai báo trước, không phải giá/quota đã kiểm lại. Chưa có deadline hoặc Sprint Goal được cung cấp. [S1 C1–C7; S2]</p>
+<p><strong>Tín hiệu thành công:</strong> R1/R7/R8 nêu trạng thái Human mong muốn, chưa nêu outcome đã đạt. Đề xuất đo công chuyển việc + đọc/duyệt + rework, cùng lỗi lọt review và khả năng sử dụng đầu ra. M2 đề xuất test/clippy, resume đúng step và lỗi hiển thị; ngưỡng, phương pháp và DoD còn cần xử lý theo scope ở refinement, không chốt tại discovery. [S2 M2; S3 H1–H4]</p>
+</details>
+<details><summary>5. Cập nhật giả định theo bằng chứng</summary>
+<p>ID <strong>A1–A12 thuộc discovery kit S3</strong>, không đồng nhất A1/A2 trong intake. <code>Confirmed</code>/<code>refuted</code> áp cho đúng mệnh đề và phạm vi kiểm; câu trả lời về mong muốn không chứng minh hiệu quả. Không có bằng chứng mới từ một buổi khách hàng trong phiên này.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">ID / mức trong kit</th><th scope="col">Trạng thái sau vòng 2</th><th scope="col">Bằng chứng và giới hạn</th><th scope="col">Bổ sung cần thiết / người đề xuất</th></tr></thead><tbody>
+<tr><td>A1 · high-risk</td><td><strong>Open</strong></td><td>S1 xác nhận nhu cầu qua bản ghi; R1/R8 nêu ưu tiên. Chưa có baseline hay dùng Crew để chứng minh tiết kiệm đủ lớn.</td><td>E1: một việc gần nhất + tổng công thực tế; Human với góc nhìn người dùng, BA/UX.</td></tr>
+<tr><td>A2 · high-risk</td><td><strong>Partially supported</strong></td><td>S1 E1 phù hợp giả thuyết lệch capability; chỉ một lời kể, chưa xác nhận nguyên nhân hoặc tính lặp lại.</td><td>E2: yêu cầu/diff/API mapping và phản ví dụ làm tốt; Human/Developer → BA/Architect.</td></tr>
+<tr><td>A3 · high-risk</td><td><strong>Open</strong></td><td>R2/R4 là ranh giới mong muốn; S5/S7 nêu bypass và quyền rộng. PAT accepted không phải enforcement evidence.</td><td>E3: kiểm hành động ngoài worktree/gate trên quyền thật; Architect/Developer, phối hợp người vận hành.</td></tr>
+<tr><td>A4 · high-risk</td><td><strong>Partially supported</strong></td><td>S5/S6 báo load/resume lịch sử sau restart; không kiểm restart sau ghi issue/PR nhưng trước khi ghi result.</td><td>E4: timeline trước/sau side effect và kết quả đối soát; Architect/Developer.</td></tr>
+<tr><td>A5 · high-risk</td><td><strong>Partially supported; một cách chèn role bị refuted</strong></td><td>S6: Codex 2.2.2 trả BANANA; Antigravity 1.3.0 trả OK dù role yêu cầu BANANA; Claude 0.89.0 lỗi auth. Cách chèn <code>_meta</code> không đạt ở mẫu Antigravity; chưa bác bỏ mọi fallback hay mọi capability của provider.</td><td>E5: role/fallback qua compaction, prompt Claude, cancel đang chạy, permission thật; Architect/Developer.</td></tr>
+<tr><td>A6 · high-risk</td><td><strong>Open</strong></td><td>F1 chỉ chốt visibility repo. Chưa có danh mục dữ liệu, quyền gửi/lưu, retention hoặc điều khoản đúng account. Không suy applicability pháp lý từ ngôn ngữ/timezone.</td><td>E6: danh mục và hồ sơ đã che; Human/người giữ dữ liệu, specialist nếu phù hợp.</td></tr>
+<tr><td>A7 · high-risk</td><td><strong>Open</strong></td><td>S1 C7 có gói khai báo, R6 chốt xử lý quota; chưa có usage/chi phí/tải thực.</td><td>E7: usage và thời gian chờ của các lần thật; Human/vận hành → BA/Architect.</td></tr>
+<tr><td>A8 · high-risk</td><td><strong>Open</strong></td><td>R8 xác nhận sở thích HTML, không xác nhận duyệt đúng với thông tin rút gọn.</td><td>E1: Human chỉ phần thực sự đọc và căn cứ quyết định trên artifact thật; BA/UX.</td></tr>
+<tr><td>A9 · khác</td><td><strong>Open</strong></td><td>M6 là mặc định báo issue drift; chưa có bằng chứng approval/check mất hiệu lực đúng lúc.</td><td>E4/E8: lịch sử đổi issue/code/config và check chạy lại; Developer/QA/Architect.</td></tr>
+<tr><td>A10 · khác</td><td><strong>Partially supported</strong></td><td>S1/S2 phân biệt Human, Crew, target-project. Session/thread/run/cycle/step/story chưa có ví dụ đủ để xác nhận quan hệ.</td><td>Dùng cách gọi trong việc thật; BA + Human tại spec nếu ảnh hưởng hành vi.</td></tr>
+<tr><td>A11 · khác</td><td><strong>Open</strong></td><td>C6 chốt hướng tổ chức code; S5 ước lượng điểm móc và churn. Không có chi phí sync thực tế của Crew.</td><td>E9: một lần sync và công sửa/check; người bảo trì → Architect.</td></tr>
+<tr><td>A12 · khác</td><td><strong>Partially supported</strong></td><td>Q3 cho phép lát dọc, R9 giới hạn môi trường và M11 deferred; phạm vi mọi scenario chưa kiểm chứng.</td><td>E8: đối chiếu catalog với việc thật tại shaping/onboarding; Human/PO.</td></tr>
+</tbody></table></div>
+<p><strong>P1/H1–H4:</strong> P1 partially supported bởi pains được kể, quan hệ nguyên nhân còn open; H1 tiết kiệm nhờ điều phối open; H2 kiểm capability giảm lỗi partially supported bởi một sự kiện kể, hiệu quả kiểm vẫn open; H3 HTML rút gọn duyệt đúng open; H4 ranh giới/đối soát giữ quyền kiểm soát open. Không có outcome được confirmed hoặc toàn bộ giả thuyết bị refuted. [S1–S6]</p>
+<p><strong>Risk ownership:</strong> các recipient trong bảng chỉ là đề xuất, chưa ai nhận kiểm chứng hoặc chấp nhận rủi ro A1–A12. Riêng rủi ro PAT rộng có Human là người đã chấp nhận <strong>theo S2</strong>; không suy mở rộng acceptance này. Vì vậy không thể đóng high-risk assumptions bằng cách tự gán owner.</p>
+</details>
+<details><summary>6. Thuật ngữ</summary>
+<p>Đã ghi <a href="../../GLOSSARY.md">GLOSSARY.md</a> cho <strong>Human</strong>, <strong>Crew</strong>, <strong>target-project</strong>, dựa trên S1 stakeholder map và S2 R7/F1. Đây là những nghĩa đã thể hiện rõ trong lựa chọn được ghi, không phải định nghĩa mới được Human phê duyệt trong phiên này. Glossary chỉ có từ vựng; nguồn/rationale nằm ở synthesis.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Thuật ngữ nháp trong S4</th><th scope="col">Kết quả đối chiếu</th></tr></thead><tbody>
+<tr><td>Human / Crew / target-project</td><td>Giữ, nhưng sửa điểm mơ hồ: Human không đồng nhất mọi end user; Crew khác dự án đích. Quyền/visibility là quyết định, không đưa vào định nghĩa.</td></tr>
+<tr><td>Session / thread / run / cycle / step / story</td><td><strong>Open.</strong> Không gộp session với thread, không suy story = issue hay một Increment. M9 vẫn deferred tới spec.</td></tr>
+<tr><td>Gate / permission / review / verification / approval</td><td><strong>Partially supported.</strong> R2/R4 yêu cầu quyết định Human khác quyền tool; chưa đủ ví dụ để xác nhận mọi định nghĩa nháp. Không coi reviewer AI pass là Human duyệt.</td></tr>
+<tr><td>Production-ready / DoD</td><td>Sửa cách hiểu: mục tiêu chất lượng Crew theo R7; không gán chất lượng Crew cho mọi target-project. M2/M4 chưa thành DoD đã thông qua.</td></tr>
+<tr><td>Scenario / playbook và các thuật ngữ nháp khác</td><td>Giữ hypothesis ở primer, chưa chuyển vào glossary chính thức.</td></tr>
+</tbody></table></div>
+<p>Không có quyết định kiến trúc mới đã chọn, nên không tạo ADR.</p>
+</details>
+<details><summary>7. Mâu thuẫn, người có quyền quyết định và cập nhật landscape</summary>
+<div class="table-scroll"><table><thead><tr><th scope="col">ID</th><th scope="col">Xung đột / lệch bằng chứng</th><th scope="col">Trạng thái và route</th></tr></thead><tbody>
+<tr><td>C1</td><td>R3 private cả repo so với F1 Crew public</td><td><strong>Resolved theo S2 F1</strong>, Human là người quyết định. Không xin xác nhận lại.</td></tr>
+<tr><td>C2</td><td>Landscape còn hỏi R1/R2/R5/OS và đề nghị PAT hẹp</td><td><strong>Superseded bởi S2.</strong> Đã thêm cập nhật vào landscape; giữ probe cũ theo ngày/version. Kiến trúc vẫn chưa chọn.</td></tr>
+<tr><td>C3</td><td>R2 giới hạn worker trong worktree so với credential rộng/bypass nêu ở S5/S7</td><td><strong>Open về hiệu lực kiểm soát</strong>, chưa quan sát hành vi vi phạm. Architect/Developer đề xuất nhận kiểm chứng; nếu không cưỡng chế được, Human quyết định trade-off. Không hỏi lại scope PAT.</td></tr>
+<tr><td>C4</td><td>R8 chỉ HTML so với M3 thêm câu hỏi gate trong chat</td><td><strong>Default khác phạm vi lời trả lời</strong>, không coi là lựa chọn mới. Human/PO có quyền sửa mặc định khi ảnh hưởng spec; chưa chặn tổng hợp discovery.</td></tr>
+<tr><td>C5</td><td>Intake mô tả brainstorm 4 bước; <code>workflows</code> hiện có 5 mục gồm specification</td><td><strong>Lệch tài liệu đã kiểm trực tiếp S7.</strong> Đề xuất người bảo trì SDLC làm rõ cách đếm; chưa suy là lỗi runtime hoặc sửa workflow ngoài scope.</td></tr>
+<tr><td>C6</td><td>S2 gọi K5 đủ dữ kiện + mặc định; S3 và bước hiện tại yêu cầu bằng chứng high-risk</td><td><strong>Hai tiêu chí khác nhau.</strong> Đủ lựa chọn để playback không đồng nghĩa hoàn tất kiểm chứng. Không tạo lại gate D0 từ kit, không tự coi high-risk accepted.</td></tr>
+</tbody></table></div>
+<p>Không có bằng chứng xung đột giữa các người trả lời, hoặc khác biệt giữa lời nói và hành vi Human đã được quan sát trực tiếp.</p>
+<p><strong>Landscape revision:</strong> chưa có hệ thống mới được khách hàng tiết lộ ngoài bộ ba ACP, GitHub, Git/worktree, fork/upstream và trình duyệt đã kiểm kê. Bổ sung lựa chọn R1–R9/F1, phân biệt Issues giữ spec với run store giữ trạng thái; không chọn SQLite/schema; giữ hạn chế probe role/auth/cancel. Đã cập nhật <a href="../research/technical-landscape.html">technical landscape</a> bằng phần ghi ngày 11/10, không chạy lại probe hoặc kiểm điều khoản.</p>
+</details>
+<details><summary>8. Follow-up có mục tiêu và bàn giao trong cùng session</summary>
+<p><strong>Không gửi questionnaire, mở interview hoặc yêu cầu Human trả lời vòng mới.</strong> Bảng là danh sách bổ sung bằng chứng khi cần, không phải điều kiện duyệt tài liệu bắt buộc. Các câu product đã chốt không hỏi lại; accessible facts/probes do Developers/Architect xử lý.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Artifact / khoảng trống</th><th scope="col">Câu follow-up hoặc kiểm cần trả lại</th><th scope="col">Recipient / owner đề xuất</th><th scope="col">Trạng thái / next action</th></tr></thead><tbody>
+<tr><td>E1/E2, A1/A2/A8</td><td>Trong một việc gần nhất, đã copy/chuyển/đọc/sửa những gì; lỗi nhận ra bằng gì? Có một việc tương tự làm tốt và artifact nào được phép đối chiếu?</td><td>Human người dùng + BA/UX</td><td>Chưa quan sát; chỉ chọn nếu có mẫu hoặc cần bác bỏ P1. Trả notes và nguồn, không ước tính giả.</td></tr>
+<tr><td>E3, A3</td><td>Khi worker có quyền thật, hành động ngoài worktree bị chặn/đi qua gate bằng chứng nào?</td><td>Architect/Developer + người vận hành</td><td>Chưa kiểm; xác định phép thử theo quyền đã chấp nhận. Trả kết quả và giới hạn, không yêu cầu đổi PAT.</td></tr>
+<tr><td>E4/E8, A4/A9</td><td>Restart sau side effect trước result có gây ghi/PR lặp? Đổi baseline/config/issue làm check/approval nào hết hiệu lực?</td><td>Architect/Developer/QA</td><td>Chưa chạy; trả timeline/version và hành động đối soát thực tế.</td></tr>
+<tr><td>E5, A5</td><td>Role có được giữ ở từng adapter qua fallback/compaction? Cancel đang chạy và permission thật diễn ra ra sao?</td><td>Architect/Developer; Human hỗ trợ auth nếu cần</td><td>Probe cũ có giới hạn; chưa kiểm auth hiện tại. Trả evidence version-pinned; không chạy probe trong bước này.</td></tr>
+<tr><td>E6, A6</td><td>Những loại dữ liệu thực nào được phép gửi/lưu/publish, theo hồ sơ nào, retention nào?</td><td>Human/người giữ hồ sơ; chuyên gia nếu applicability đòi hỏi</td><td>Chưa có hồ sơ; xin bản tóm tắt đã che ở nơi được phép khi công việc đó cần. Không kết luận tuân thủ.</td></tr>
+<tr><td>E7, A7</td><td>Các lần thật đã dùng bao nhiêu quota/chi phí và chờ bao lâu?</td><td>Human/vận hành → BA/Architect</td><td>Chưa có usage; không hỏi lại quyết định dừng/hỏi Human của R6.</td></tr>
+<tr><td>A10/A11/A12 và C5</td><td>Từ vựng trong việc thật, công sync và catalog nào không khớp?</td><td>BA/người bảo trì/Human với góc nhìn PO</td><td>Deferred theo phạm vi; glossary/refinement/onboarding hoặc bảo trì tài liệu, không xếp backlog ở đây.</td></tr>
+</tbody></table></div>
+<p><strong>Next route đề xuất:</strong> playback problem brief từ S1/S2 và synthesis này, nêu riêng bằng chứng, giả thuyết, rủi ro chưa được nhận và mặc định. Không gọi bước discovery này complete chỉ vì bộ câu hỏi đã dừng. Điều kiện đạt completion về bằng chứng: từng A1–A8 có outcome đủ để confirmed/refuted theo scope, hoặc người có thẩm quyền thực sự chấp nhận rủi ro còn lại và owner nhận trách nhiệm. Chưa có các xác nhận đó. Không tự chọn kiến trúc, viết spec, tạo ticket hay triển khai.</p>
+</details>
+<details><summary>9. Kiểm chứng phiên này</summary>
+<p>Đã đọc và đối chiếu S1–S7, truy vấn Issues, kiểm nội dung transcript TD1 và danh sách workflow, ghi thuật ngữ đã rõ, tổng hợp riêng hai vòng và bổ sung landscape. Kiểm tĩnh tài liệu: link local, cấu trúc bảng, đủ A1–A12 và HTML full-width. Không phỏng vấn người dùng, đo outcome, chạy sản phẩm/probe mới, xác minh credential hiện tại, kiểm usability hoặc gửi thông tin ra bên ngoài. Kết quả kiểm tĩnh không xác nhận hiệu quả sản phẩm hay stakeholder agreement.</p>
+</details>
+</main></body></html>
