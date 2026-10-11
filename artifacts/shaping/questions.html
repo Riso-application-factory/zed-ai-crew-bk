@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interview đã hoàn tất · Shaping Zed AI Crew</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --background: #fafaf8;
+        --surface: #ffffff;
+        --text: #202524;
+        --muted: #5e6965;
+        --line: #d8e0db;
+        --accent: #146348;
+        --tint: #edf6ef;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #151a18;
+          --surface: #1d2521;
+          --text: #edf3ee;
+          --muted: #b0bdb5;
+          --line: #3c4941;
+          --accent: #86d9af;
+          --tint: #23372c;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--text);
+        font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main { width: 100%; max-width: none; padding: clamp(16px, 3vw, 40px); }
+      h1 { margin: 0 0 8px; font-size: clamp(26px, 3vw, 38px); line-height: 1.25; }
+      h2 { margin: 12px 0; font-size: clamp(21px, 2vw, 27px); line-height: 1.35; }
+      p { margin: 12px 0; }
+      .meta { color: var(--muted); font-size: 14px; }
+      .status {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        color: var(--accent);
+        background: var(--tint);
+        font-size: 14px;
+        font-weight: 650;
+      }
+      .question {
+        margin-top: 24px;
+        padding: clamp(16px, 2.5vw, 30px);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--accent);
+        border-radius: 10px;
+      }
+      .reply { margin-top: 20px; padding: 12px 16px; background: var(--tint); border-radius: 6px; }
+      ul { padding-left: 24px; }
+      li { margin: 7px 0; }
+      details { margin-top: 22px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
+      summary { cursor: pointer; font-weight: 650; }
+      a { color: var(--accent); text-underline-offset: 3px; }
+      code { font-size: 0.92em; overflow-wrap: anywhere; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="status">G6 confirmed · Interview cũ đã dừng</span>
+      <h1>Shaping · Zed AI Crew</h1>
+      <p class="meta">Mục tiêu: định hình toàn cảnh sản phẩm Crew production-ready, rồi chia Epic triển khai. Đi lớn → nhỏ; chi tiết cycle implement giữ draft.</p>
+      <section class="question"><h2>Đã sửa phạm vi shaping</h2><p>Bản trước đã thu hẹp sai vào lát đầu. <a href="solution-scope.html"><strong>Xem toàn cảnh production-ready</strong></a>: năng lực, hành trình toàn vòng đời, INPUT/OUTPUT, chất lượng và phần còn mở. Các câu trả lời của Human được giữ. Kết thúc interview cũ không chứng minh toàn cảnh đã hoàn tất.</p></section>
+
+      <section class="question" aria-labelledby="question-g6" data-question-id="G6" data-status="confirmed">
+        <h2 id="question-g6">G6 · Chất lượng của chính Crew</h2>
+        <p><strong>Đúng: G6 áp dụng cho sản phẩm Crew.</strong> Chất lượng target-project theo tiêu chí riêng của project đó.</p>
+        <p><strong>Phản hồi đã ghi:</strong> khung cũ chưa đủ. AI có thể viết cả code lẫn test dựa trên cùng một cách hiểu sai; test pass nhưng phần mềm vẫn không làm đúng điều Human cần.</p>
+        <p><strong>Human đã đồng ý khung sửa:</strong> mỗi Epic phải có bằng chứng Crew thực hiện đúng hành vi đã xác nhận, cùng chất lượng cần thiết để sử dụng. Test pass là một phần của bằng chứng.</p>
+        <ol>
+          <li><strong>Tiêu chí xuất phát từ yêu cầu.</strong> Xác định hành vi mong đợi, kết quả và ngoại lệ từ spec đã xác nhận trước khi triển khai. Không suy expected result từ code đang được kiểm.</li>
+          <li><strong>Kiểm chứng độc lập.</strong> Người hoặc worker kiểm chứng khác tác giả, context riêng, đối chiếu yêu cầu với cả code và test. Kiểm cả hành vi thiếu và liệu phép kiểm có phát hiện sai hành vi hay không. AI viết code vẫn có thể viết test; tự báo pass chưa đủ để chấp nhận.</li>
+          <li><strong>Chạy Crew thật.</strong> Kiểm luồng đầu cuối qua giao diện người dùng và các tích hợp thật trong phạm vi Epic; quan sát kết quả và tác động thực tế. Mock/fake hỗ trợ kiểm lỗi nhưng không thay bằng chứng tích hợp thật.</li>
+          <li><strong>Chất lượng ngoài chức năng.</strong> Chọn tiêu chí đo được theo rủi ro và phạm vi Epic dựa trên ISO/IEC 25010:2023: khả năng sử dụng, hiệu năng/chi phí, tích hợp, độ tin cậy/phục hồi, bảo mật, bảo trì và các đặc tính liên quan. Test và <code>./script/clippy</code> là baseline; không bao trùm các tiêu chí này.</li>
+          <li><strong>Bằng chứng cho Human quyết định.</strong> HTML review nêu hành vi đã kiểm, phiên bản, kết quả thực tế và phần chưa kiểm. Human đánh giá những hành vi cần trải nghiệm trực tiếp trong lần review hiện có; không giả lập feedback hoặc thêm gate duyệt từng test.</li>
+        </ol>
+        <p><strong>Ví dụ:</strong> Crew mở PR nhưng CI failed. Kiểm chứng phải thấy session chưa hoàn thành; sau sửa code, check lại và Human duyệt phiên bản mới; chỉ xác nhận OUTPUT khi PR thật sự merged vào main.</p>
+        <p><strong>Giới hạn:</strong> đổi worker hoặc model vẫn có thể giữ cùng giả định sai. Cần cả tiêu chí độc lập và bằng chứng hành vi thật. Khung đã confirmed; chưa có các phép kiểm này được chạy.</p>
+        <p><strong>Trade-off:</strong> tăng công kiểm chứng và chạy tích hợp; giảm phụ thuộc vào lời tự xác nhận của AI. Developers/QA làm sâu cách kiểm và ngưỡng khi triển khai.</p>
+        <p class="reply"><strong>Đã ghi câu trả lời “đồng ý”.</strong> Không cần xác nhận lại. <a href="solution-scope.html">Xem bản shaping tổng hợp</a>.</p>
+      </section>
+
+      <p><strong>Interview cũ đã dừng.</strong> Không có câu đang chờ trong bộ này. Kết quả lọc 8 ứng viên phụ đã được lưu; kết luận cũ “đủ shaping tổng thể” được rút lại vì thiếu toàn cảnh. Các hợp đồng chung còn mở nằm trong bản toàn cảnh draft; chưa xác nhận complete hoặc ready-to-build. Không yêu cầu Human trả lời lại hay tự mở vòng hỏi mới.</p>
+
+      <details>
+        <summary>G1–G5 đã có dữ kiện · không cần trả lời lại</summary>
+        <ul>
+          <li><strong>G1 · Giá trị và ranh giới:</strong> giúp Human giảm điều phối, đọc/duyệt và rework; chạy local trên máy macOS này, trong fork Zed, với ba provider ACP và GitHub Issues.</li>
+          <li><strong>G2 · Mô hình vận hành:</strong> yêu cầu → session → session plan → cycle → OUTPUT. Refine giao Story Ready; implement nhận Story Ready và kết thúc khi PR merged vào main.</li>
+          <li><strong>G3 · Hướng điều phối:</strong> câu 7 đã đồng ý. LLM hiểu yêu cầu, tạo plan; code kiểm tính hợp lệ và quản lý thực thi.</li>
+          <li><strong>G4 · Phạm vi giao:</strong> mỗi Epic là lát nhỏ đủ triển khai và sử dụng trong toàn cảnh. Build đầu tiên là thứ tự giao việc; onboarding và các hành trình khác vẫn thuộc phạm vi shaping. Chuỗi cycle implement giữ draft.</li>
+          <li><strong>G5 · Human và quyền quyết định:</strong> hội thoại với Orchestrator; worker trong worktree riêng, ngoài worktree qua Crew/gate; Human duyệt PR vào main. Approval gắn phiên bản; sửa code thì kiểm lại và Human duyệt phiên bản mới. Hết quota hỏi Human.</li>
+        </ul>
+        <p><strong>Câu 8 đã hoãn thiết kế/triển khai.</strong> Không coi pause/replan đã được Human chọn và không tiếp tục hỏi trong interview này.</p>
+      </details>
+
+      <details>
+        <summary>Nguồn và trạng thái</summary>
+        <p>Interview cũ đã dừng · 2026-10-11. G6 bản sửa được Human đồng ý; kết quả lọc câu phụ đã ghi. Toàn cảnh còn draft; chưa có validation sản phẩm mới.</p>
+        <p><a href="../discovery/problem-brief.html">Playback đã xác nhận</a> · <a href="../discovery/questions.html">Quyết định discovery và M2</a> · <a href="../research/domain-primer.html">Domain primer</a></p>
+        <p><a href="questions.md">Sổ câu hỏi và luật lọc dành cho AI</a> · <a href="solution-scope.md">Bản ghi shaping dành cho AI</a>. Chưa có issue spec hiện hành để liên kết; HTML không thay nguồn spec/ticket trên GitHub.</p>
+        <p>Khung G6 được Human xác nhận; chưa tự trở thành Definition of Done của Scrum Team hoặc bằng chứng chứng nhận ISO.</p>
+      </details>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toàn cảnh production-ready · Zed AI Crew</title>
+<style>
+:root { color-scheme: light dark; --background:#fafaf8; --surface:#fff; --text:#202524; --muted:#5e6965; --line:#d8e0db; --accent:#146348; --tint:#edf6ef; --warn:#8a5411; }
+@media(prefers-color-scheme:dark) { :root { --background:#151a18; --surface:#1d2521; --text:#edf3ee; --muted:#b0bdb5; --line:#3c4941; --accent:#86d9af; --tint:#23372c; --warn:#edbd71; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--background); color:var(--text); font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+main { width: 100%; max-width: none; padding:clamp(16px,3vw,40px); }
+h1 { margin:0 0 12px; font-size:clamp(28px,3.2vw,42px); line-height:1.2; }
+h2 { margin:32px 0 12px; font-size:24px; }
+p { margin:10px 0; }
+a { color:var(--accent); text-underline-offset:3px; }
+code { font-size:.9em; overflow-wrap:anywhere; }
+.meta { color:var(--muted); font-size:14px; }
+.badge { display:inline-block; padding:4px 10px; margin:0 8px 14px 0; background:var(--tint); color:var(--accent); border-radius:6px; font-size:14px; font-weight:650; }
+.badge.draft { color:var(--warn); }
+.notice { padding:16px 20px; background:var(--tint); border-left:4px solid var(--accent); border-radius:6px; }
+li { margin:7px 0; }
+.table-wrap { width:100%; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+th,td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+th { color:var(--muted); }
+details { margin:20px 0; padding:16px; border:1px solid var(--line); border-radius:8px; }
+summary { cursor:pointer; font-weight:650; }
+@media(max-width:800px) { .scenarios thead { display:none; } .scenarios tr { display:block; margin:12px 0; padding:12px; border:1px solid var(--line); border-radius:8px; background:var(--surface); } .scenarios td { display:block; padding:6px 0; border:0; } .scenarios td::before { content:attr(data-label) " · "; color:var(--muted); font-weight:650; } }
+</style>
+</head>
+<body><main>
+<span class="badge draft">Draft toàn cảnh · Chưa ready-to-build</span><span class="badge">Không có câu hỏi chờ bạn</span>
+<h1>Toàn cảnh sản phẩm production-ready<br />Zed AI Crew</h1>
+<p>Crew hỗ trợ bạn từ ý tưởng hoặc project có sẵn → công việc Ready → thay đổi đúng yêu cầu → chuyển giao khi được ủy quyền → vận hành, khắc phục, cải tiến và retirement. Bạn điều khiển bằng hội thoại; Crew giữ ngữ cảnh, tiến trình và bằng chứng.</p>
+<p class="meta">Một Human · máy macOS này · project local · fork Zed Rust/GPUI · Claude/Codex/Antigravity qua ACP · GitHub Issues · Crew public, target-project private.</p>
+
+<section id="decisions"><h2>1 · Vừa chốt sau review</h2>
+<ul>
+<li><strong>D15 · Danh mục:</strong> 15 kịch bản bên dưới là các kịch bản bạn mong muốn. Refactor/nợ kỹ thuật đi qua refine → implement. Release, incident, retirement chỉ thao tác lên môi trường target-project khi bạn cấp quyền cho từng project.</li>
+<li><strong>D16 · PR:</strong> mỗi Story một integration branch, một PR vào main.</li>
+<li><strong>D17 · Merge:</strong> bạn duyệt trên GitHub PR review; Crew merge ngay khi phiên bản PR trùng phiên bản bạn đã duyệt.</li>
+</ul>
+<p class="notice"><strong>Bước tiếp:</strong> viết business rules và acceptance criteria cho mô hình vận hành chung và refine/implement. Không cần bạn trả lời gì trước bước này.</p>
+</section>
+
+<section id="rules"><h2>2 · Luật áp dụng xuyên sản phẩm</h2>
+<ul>
+<li>Bạn chỉ ra lệnh qua Zed. LLM hiểu yêu cầu và tạo plan; code giữ trạng thái, dependency, quyền và OUTPUT.</li>
+<li>Crew là bên duy nhất ghi Issues. Bạn sửa issue trên web thì Crew báo lệch trước step tiếp theo, không ghi đè.</li>
+<li>Không có nút Approve/Re-run trong Crew; câu hỏi nằm trong hội thoại.</li>
+<li>Refine giao Story Ready. Implement chỉ nhận Story Ready; thiếu dữ liệu thì không bắt đầu, báo phần thiếu và đề xuất refine.</li>
+<li>Implement kết thúc khi PR của Story merged vào main. CI failed, conflict hoặc findings còn mở thì chưa xong.</li>
+<li>Approval theo phiên bản: code đổi sau khi bạn duyệt thì check lại và bạn duyệt phiên bản mới.</li>
+<li>Worker trong worktree riêng; ngoài worktree qua Crew/gate. Bạn vắng: phần phụ thuộc chờ, phần độc lập chạy tiếp. Hết quota: dừng phần đó và hỏi bạn, không tự đổi provider.</li>
+<li>Target-project là repo public: Crew dừng và hỏi bạn.</li>
+</ul>
+</section>
+
+<section id="lifecycle"><h2>3 · 15 kịch bản: INPUT → OUTPUT</h2>
+<p class="meta">Chỉ OUTPUT của S04/S05 đã chốt; các dòng khác là đề xuất BA, làm rõ khi spec từng nhóm.</p>
+<div class="table-wrap"><table class="scenarios"><thead><tr><th>Kịch bản</th><th>INPUT</th><th>OUTPUT</th><th>Ngoại lệ chính</th></tr></thead><tbody>
+<tr><td data-label="Kịch bản">S01 · Onboard target-project</td><td data-label="INPUT">Repo/project có sẵn và quyền được cấp.</td><td data-label="OUTPUT">Baseline code/docs/tracker, capability, constraints và cấu hình đủ để Crew làm việc.</td><td data-label="Ngoại lệ">Doc lệch code, thiếu quyền; repo public thì dừng và hỏi.</td></tr>
+<tr><td data-label="Kịch bản">S02 · Kickoff sản phẩm</td><td data-label="INPUT">Ý tưởng, nhu cầu, constraints, bằng chứng ban đầu.</td><td data-label="OUTPUT">Problem brief được xác nhận, phạm vi, hướng giải pháp, tiêu chí và backlog feature/Epic trên Issues.</td><td data-label="Ngoại lệ">Sai vấn đề, ý tưởng mâu thuẫn, thiếu bằng chứng.</td></tr>
+<tr><td data-label="Kịch bản">S03 · Nghiên cứu / spike</td><td data-label="INPUT">Câu hỏi hoặc giả thuyết có phạm vi.</td><td data-label="OUTPUT">Kết luận có nguồn hoặc thực nghiệm, phương án và giới hạn.</td><td data-label="Ngoại lệ">Inconclusive, thiếu access, nhầm prototype là code production.</td></tr>
+<tr><td data-label="Kịch bản">S04 · Refine <strong>(chốt)</strong></td><td data-label="INPUT">Feature/Epic từ S02/S06 hoặc yêu cầu của bạn, kể cả refactor.</td><td data-label="OUTPUT">Spec trên Issues và các Story đạt Story Ready.</td><td data-label="Ngoại lệ">Còn lựa chọn chưa giải quyết thì chưa Ready.</td></tr>
+<tr><td data-label="Kịch bản">S05 · Implement <strong>(chốt)</strong></td><td data-label="INPUT">Một Story Ready.</td><td data-label="OUTPUT">PR của Story merged vào main, kiểm chứng và approval đúng phiên bản.</td><td data-label="Ngoại lệ">Story chưa Ready; CI failed, conflict, findings; code đổi sau approval.</td></tr>
+<tr><td data-label="Kịch bản">S06 · Đổi scope</td><td data-label="INPUT">Baseline và thay đổi bạn yêu cầu.</td><td data-label="OUTPUT">Quyết định cùng impact; spec/backlog và việc bị ảnh hưởng được đồng bộ.</td><td data-label="Ngoại lệ">Việc đang chạy, approval/check cũ, thay đổi đã publish.</td></tr>
+<tr><td data-label="Kịch bản">S07 · Bug / hotfix</td><td data-label="INPUT">Triệu chứng, báo cáo, test thất bại.</td><td data-label="OUTPUT">Bằng chứng tái hiện/chẩn đoán; bản sửa vào main theo hợp đồng S05.</td><td data-label="Ngoại lệ">Không tái hiện được, test flaky; hotfix vẫn cần bạn duyệt.</td></tr>
+<tr><td data-label="Kịch bản">S08 · Dependency / security</td><td data-label="INPUT">Version/advisory hoặc nhu cầu thay dependency.</td><td data-label="OUTPUT">Impact được đối chiếu; thay đổi vào main theo hợp đồng S05 kèm security evidence.</td><td data-label="Ngoại lệ">Breaking API, license, disclosure cần specialist.</td></tr>
+<tr><td data-label="Kịch bản">S09 · Release / deploy</td><td data-label="INPUT">Thay đổi đạt điều kiện, môi trường và quyền.</td><td data-label="OUTPUT">Bản phát hành chạy đúng tiêu chí; rollout/rollback có evidence.</td><td data-label="Ngoại lệ">Deploy xong nhưng lỗi; thiếu quyền; rollback thất bại.</td></tr>
+<tr><td data-label="Kịch bản">S10 · Migration</td><td data-label="INPUT">Nguồn/đích, quy tắc chuyển và quyền.</td><td data-label="OUTPUT">Trạng thái đích đối soát toàn vẹn; phần chưa đạt ghi đúng.</td><td data-label="Ngoại lệ">Thiếu/trùng dữ liệu, cutover dở dang.</td></tr>
+<tr><td data-label="Kịch bản">S11 · Incident</td><td data-label="INPUT">Sự cố có tác động và quyền xử lý.</td><td data-label="OUTPUT">Phục hồi mức hoạt động mong muốn, có timeline và việc còn lại.</td><td data-label="Ngoại lệ">Thiếu access, mitigation chưa đủ, rollback thất bại.</td></tr>
+<tr><td data-label="Kịch bản">S12 · Postmortem</td><td data-label="INPUT">Incident đã ổn định, timeline/logs.</td><td data-label="OUTPUT">Nguyên nhân có bằng chứng; hành động phòng ngừa và cách theo dõi.</td><td data-label="Ngoại lệ">Không đủ evidence; chưa ai nhận việc.</td></tr>
+<tr><td data-label="Kịch bản">S13 · Review vận hành</td><td data-label="INPUT">Một kỳ sử dụng, mục tiêu, dữ liệu/feedback.</td><td data-label="OUTPUT">Đánh giá giá trị, độ lệch mục tiêu và route tiếp theo.</td><td data-label="Ngoại lệ">Không có baseline; đếm ticket không chứng minh giá trị.</td></tr>
+<tr><td data-label="Kịch bản">S14 · Retrospective</td><td data-label="INPUT">Run logs, defects, checks, feedback.</td><td data-label="OUTPUT">Cải tiến được chọn cùng cách đo; thay đổi playbook/rules có review.</td><td data-label="Ngoại lệ">Suy luận từ summary; tự sửa rules.</td></tr>
+<tr><td data-label="Kịch bản">S15 · Retirement</td><td data-label="INPUT">Quyết định ngừng và phạm vi dữ liệu/quyền.</td><td data-label="OUTPUT">Dữ liệu chuyển/lưu theo quyết định, tài nguyên/quyền ngừng, kết quả xác nhận.</td><td data-label="Ngoại lệ">Dependency còn dùng; retention chưa rõ.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="gaps"><h2>4 · Còn mở · không cần bạn trả lời lúc này</h2>
+<div class="table-wrap"><table><thead><tr><th>Gap</th><th>Điều còn thiếu</th><th>Người xử lý đề xuất</th></tr></thead><tbody>
+<tr><td>Bảo vệ main</td><td>Repo chưa có branch protection/ruleset; "bạn duyệt trước merge" hiện chỉ dựa vào Crew kiểm phiên bản.</td><td>Developers/Security</td></tr>
+<tr><td>Quyền và dữ liệu</td><td>Chặn thao tác ngoài worktree với quyền thật; dữ liệu gửi/lưu/retention; quyền release/migration theo project.</td><td>Developers/Security + bạn khi có target-project</td></tr>
+<tr><td>Recovery và provider</td><td>Role/auth/cancel/compaction ba ACP; restart sau thao tác ghi chưa được chứng minh.</td><td>Developers/Architect/QA</td></tr>
+<tr><td>Chất lượng đo được</td><td>Ngưỡng, bộ check CI bắt buộc, seams kiểm chứng.</td><td>Developers/QA</td></tr>
+<tr><td>Cấu hình và lifecycle</td><td>Hierarchy Epic/Story/Task trên Issues, override/version, hủy, replan khi lệch issue.</td><td>BA/Developers/UX</td></tr>
+</tbody></table></div>
+<p class="meta">Owner là đề xuất, chưa ai nhận. Một gap chỉ thành câu hỏi cho bạn khi kết quả buộc chọn trade-off sản phẩm.</p>
+</section>
+
+<details><summary>11 khối năng lực C01–C11</summary><div class="table-wrap"><table><thead><tr><th>Khối</th><th>Năng lực</th></tr></thead><tbody>
+<tr><td>C01 · Trải nghiệm trong Zed</td><td>Hội thoại, pipeline dưới chat, đồ thị cycle/step, Run log, HTML review ngắn.</td></tr>
+<tr><td>C02 · Orchestrator</td><td>Hiểu intent, chọn session, tạo plan, phân công role, tổng hợp kết quả.</td></tr>
+<tr><td>C03 · Engine thực thi</td><td>Dependency, dispatch/join, chờ bạn, lỗi/retry/rework, hủy, restart, đối soát.</td></tr>
+<tr><td>C04 · Playbook</td><td>Danh mục session với INPUT/OUTPUT, cycle/step tái dùng, tiêu chí kiểm chứng.</td></tr>
+<tr><td>C05 · Worker ACP</td><td>Ba provider; role/skills, mode/model, quyền, cancel/resume, quota.</td></tr>
+<tr><td>C06 · Workspace và tích hợp</td><td>Worktree, integration branch mỗi Story, conflict, PR, approval, merge main.</td></tr>
+<tr><td>C07 · Ngữ cảnh và bằng chứng</td><td>Issues, glossary, ADR, run store, log/diff có truy vết.</td></tr>
+<tr><td>C08 · Kiểm chứng độc lập</td><td>Tiêu chí từ yêu cầu, người kiểm khác tác giả, E2E thật, evidence đúng version.</td></tr>
+<tr><td>C09 · Quyền và dữ liệu</td><td>Boundary ngoài worktree, input không đáng tin, secret, thẩm quyền release/migration.</td></tr>
+<tr><td>C10 · Cấu hình theo project</td><td>Cấu hình chuẩn, override, kiểm hợp lệ, version dùng trong session.</td></tr>
+<tr><td>C11 · Vận hành Crew</td><td>Theo dõi session/quota/cost, recovery, sync upstream, trace lịch sử.</td></tr>
+</tbody></table></div></details>
+
+<details><summary>Hành trình nối các kịch bản</summary><ul>
+<li><strong>Project mới:</strong> S02 → S03 → backlog → S04 → S05 → S09 khi có mục tiêu/quyền → S13 → S14.</li>
+<li><strong>Project có sẵn:</strong> S01 → feature, refactor hoặc bug → S04 hoặc S07 → thay đổi vào main theo hợp đồng S05.</li>
+<li><strong>Sự cố:</strong> S11 → hotfix qua S07 → S12.</li>
+<li><strong>Thay đổi lớn hoặc kết thúc:</strong> S06/S10/S15: impact → thao tác được ủy quyền → đối soát → ghi đúng trạng thái.</li>
+</ul></details>
+
+<details><summary>Production-ready: bằng chứng theo ISO/IEC 25010</summary><div class="table-wrap"><table><thead><tr><th>Đặc tính</th><th>Bằng chứng cần thiết kế</th></tr></thead><tbody><tr><td>Đúng chức năng</td><td>Acceptance scenarios từ yêu cầu; evaluator độc lập; E2E thật gồm luồng chính/ngoại lệ.</td></tr><tr><td>Hiệu năng và tài nguyên</td><td>Latency, tài nguyên, token/cost trên workload xác định.</td></tr><tr><td>Tương thích</td><td>Đúng version Zed/GitHub/ba ACP; capability mismatch được báo.</td></tr><tr><td>Khả năng tương tác</td><td>Bạn hiểu và quyết định được; keyboard/focus, chờ/lỗi/empty, HTML vừa đủ.</td></tr><tr><td>Độ tin cậy</td><td>Timeout/restart/kết quả trễ/partial failure; đối soát trước retry.</td></tr><tr><td>Bảo mật</td><td>Input không đáng tin, secret/log/data boundary, hiệu lực quyền thật.</td></tr><tr><td>Khả năng bảo trì</td><td>Review kiến trúc/ADR, boundary crate, regression, một lần sync upstream.</td></tr><tr><td>Tính linh hoạt</td><td>Override provider/project giữ hợp đồng; version cấu hình xác định.</td></tr><tr><td>An toàn thao tác</td><td>Chặn thao tác vượt phạm vi; rollback/recovery được xác nhận.</td></tr></tbody></table></div><p>Khung G6 đã chốt cho Crew; target-project có tiêu chí riêng. Ngưỡng và checks chưa có.</p></details>
+
+<details><summary>Nguồn và giới hạn bằng chứng</summary>
+<p>Đã đối chiếu intake, bản ghi discovery, playback, synthesis, primer, landscape và catalog cũ 12 scenario/33 cycle. Ngày 2026-10-11: Actions đang bật, ruleset rỗng. Chưa chạy Crew E2E, benchmark hoặc probe mới.</p>
+<p><a href="solution-scope.md">Bản ghi đầy đủ và sổ quyết định D0–D17</a> · <a href="../intake-brief.html">Intake</a> · <a href="../discovery/problem-brief.html">Playback</a> · <a href="../research/domain-primer.html">Domain primer</a> · <a href="../research/technical-landscape.html">Technical landscape</a> · <a href="questions.html">Interview shaping</a> · <a href="../../GLOSSARY.md">Glossary</a> · <a href="../../docs/adr/0001-hybrid-orchestration.md">ADR-0001</a></p>
+</details>
+</main></body></html>
