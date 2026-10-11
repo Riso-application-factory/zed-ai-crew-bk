@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Technical landscape · Zed AI Crew</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e3e3e0;
+    --card: #ffffff; --accent: #2f6fdb; --warn: #b26b00; --ok: #1f8a4c; --bad: #c0392b; --chip: #eef2fb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --fg: #e8e8ea; --muted: #9a9aa2; --line: #2c2d31;
+      --card: #1f2023; --accent: #6ea0ff; --warn: #e0a040; --ok: #4cc27f; --bad: #ff7b6b; --chip: #23304a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { width: 100%; max-width: none; padding: clamp(16px, 3vw, 40px); }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 32px 0 10px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+    background: var(--chip); color: var(--accent); margin-right: 6px; }
+  .badge.warn { color: var(--warn); }
+  .badge.ok { color: var(--ok); }
+  .badge.bad { color: var(--bad); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .card p { margin: 6px 0; }
+  .label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .rec { border-left: 3px solid var(--ok); padding-left: 10px; margin-top: 8px; }
+  .example { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); }
+  ol.opts { margin: 4px 0; padding-left: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  td:first-child { font-weight: 600; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--chip); padding: 1px 4px; border-radius: 4px; }
+  .src { color: var(--accent); font-size: 12px; }
+  ul.tight { margin: 4px 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Technical landscape · Zed AI Crew</h1>
+  <p class="meta">
+    <span class="badge ok">Complete theo tiêu chí bước · chờ Human trả lời</span>
+    <span class="badge warn">3 kiểm chứng TD1 còn mở</span>
+    Bước 1b: Technical discovery · Software / Solution Architect · 2026-10-10 ·
+    Baseline: <a href="../intake-brief.html">intake brief</a> (Q1–Q3 đã chốt) · song song với <a href="domain-primer.html">domain primer</a>.
+    Không phải spec hay quyết định kiến trúc.
+  </p>
+  <p class="meta">
+    Ký hiệu bằng chứng: <b>[P]</b> probe chạy thật · <b>[C]</b> đọc code fork · <b>[S]</b> nguồn adapter/tài liệu chính thức ·
+    <b>[O]</b> thiết kế cũ <code>zed-scrum-team/old-specs</code> · <b>[I]</b> suy luận Architect, chưa kiểm chứng.
+  </p>
+
+  <h2>1 · Kết luận chính</h2>
+  <div class="card">
+    <ul class="tight">
+      <li><b>A1 đứng được, nhưng có 2 lỗ hổng.</b> Cả 3 provider đều có cwd riêng cho mỗi session, forward MCP stdio, load/resume sau restart, chọn mode/model và cancel. <b>[P]</b> Lỗ hổng: Antigravity bỏ qua role instruction ở <code>session/new</code>, và không gửi <code>plan</code> update. <b>[P][S]</b></li>
+      <li><b>Zed đã có gần đủ “ống nước”.</b> Có sẵn API để tạo thread ACP (chọn agent, cwd, prompt), gửi prompt, nghe event, cancel và resume, kèm luồng tạo thread trong git worktree mới. Mỗi hướng kiến trúc chỉ cần 3–5 điểm móc nhỏ (≈50–80 dòng) vào upstream. <b>[C]</b></li>
+      <li><b>Rủi ro lớn nhất là bảo mật, không phải khả thi.</b> Token <code>gh</code> mà mọi worker đều đọc được có scope <code>admin:org</code> và <code>delete_repo</code>. Repo public, ai cũng comment được vào issue mà agent sẽ đọc. Ở chế độ bypass/yolo thì gate quyền bị bỏ qua. <b>[P][C]</b></li>
+      <li><b>Kiến trúc chưa chốt.</b> Có 3 hướng ứng viên ở §4. Hướng nào thắng phụ thuộc chủ yếu vào câu trả lời của Human cho câu R1 và R2 trong <a href="../discovery/questions.html">bộ câu hỏi</a>.</li>
+    </ul>
+  </div>
+
+  <h2>2 · Câu hỏi cho Human</h2>
+  <div class="card"><p>Đã chuyển sang bộ câu hỏi duy nhất của discovery: <a href="../discovery/questions.html"><code>artifacts/discovery/questions.html</code></a> (9 câu gốc R1–R9, có luật dừng). Không lặp lại ở đây.</p></div>
+
+  <h2>3 · Khả thi và rabbit hole theo capability</h2>
+  <table>
+    <tr><th>Capability</th><th>Khả thi</th><th>Bằng chứng</th><th>Unknown / rabbit hole</th><th>Mức</th></tr>
+    <tr><td>Tạo và điều khiển worker ACP</td><td><span class="badge ok">Cao</span></td><td><code>AgentPanel::create_thread_with_options</code> <code>agent_panel.rs:3232</code>; <code>AcpThread::send/cancel</code> <code>acp_thread.rs:6113/6478</code>; <code>AcpThreadEvent</code> <code>:3531</code> <b>[C]</b></td><td>Hàm trả về <code>ThreadId</code> trước khi có ACP session, nên controller phải chờ. Câu hỏi về quyền của worker hiện ra trong thread của worker, không ở thread Orchestrator.</td><td>Trung bình</td></tr>
+    <tr><td>Role instruction cho từng provider</td><td><span class="badge warn">Trung bình</span></td><td>codex <code>_meta.jetbrains.air.customInstructions</code> → trả lời “BANANA” <b>[P]</b>; claude <code>_meta.systemPrompt</code> <b>[S]</b>, chưa chạy prompt vì chưa đăng nhập; antigravity bỏ qua cả hai, trả lời “OK” <b>[P]</b>. Zed hiện không gửi <code>_meta</code> này <b>[C]</b></td><td>Fallback cho Antigravity (đưa role vào prompt đầu tiên hoặc vào rules file) <b>chưa thử</b>. Role đặt trong prompt có thể bị compaction làm mất.</td><td>Cao</td></tr>
+    <tr><td>Khôi phục sau restart</td><td><span class="badge ok">Cao</span></td><td>Cả 3 provider đều replay được history bằng <code>session/load</code> sau khi kill process <b>[P]</b></td><td>Codex <code>session/list</code> chỉ khớp realpath của cwd. Run store phải lưu realpath.</td><td>Thấp</td></tr>
+    <tr><td>Song song bằng git worktree</td><td><span class="badge ok">Cao</span></td><td><code>create_thread</code> tool có <code>use_new_worktree</code>/<code>base_ref</code>; <code>worktree_service.rs:736</code>; cwd riêng mỗi session <b>[C][P]</b></td><td>Thread mở ở trạng thái detached HEAD. Logic archive/restore của sidebar (<code>thread_worktree_archive.rs</code>) là rabbit hole, không nên đụng vào.</td><td>Thấp</td></tr>
+    <tr><td>Sub-issue và dependency trên GitHub</td><td><span class="badge ok">Cao</span></td><td>GraphQL có <code>subIssues</code>/<code>blockedBy</code> và các mutation tương ứng; gh 2.102 có <code>--parent</code>/<code>--blocked-by</code> <b>[P]</b></td><td>Edit issue không có compare-and-set, nên cần outbox kèm marker trong body để ghi idempotent.</td><td>Thấp</td></tr>
+    <tr><td>Skills dùng chung cho 3 provider</td><td><span class="badge warn">Trung bình</span></td><td>Codex và Antigravity đọc <code>.agents/skills</code>; Claude chỉ đọc <code>.claude/skills</code>, mà repo không có thư mục này <b>[S][P]</b></td><td>Worker Claude <b>hiện không thấy</b> skill nào của repo. <code>docs/src/ai/external-agents.md:55</code> ghi đường dẫn skills của Codex lệch với tài liệu chính thức.</td><td>Trung bình</td></tr>
+    <tr><td>Theo dõi tiến độ worker</td><td><span class="badge warn">Trung bình</span></td><td>claude/codex gửi <code>plan</code> update; antigravity thì không <b>[S]</b></td><td>Tiến độ phải suy từ event chung (<code>Stopped</code>, <code>StatusChanged</code>), không dựa vào <code>plan</code>. Chưa test cancel giữa lúc đang chạy prompt.</td><td>Trung bình</td></tr>
+    <tr><td>Dải pipeline dưới ô chat</td><td><span class="badge warn">Trung bình</span></td><td>Chèn ngay sau <code>render_message_editor</code> ở <code>thread_view.rs:13367</code>; <code>agent_ui</code> không có extension point <b>[C]</b></td><td>File này có churn cao (60 commit trong 3 tháng). Giữ patch ở mức một slot <code>AnyView</code> khoảng 3 dòng.</td><td>Trung bình</td></tr>
+    <tr><td>Đồ thị và tab Run log</td><td><span class="badge ok">Cao</span></td><td>Implement <code>workspace::Item</code>; mẫu canvas vẽ lane/edge trong <code>git_graph.rs:882, 3544–3660</code> <b>[C]</b></td><td>Chép mẫu, không móc vào <code>git_graph</code>. Không cần sửa upstream.</td><td>Thấp</td></tr>
+    <tr><td>Xem artifact HTML trong Zed</td><td><span class="badge bad">Thấp</span></td><td>Không có webview; markdown chỉ render một phần HTML <b>[C]</b></td><td>Mở trình duyệt bằng <code>cx.open_url</code>. Nhúng webview là rabbit hole lớn.</td><td>Thấp (nếu chấp nhận mở browser)</td></tr>
+    <tr><td>Gate Human với worker ACP</td><td><span class="badge warn">Trung bình</span></td><td>Bypass/yolo bỏ qua <code>request_permission</code>; Claude tự tắt bypass khi chạy bằng root ngoài sandbox <b>[S]</b></td><td>Gate thật phải nằm ở engine (ai được push, merge, ghi issue), không nằm ở gate quyền của agent. Phụ thuộc R2.</td><td>Cao</td></tr>
+    <tr><td>Bí mật và danh tính</td><td><span class="badge bad">Thấp</span></td><td>Process con nhận toàn bộ env của login shell (<code>agent_server_store.rs:1167</code>), trong đó có <code>ANTHROPIC_API_KEY</code>; token gh nằm trong keyring với scope admin <b>[C][P]</b></td><td>Chỉ có một danh tính gh, nên không phân biệt được bạn ghi hay AI ghi. Sandbox riêng cho từng worker là rabbit hole lớn; nên bắt đầu bằng PAT hẹp và lọc env.</td><td>Cao</td></tr>
+    <tr><td>Cấu hình chuẩn kèm override theo project</td><td><span class="badge warn">Trung bình</span></td><td>Cài đặt <code>agent</code>/<code>agent_servers</code> chỉ có ở cấp user; <code>.zed/settings.json</code> không override được (<code>settings_store.rs:1101</code>) <b>[C]</b></td><td>Thêm key settings mới thì phải sửa <code>settings_content</code> upstream. Một file playbook riêng, pin bằng commit SHA và hash, không cần sửa gì.</td><td>Thấp</td></tr>
+    <tr><td>Sync upstream</td><td><span class="badge warn">Trung bình</span></td><td>190 commit vào 4 crate agent từ 2026-07-01; fork dùng ACP crate 3.2.0 có bật <code>unstable_protocol_v2</code>, trong khi adapter trả về protocolVersion 1 <b>[C][P]</b></td><td>Public API vẫn có thể drift dù số điểm móc ít. Nên có một smoke test riêng cho các API đã dùng.</td><td>Trung bình</td></tr>
+  </table>
+
+  <h2>4 · Hướng kiến trúc ứng viên (chưa chọn)</h2>
+  <p>Áp dụng nguyên tắc chỉ dựng seam ở chỗ thực sự có biến thể. <b>Profile provider là seam thật:</b> 3 adapter chèn role, đặt mode và báo tiến độ theo 3 cách khác nhau. <b>Tracker là seam giả:</b> chỉ có GitHub, nên gọi trực tiếp, không trừu tượng hoá. Cả 3 hướng đều cần một run store SQLite do crate Crew sở hữu, lưu run/cycle/step, phân công (agent, SessionId, worktree realpath, lần thử), verdict, quyết định gate, outbox GitHub và digest playbook. <b>[I]</b></p>
+  <table>
+    <tr><th></th><th>D1 · Engine Rust tất định, LLM chỉ phán đoán</th><th>D2 · LLM Orchestrator + Crew MCP server, code giữ bất biến</th><th>D3 · LLM tự điều phối bằng prose + gh</th></tr>
+    <tr><td>Mô tả</td><td>Engine chạy playbook, điều khiển <code>AcpThread</code> trực tiếp. LLM chỉ được gọi tại các điểm có giới hạn (chọn kịch bản, verdict, định tuyến rework), trả về structured output.</td><td>Claude ACP gọi các tool <code>crew.*</code> qua MCP HTTP loopback; engine chặn mọi thao tác sai bất biến. Đây là mô hình của thiết kế cũ (D-ORC-02/03).</td><td>Một thread Claude làm theo prompt playbook, tự gọi gh và tự tạo thread.</td></tr>
+    <tr><td>Độ tin cậy</td><td>Cao</td><td>Khá: sẽ đứng nếu LLM quên gọi tool</td><td>Thấp: tự nhận xong, bỏ qua step</td></tr>
+    <tr><td>Khôi phục sau restart</td><td>Đọc lại store rồi gắn lại worker bằng <code>session/load</code></td><td>Như D1, nhưng còn phải bootstrap lại context cho Orchestrator</td><td>Phụ thuộc replay chat</td></tr>
+    <tr><td>Chi phí token</td><td>Thấp nhất: chờ worker không tốn token</td><td>Trung bình: mỗi lần chờ hoặc poll là một lượt model, trừ vào quota Claude</td><td>Cao nhất</td></tr>
+    <tr><td>Kiểm thử</td><td>Rust thuần, dùng fake backend</td><td>Bất biến test được; hành vi thì cần eval</td><td>Chỉ eval bằng model thật</td></tr>
+    <tr><td>Điểm móc upstream</td><td>H1 re-export, H2 slot UI, H4 init: ≈35 dòng</td><td>Như D1, thêm H3 inject MCP theo session (≈15 dòng ở <code>acp.rs:7153</code>) và có thể thêm H5</td><td>Gần như không có</td></tr>
+    <tr><td>Hợp với yêu cầu</td><td>Khớp “trạng thái đọc từ run store”; khớp R1 = A</td><td>Khớp R1 = B</td><td>Trái F6 và D-ORC-04</td></tr>
+  </table>
+  <p class="meta">D1 và D2 không loại trừ nhau: D1 có thể thêm một MCP read-only sau. Quyết định chờ bước định hình giải pháp, sau khi có câu trả lời R1/R2, và sẽ ghi thành ADR.</p>
+
+  <h2>5 · Chi tiết</h2>
+
+  <details>
+    <summary>Hệ thống hiện tại và kiểm kê tích hợp</summary>
+    <p><b>Fork Zed (Rust/GPUI), chưa có dòng code Crew nào.</b> Các crate liên quan: <code>agent_servers</code> khởi chạy adapter và giữ kết nối ACP; <code>acp_thread</code> chứa model thread và event; <code>agent</code> là native agent, có tool <code>spawn_agent</code> và <code>create_thread</code> (chỉ native agent dùng được, <code>create_thread</code> nằm sau feature flag); <code>agent_ui</code> gồm panel, thread view và sidebar; bảng <code>sidebar_threads</code> nằm trong <code>thread_metadata_store.rs</code>. Native agent và ACP agent không dùng chung tool. <b>[C]</b></p>
+    <table>
+      <tr><th>Hệ thống</th><th>Hướng</th><th>Dữ liệu</th><th>Giao thức</th><th>Owner</th><th>Tài liệu</th></tr>
+      <tr><td>claude-agent-acp 0.89.0</td><td>2 chiều</td><td>prompt, session update, permission</td><td>ACP v1, JSON-RPC qua stdio (npx)</td><td>Anthropic / ACP org</td><td>Có (README, source npm)</td></tr>
+      <tr><td>codex-acp 2.2.2</td><td>2 chiều</td><td>như trên</td><td>ACP v1, stdio; MCP chỉ http, không sse</td><td>OpenAI / ACP org</td><td>Có (source npm)</td></tr>
+      <tr><td>antigravity-acp 1.3.0 (<code>agy_acp_server.par</code>)</td><td>2 chiều</td><td>như trên, thêm audio</td><td>ACP v1, stdio</td><td>Google</td><td>Chỉ có binary đóng; tham chiếu <code>external-agents.md</code></td></tr>
+      <tr><td>GitHub Issues</td><td>đọc/ghi</td><td>issue, sub-issue, blockedBy, label, comment</td><td>REST/GraphQL qua gh 2.102</td><td>GitHub</td><td>Có</td></tr>
+      <tr><td>Git local + worktree</td><td>đọc/ghi</td><td>branch, worktree, commit</td><td>git CLI qua <code>crates/git</code></td><td>Local</td><td>Code</td></tr>
+      <tr><td>MCP server của project</td><td>Zed → agent</td><td>tool</td><td>MCP stdio/http, forward lúc <code>session/new</code>/load/resume (<code>acp.rs:7153</code>)</td><td>Cấu hình user</td><td>Code</td></tr>
+      <tr><td>GitHub MCP server (tuỳ chọn)</td><td>agent → GitHub</td><td>issue, sub-issue</td><td>MCP; có <code>--read-only</code>, <code>--toolsets</code>, <code>--lockdown-mode</code></td><td>GitHub</td><td>Có</td></tr>
+      <tr><td>Upstream Zed</td><td>code vào fork</td><td>commit</td><td>git sync định kỳ</td><td>zed-industries</td><td>—</td></tr>
+      <tr><td>Trình duyệt</td><td>ra ngoài</td><td>artifact HTML</td><td><code>cx.open_url</code></td><td>OS</td><td>—</td></tr>
+    </table>
+  </details>
+
+  <details>
+    <summary>Dữ liệu: nguồn sự thật (ứng viên), khối lượng, độ nhạy, migration</summary>
+    <table>
+      <tr><th>Dữ liệu</th><th>Nguồn sự thật ứng viên</th><th>Khối lượng</th><th>Độ nhạy</th><th>Migration</th></tr>
+      <tr><td>Spec, ticket, quyết định cần thảo luận</td><td>GitHub Issues (đã chốt ở Q1 intake)</td><td>Hàng chục đến hàng trăm; repo hiện có 0 issue</td><td><b>Công khai</b></td><td>Không có (backlog.db cũ chưa từng được triển khai)</td></tr>
+      <tr><td>Glossary, ADR, artifact, playbook</td><td>File trong repo, pin theo commit</td><td>Thấp</td><td>Công khai</td><td>Thiết kế cũ chỉ là input; ADR viết mới</td></tr>
+      <tr><td>Trạng thái run</td><td>SQLite của Crew trong <code>data_dir</code> <b>[I]</b></td><td>Vài event cho mỗi step</td><td>Local; có thể chứa trích đoạn output</td><td>Không có</td></tr>
+      <tr><td>Transcript của thread</td><td>Kho session của từng provider + DB thread của Zed</td><td>Cao</td><td>Local; có thể chứa code và secret</td><td>Không; cần chính sách retention</td></tr>
+      <tr><td>Credential</td><td>Keyring (gh), <code>~/.codex/auth.json</code>, env shell</td><td>—</td><td><b>Cao</b>, hiện mọi worker đều đọc được</td><td>Đề xuất chuyển sang PAT hẹp</td></tr>
+    </table>
+    <p><b>Lựa chọn còn mở:</b> trạng thái ticket lấy từ run store rồi engine là bên duy nhất ghi lên Issues, hay lấy chính Issues làm trạng thái (đơn giản hơn nhưng chậm, công khai và không có CAS). Phụ thuộc câu R5. <b>[I]</b></p>
+  </details>
+
+  <details>
+    <summary>Ràng buộc</summary>
+    <ul class="tight">
+      <li><b>Triển khai:</b> app desktop local, một người dùng; máy quan sát là macOS. Chưa biết có cần hỗ trợ OS khác.</li>
+      <li><b>Danh tính:</b> một tài khoản gh duy nhất (<code>riso-tech</code>), nên luật “chỉ Human được chuyển trạng thái” phải do Crew tự cưỡng chế. <b>[P]</b></li>
+      <li><b>Stack bắt buộc:</b> Rust/GPUI, crate riêng, móc mỏng vào upstream (C5, C6); ACP cho cả 3 provider (C1); GitHub Issues (C2); <code>./script/clippy</code>.</li>
+      <li><b>Chất lượng:</b> ISO/IEC 25010:2023 (C3). Cách chuyển thành tiêu chí DoD nằm ở DR3 của domain primer.</li>
+      <li><b>Compliance:</b> intake không nêu loại dữ liệu chịu quy định. Không suy thêm.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Build hay tái dùng</summary>
+    <ul class="tight">
+      <li><b>Tái dùng trong Zed, không cần sửa upstream:</b> <code>create_thread_with_options</code>, <code>AcpThread</code> (send, cancel, events), <code>load_session</code>/<code>resume_session</code>, worktree service, elicitation (<code>acp_thread/src/elicitation.rs</code>), forward <code>context_servers</code>, <code>workspace::Item</code>, mẫu canvas của <code>git_graph</code>.</li>
+      <li><b>Bên ngoài:</b> gh CLI (cờ sub-issue và dependency); GitHub MCP server (read-only/lockdown, nhưng tốn context vì schema tool); subagent native của Claude/Codex (fan-out nhanh nhưng đi vòng qua run store, nên không dùng cho step của playbook <b>[I]</b>).</li>
+      <li><b>Sản phẩm điều phối có sẵn:</b> so sánh ở <a href="domain-primer.html">domain primer · DR2</a>. Không lặp lại ở đây.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Spike TD1: probe ACP (đã chạy 2026-10-10)</summary>
+    <p>Mỗi provider chạy handshake, <code>session/new</code>, cancel lúc rảnh, kill process rồi load/resume, một MCP stdio giả, và tối đa một prompt nhỏ. Transcript nằm ở <a href="../evidence/technical-discovery/td1/README.md"><code>artifacts/evidence/technical-discovery/td1/</code></a>; script để ngoài repo (<code>/tmp/acp-probe/scripts/</code>).</p>
+    <table>
+      <tr><th>Capability</th><th>claude</th><th>codex</th><th>antigravity</th></tr>
+      <tr><td>Session capabilities</td><td>load, resume, list, fork, close, subagents</td><td>như claude</td><td>chỉ load, list, resume</td></tr>
+      <tr><td>Mode</td><td>default, acceptEdits, plan, auto, bypassPermissions</td><td>read-only, workspace-write, agent, agent-full-access</td><td>default, auto_edit, yolo</td></tr>
+      <tr><td>Model</td><td>chỉ qua config option</td><td>config option, ID dạng model[effort]</td><td><code>set_model</code> (đã deprecated) hoặc config option</td></tr>
+      <tr><td>MCP</td><td>http, sse; stdio khởi động lúc <code>session/new</code></td><td>chỉ http; stdio khởi động lúc <code>session/new</code></td><td>http, sse; stdio khởi động lazy ở prompt đầu tiên, có admin allowlist</td></tr>
+      <tr><td>Role instruction</td><td><code>_meta.systemPrompt</code> [S], <b>chưa kiểm chứng</b></td><td>Kiểm chứng được [P]</td><td>Không hỗ trợ [P]</td></tr>
+    </table>
+    <p><b>Còn mở:</b> (1) pha prompt của Claude, đang bị chặn vì <code>claude auth status</code> báo <code>loggedIn: false</code>; (2) cancel khi đang chạy prompt và prompt xin quyền thật; (3) fallback role cho Antigravity. Lệnh chạy lại: <code>python3 -I /tmp/acp-probe/scripts/probe.py claude prompt &lt;td1-dir&gt;</code>.</p>
+    <p><b>Tác dụng phụ:</b> các session thử còn nằm trong kho session của 3 provider (ví dụ <code>~/.claude/projects/-private-tmp-acp-probe-ws*</code>). Transcript có chứa đường dẫn <code>~</code>; nên xoá trước khi commit lên repo public. Đã quét: không thấy token hay email.</p>
+  </details>
+
+  <details>
+    <summary>TD9: thiết kế cũ, giữ / sửa / bỏ (tóm tắt)</summary>
+    <ul class="tight">
+      <li><b>Giữ:</b> D-SYS-02/03; D-ORC-03/04/05/07/09 (run store, tách trạng thái chạy khỏi verdict, mỗi run một thread); D-WRK-04/07/08; D-SDLC-02, 04–09 (fan-out, review độc lập, “hết lượt chưa phải bằng chứng”, phân biệt retry với rework, luật gate); D-INT-01/05; D-CFG-02/03/09/11/12; H-02/03/04.</li>
+      <li><b>Sửa:</b> D-ORC-01/02 (tuỳ hướng D1/D2); D-ORC-08 (chuyển việc chờ từ LLM sang engine); D-WRK-06/09; D-SDLC-01/03 (đổi tên session › cycle › step, phạm vi theo DR1); D-BL-03/04/05/09/12 (ánh xạ sang GitHub, idempotency bằng outbox); D-INT-02/03/04 (MCP HTTP loopback thay cho relay stdio); D-CFG-01/04–08/13/14.</li>
+      <li><b>Bỏ:</b> D-WRK-01/02/03/05/10, H-01 (worker native Zed); D-BL-01/02/06/07/08/11 (backlog.db, backlog-mcp).</li>
+      <li><b>Giả định cũ không còn đúng:</b> crate <code>backlog</code> và BacklogPanel không tồn tại; elicitation đã được triển khai; bridge không cần stdio relay; ACP agent tự quản lý tool của nó. Vẫn đúng: không có cơ chế inject MCP theo từng session.</li>
+      <li><b>Lệch baseline:</b> commit <code>467034cc</code> nêu trong intake không có trong repo nào ở máy. Bản rà dùng commit <code>95cd535a5f</code> (trước 2026-10-02) thay thế.</li>
+    </ul>
+  </details>
+
+  <h2>6 · Trạng thái và route tiếp theo</h2>
+  <div class="card">
+    <p><b>Đối chiếu tiêu chí hoàn thành:</b> mọi capability đều có đánh giá kèm bằng chứng hoặc unknown được gọi tên (§3) ✓ · đã kiểm kê tích hợp và ràng buộc (§5) ✓ · chưa chốt kiến trúc nào (§4) ✓ · câu hỏi chỉ khách hàng trả lời được đã liệt kê (§2) ✓.</p>
+    <p><b>Giới hạn:</b> chưa refetch upstream; chưa đo quota thật (C7); 3 kiểm chứng TD1 ở trên còn mở.</p>
+    <p><b>Route tiếp:</b> bước 2 (BA · giả thuyết và bộ câu hỏi discovery) dùng <a href="../discovery/questions.html">bộ câu hỏi</a> (đã gộp các câu từ domain primer §10) cùng các rủi ro mức Cao ở §3. Quyết định D1/D2 và ADR chờ đến bước định hình giải pháp. Người cộng tác đề xuất, chưa ai nhận: Tech Lead (Human) cho R1/R4; Security cho token, injection và env; Platform/DevOps cho chiến lược sync upstream.</p>
+  </div>
+</main>
+</body>
+</html>

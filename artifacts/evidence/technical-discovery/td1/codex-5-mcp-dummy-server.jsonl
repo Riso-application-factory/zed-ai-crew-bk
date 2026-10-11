@@ -1,0 +1,12 @@
+{"time": 1791649296.521145, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-codex.log"]}
+{"time": 1791649296.5213041, "event": "recv", "method": "initialize"}
+{"time": 1791649296.521836, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649296.522482, "event": "recv", "method": "tools/list"}
+{"time": 1791649348.566814, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-codex.log"]}
+{"time": 1791649348.567022, "event": "recv", "method": "initialize"}
+{"time": 1791649348.567307, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649348.567404, "event": "recv", "method": "tools/list"}
+{"time": 1791649360.567028, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-codex.log"]}
+{"time": 1791649360.5672069, "event": "recv", "method": "initialize"}
+{"time": 1791649360.567659, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649360.567786, "event": "recv", "method": "tools/list"}

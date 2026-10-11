@@ -1,0 +1,15 @@
+{"time": 1791649224.9056919, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-claude.log"]}
+{"time": 1791649224.906114, "event": "recv", "method": "server/discover"}
+{"time": 1791649224.9284852, "event": "recv", "method": "initialize"}
+{"time": 1791649224.932462, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649224.9325829, "event": "recv", "method": "tools/list"}
+{"time": 1791649239.0169091, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-claude.log"]}
+{"time": 1791649239.017185, "event": "recv", "method": "server/discover"}
+{"time": 1791649239.03882, "event": "recv", "method": "initialize"}
+{"time": 1791649239.0488052, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649239.0490391, "event": "recv", "method": "tools/list"}
+{"time": 1791649268.578152, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-claude.log"]}
+{"time": 1791649268.578685, "event": "recv", "method": "server/discover"}
+{"time": 1791649268.60413, "event": "recv", "method": "initialize"}
+{"time": 1791649268.614092, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649268.614301, "event": "recv", "method": "tools/list"}

@@ -1,0 +1,5 @@
+{"time": 1791649478.161556, "event": "started", "argv": ["/tmp/acp-probe/scripts/mcp_dummy.py", "/tmp/acp-probe/mcp-antigravity.log"]}
+{"time": 1791649478.1617181, "event": "recv", "method": "server/discover"}
+{"time": 1791649478.1622138, "event": "recv", "method": "initialize"}
+{"time": 1791649478.162389, "event": "recv", "method": "notifications/initialized"}
+{"time": 1791649478.1624541, "event": "recv", "method": "tools/list"}
