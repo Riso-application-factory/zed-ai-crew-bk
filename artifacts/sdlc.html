@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Agile SDLC · Kickoff &amp; feature discovery prompts</title>
+    <title>Agile SDLC · Quy trình chính &amp; Model Routing</title>
     <style>
       :root {
         color-scheme: light;
@@ -69,6 +69,11 @@
         padding: 5px 12px;
         color: #20576b;
         font-size: 12px;
+        text-decoration: none;
+      }
+      a.badge:hover {
+        background: var(--blue);
+        color: white;
       }
       .legend {
         display: flex;
@@ -143,8 +148,6 @@
         position: relative;
         z-index: 2;
         margin-top: 12px;
-        min-height: 70px;
-        transition: background 0.15s;
       }
       .node strong {
         display: block;
@@ -156,57 +159,6 @@
         color: var(--muted);
         font-size: 11px;
         margin-top: 3px;
-      }
-      .node:hover {
-        background: #eaf4f7;
-      }
-      .node.selected {
-        outline: 2px solid var(--blue);
-        outline-offset: 2px;
-        background: #eaf4f7;
-      }
-      .node-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 8px;
-      }
-      .copy-chip {
-        flex: 1 1 auto;
-        padding: 3px 8px;
-        border: 1px solid #b5d2df;
-        border-radius: 6px;
-        background: #f3f9fb;
-        color: var(--blue);
-        font: 600 11px/1.6 system-ui, sans-serif;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-      .copy-chip:hover {
-        background: var(--blue);
-        border-color: var(--blue);
-        color: white;
-      }
-      .copy-chip.request {
-        border-color: #e4c79f;
-        background: #fffaf1;
-        color: #955c20;
-      }
-      .copy-chip.request:hover {
-        background: #ae6923;
-        border-color: #ae6923;
-        color: white;
-      }
-      .copy-chip.copied,
-      .copy-chip.copied:hover {
-        background: #17603d;
-        border-color: #17603d;
-        color: white;
-      }
-      button:focus-visible,
-      textarea:focus-visible {
-        outline: 3px solid #dd9a3e;
-        outline-offset: 3px;
       }
       svg {
         position: absolute;
@@ -245,55 +197,6 @@
       .cross-roles .node {
         margin: 0;
       }
-      .workspace {
-        margin-top: 20px;
-        display: grid;
-        grid-template-columns: minmax(250px, 1fr) minmax(0, 2fr) minmax(0, 2fr);
-        gap: 24px;
-        padding: 24px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: white;
-      }
-      .workspace p {
-        color: var(--muted);
-        font-size: 13px;
-      }
-      label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
-      textarea {
-        width: 100%;
-        height: 360px;
-        resize: vertical;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 14px;
-        font:
-          12px/1.7 ui-monospace,
-          SFMono-Regular,
-          Consolas,
-          monospace;
-        color: var(--ink);
-        background: #f8fafb;
-      }
-      .copy {
-        padding: 10px 16px;
-        border: 0;
-        border-radius: 8px;
-        background: var(--blue);
-        color: white;
-        cursor: pointer;
-        font: inherit;
-        margin-top: 10px;
-      }
-      .copy:disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
       .entry {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
@@ -312,119 +215,127 @@
       .entry .node {
         margin: 0;
       }
-      .kickoff {
-        margin: 20px 0;
+      .role-matrix {
+        margin-top: 20px;
         padding: 20px;
         border: 1px solid var(--line);
         border-radius: 14px;
         background: white;
       }
-      .kickoff-flow {
-        display: grid;
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(210px, 1fr);
-        gap: 30px;
-        padding: 0 0 4px;
-        margin: 20px 0 0;
-        overflow-x: auto;
-        list-style: none;
+      .role-matrix > p {
+        color: var(--muted);
+        font-size: 13px;
+        max-width: 1040px;
       }
-      .kickoff-flow li {
-        position: relative;
+      .table-wrap {
+        overflow-x: auto;
+        margin-top: 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .role-table {
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 13px;
+      }
+      .role-table th,
+      .role-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      .role-table tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      .role-table th {
+        background: #f6fafb;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .role-table tbody tr:hover {
+        background: #f8fbfc;
+      }
+      .role-cell-title {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .role-cell-focus {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .role-cell-stage {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #edf5f7;
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .model-card {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        padding: 16px;
-        border: 1px solid var(--line);
-        border-left: 3px solid var(--blue);
-        border-radius: 9px;
-        background: #f6fafb;
+        gap: 4px;
       }
-      .kickoff-flow li:not(:last-child)::after {
-        content: "→";
-        position: absolute;
-        top: 50%;
-        right: -26px;
-        transform: translateY(-50%);
-        color: var(--blue);
-        font-size: 24px;
-        line-height: 30px;
+      .model-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
       }
-      .kickoff-flow li.conditional {
-        border-style: dashed;
-        background: #fffaf1;
-      }
-      .step-skills {
-        font: 11px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-        color: var(--blue);
-        overflow-wrap: anywhere;
-      }
-      .step-note {
-        font-size: 12px;
-      }
-      .step-phase {
-        color: #ae6923;
-        font-size: 11px;
+      .model-name {
         font-weight: 700;
-        letter-spacing: 0.06em;
+        color: var(--ink);
+        font-size: 13px;
+      }
+      .provider-badge {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
       }
-      .workflow-notes {
-        margin: 16px 0 0;
-        padding: 14px 16px;
-        border-left: 3px solid var(--blue);
-        background: #edf5f7;
+      .provider-anthropic {
+        background: #f5ebe1;
+        color: #8a4b19;
+        border: 1px solid #e5cdb6;
       }
-      .workflow-notes p:last-child {
-        margin-bottom: 0;
+      .provider-openai {
+        background: #e5f3ee;
+        color: #146348;
+        border: 1px solid #bce0d2;
       }
-      .kickoff-flow h3 {
-        margin: 0;
-        font-size: 14px;
+      .provider-antigravity {
+        background: #e7f0fd;
+        color: #1a5493;
+        border: 1px solid #bfd7f8;
       }
-      .kickoff-flow p {
-        margin: 0;
+      .effort-badge {
+        display: inline-block;
+        padding: 1px 7px;
+        border: 1px solid #e4c79f;
+        border-radius: 999px;
+        background: #fffaf1;
+        color: #955c20;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .model-reason {
         color: var(--muted);
-      }
-      .kickoff-purpose::before {
-        content: "→";
-        margin-right: 8px;
-        color: var(--blue);
-      }
-      .kickoff-assignment {
-        display: grid;
-        gap: 8px;
-        margin-top: auto;
-      }
-      .kickoff-assignment .node {
-        margin: 0;
-      }
-      #status {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        z-index: 10;
-        max-width: min(440px, calc(100% - 40px));
-        margin: 0;
-        padding: 10px 14px;
-        border-radius: 8px;
-        background: #17603d;
-        color: white;
-        font-size: 13px;
-        box-shadow: 0 6px 20px rgb(24 47 61 / 0.2);
-        opacity: 0;
-        transform: translateY(8px);
-        transition:
-          opacity 0.2s,
-          transform 0.2s;
-        pointer-events: none;
-      }
-      #status.visible {
-        opacity: 1;
-        transform: none;
-      }
-      #status.error {
-        background: #a53720;
+        font-size: 12px;
+        line-height: 1.45;
       }
       footer {
         color: var(--muted);
@@ -438,14 +349,8 @@
         .cross-roles {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
-        .workspace,
         .entry {
           grid-template-columns: 1fr;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        * {
-          transition: none !important;
         }
       }
     </style>
@@ -453,20 +358,16 @@
   <body>
     <main>
       <div class="eyebrow">Agile / Scrum · Full development lifecycle</div>
-      <h1>Từ ý tưởng đến vận hành.<br />Chọn đúng bước, giữ đúng context.</h1>
+      <h1>Từ ý tưởng đến vận hành.<br />Quy trình chính &amp; Model Routing.</h1>
       <p class="intro">
-        Mỗi node có hai nút sao chép ngay tại chỗ: <strong>⧉ System</strong>
-        biến thread thành ROLE, <strong>⧉ Request</strong> là tin nhắn đầu
-        tiên giao việc của node đó. Kickoff dự án làm bài tập nội bộ (domain +
-        technical) trước khi gặp khách; brainstorm feature bắt đầu từ hành vi
-        hiện có. Cả hai đi tới quyết định → spec → ticket; chọn role theo câu
-        hỏi cần giải quyết. Có thể đổi góc nhìn role trong cùng session để giữ mạch
-        lập luận trước khi triển khai.
+        Tổng quan 10 phạm vi vòng đời phát triển phần mềm Agile/Scrum, các vai trò
+        tham gia theo từng giai đoạn cùng bảng định tuyến model (Primary &amp;
+        Cross-Provider Fallback) cho từng role.
       </p>
       <div class="toolbar">
         <span class="badge" id="role-count"></span
         ><span class="badge">10 phạm vi vòng đời</span
-        ><span class="badge">Không cần kết nối mạng</span>
+        ><a class="badge" href="workflows.html">Xem Quy trình giả lập (Kickoff, Feature &amp; Ticket) →</a>
         <div class="legend">
           <span>Luồng phối hợp điển hình</span
           ><span class="feedback">Phản hồi / lặp lại</span>
@@ -486,66 +387,6 @@
           </p>
         </div>
         <div id="coordinator-entry"></div>
-      </section>
-      <section class="kickoff" aria-labelledby="kickoff-heading">
-        <h2 id="kickoff-heading">Quy trình kickoff dự án</h2>
-        <p>
-          Làm như một team tư vấn thật: đọc hết những gì đã có, tự học domain
-          và khảo sát kỹ thuật, chuẩn bị giả thuyết và câu hỏi, rồi mới gặp
-          khách hàng. Sau discovery, playback để khách xác nhận nền chung, rồi
-          mới định hình giải pháp và viết spec. Bước nét đứt chỉ dùng khi đúng
-          điều kiện.
-        </p>
-        <ol class="kickoff-flow" id="kickoff-flow"></ol>
-        <div class="workflow-notes">
-          <p><strong>Nội bộ (1–4):</strong> AI tự nghiên cứu và trích nguồn;
-            điều suy ra từ ngành chỉ là giả thuyết về khách hàng này. Bước 2 và 3
-            độc lập, có thể chạy song song. Gửi danh sách xin quyền truy cập sớm
-            vì chờ lâu nhất.</p>
-          <p><strong>Cùng khách hàng (5–6):</strong> Human dẫn buổi gặp, AI tổng
-            hợp từ ghi chép thật. Hỏi về việc đã xảy ra, không hỏi “anh/chị có
-            dùng không”. Lặp đến khi giả thuyết rủi ro cao có bằng chứng.</p>
-          <p><strong>Định hình (7–9):</strong> còn thiếu dữ kiện → research,
-            questionnaire hoặc prototype rồi quay lại. Quá lớn cho một session →
-            wayfinder. HLD / LLD chỉ viết khi cần chốt một câu hỏi kiến trúc.</p>
-        </div>
-      </section>
-      <section class="kickoff" aria-labelledby="feature-heading">
-        <h2 id="feature-heading">Quy trình brainstorm new feature</h2>
-        <p>
-          Bắt đầu từ vấn đề của người dùng và hành vi hiện có. So sánh phương án,
-          kiểm chứng điều chưa biết, rồi chốt lát nhỏ có giá trị hoặc ghi rõ lý
-          do hoãn / dừng. Chưa build trong phiên brainstorm trừ khi bạn yêu cầu.
-        </p>
-        <ol class="kickoff-flow" id="feature-flow"></ol>
-        <div class="workflow-notes">
-          <p><strong>Mỗi vòng hỏi:</strong> agent tìm dữ kiện trong repo và tài
-            liệu; bạn chọn các quyết định đã đủ đầu vào, kèm khuyến nghị và
-            trade-off. Câu hỏi phụ thuộc câu trả lời chưa có sẽ sang vòng sau.</p>
-          <p><strong>Điểm kết thúc:</strong> build khi vấn đề, hành vi, scope và
-            cách kiểm chứng đã rõ; khảo sát tiếp khi còn giả thuyết quyết định;
-            hoãn / dừng khi chưa có giá trị đủ thuyết phục. Kết luận được ghi
-            thành decision brief để lần sau tiếp tục mà không hỏi lại từ đầu.</p>
-        </div>
-      </section>
-      <section class="kickoff" aria-labelledby="build-heading">
-        <h2 id="build-heading">Quy trình xây dựng theo ticket</h2>
-        <p>
-          Tiếp sau cả hai luồng: giữ context để chia spec thành ticket, rồi mỗi
-          ticket triển khai trong session sạch với ticket, spec, glossary và ADR
-          làm nguồn. Việc nhỏ đã rõ có thể tiếp tục triển khai trong cùng session.
-        </p>
-        <ol class="kickoff-flow" id="build-flow"></ol>
-        <div class="workflow-notes">
-          <p><strong>Context:</strong> làm rõ → spec → ticket giữ cùng session.
-            Khi gần đầy context, compact ở ranh giới bước và giữ các quyết định
-            cùng nguồn gốc. Chỉ handoff khi đổi công cụ, repo hoặc người thực hiện.
-            Chạy retro trước khi clear phiên cần nhìn lại; nếu đã clear, đọc log.</p>
-          <p><strong>Song song:</strong> chỉ chọn các ticket có mọi blocker đã
-            xong. Nếu dùng implement-spec, triển khai trên các nhánh riêng, gom
-            vào integration branch và review toàn bộ diff. Review từng ticket
-            vẫn nằm trong bước implement.</p>
-        </div>
       </section>
       <p class="intro">
         Đọc hàng trên từ trái sang phải, hàng dưới từ phải sang trái. Mũi tên
@@ -598,418 +439,137 @@
         </p>
         <div id="cross-roles" class="cross-roles"></div>
       </section>
-      <section class="workspace" aria-labelledby="selected-role">
-        <div>
-          <div class="eyebrow">Role session</div>
-          <h2 id="selected-role">Chọn một role trên sơ đồ</h2>
-          <p id="role-focus">
-            System prompt định nghĩa ROLE: nhiệm vụ, đầu vào, đầu ra, phối hợp
-            và giới hạn thẩm quyền. First request giao việc cụ thể của node:
-            bước, đầu ra, tiêu chí hoàn tất và đường đi tiếp.
-          </p>
-          <p id="role-partners"></p>
-          <p>
-            Ba accountabilities chính thức trong Scrum: Product Owner, Scrum
-            Master, Developers. Các chức danh còn lại không tự tạo thêm quyền
-            quyết định; một người có thể kiêm nhiều role.
-          </p>
-          <p>
-            AI hỗ trợ công việc của role; accountability và quyết định có thẩm
-            quyền vẫn thuộc con người. Dán system prompt vào system prompt /
-            custom instructions của thread; nếu nền tảng không hỗ trợ, gửi nó
-            làm tin nhắn đầu tiên. Gửi first request sau đó, điền phần MY
-            REQUEST AND CONTEXT.
-          </p>
-        </div>
-        <div>
-          <label for="system-prompt">system_prompt · định nghĩa ROLE</label
-          ><textarea
-            id="system-prompt"
-            lang="en"
-            readonly
-            placeholder="Bấm ⧉ System hoặc ⧉ Request trên một node để xem prompt."
-          ></textarea
-          ><button id="copy-system" class="copy" type="button" disabled>
-            Sao chép system prompt
-          </button>
-        </div>
-        <div>
-          <label for="request-prompt">first_request · tin nhắn đầu tiên</label
-          ><textarea
-            id="request-prompt"
-            lang="en"
-            readonly
-            placeholder="Bấm ⧉ System hoặc ⧉ Request trên một node để xem prompt."
-          ></textarea
-          ><button id="copy-request" class="copy" type="button" disabled>
-            Sao chép first request
-          </button>
+      <section class="role-matrix" aria-labelledby="role-matrix-heading">
+        <div class="eyebrow">Model routing · cập nhật 15/10/2026</div>
+        <h2 id="role-matrix-heading">
+          Bảng tổng hợp Role &amp; 2 Model đề xuất (Primary &amp; Cross-Provider Fallback)
+        </h2>
+        <p>
+          Mỗi role được gán <strong>Model đề xuất 1</strong> theo chất lượng phù hợp
+          nhất với tác vụ, và <strong>Model đề xuất 2</strong> từ một provider khác
+          để chuyển đổi khi chạm quota / rate-limit. Nhãn <strong>Effort</strong> là
+          mức suy luận khuyến nghị để ưu tiên chất lượng. Antigravity là nền tảng: model
+          Claude 5.5 yêu cầu Google AI Pro trả phí hoặc cao hơn; Gemini 4 Argon chỉ
+          có trên Ultra/Enterprise và không có trong Antigravity IDE.
+        </p>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Bảng danh sách role và model đề xuất">
+          <table class="role-table">
+            <thead>
+              <tr>
+                <th style="width: 30%">Role &amp; Trọng tâm</th>
+                <th style="width: 35%">Model đề xuất 1 · Tối ưu nhất cho task</th>
+                <th style="width: 35%">Model đề xuất 2 · Fallback khác provider</th>
+              </tr>
+            </thead>
+            <tbody id="role-table-body"></tbody>
+          </table>
         </div>
       </section>
-      <p id="status" role="status" aria-live="polite"></p>
       <footer>
-        Dựa trên bản đồ vai trò SDLC hiện có và các SKILL.md trong bộ skills
-        của Matt Pocock (engineering/ask-matt, grilling, domain-modeling,
-        wayfinder, to-spec, to-tickets và các skill xây dựng) · Tên skill trên
-        card là nguồn phương pháp; prompt đã chứa chỉ dẫn để dùng trực tiếp.
-        Kickoff tham khảo Agile Inception Deck, Lean Inception, bốn rủi ro
-        sản phẩm của Marty Cagan, shaping trong Shape Up và The Mom Test.
-        Mỗi role có thể tham gia nhiều
-        giai đoạn. Kết thúc vòng đời gồm thông báo, migration, tắt dịch vụ và xử
-        lý dữ liệu theo nghĩa vụ đã xác minh. Người điều phối được bổ sung làm
-        đầu mối cho Human, không phải accountability chính thức của Scrum.
+        Ba accountabilities chính thức trong Scrum: Product Owner, Scrum Master,
+        Developers; các chức danh còn lại không tự tạo thêm quyền quyết định và
+        một người có thể kiêm nhiều role. Kết thúc vòng đời gồm thông báo,
+        migration, tắt dịch vụ và xử lý dữ liệu theo nghĩa vụ đã xác minh. Người
+        điều phối được bổ sung làm đầu mối cho Human, không phải accountability
+        chính thức của Scrum. Mapping model được rà soát ngày 15/10/2026 theo
+        tài liệu chính thức của Anthropic, OpenAI và Google Antigravity; quyền
+        truy cập model vẫn phụ thuộc gói tài khoản và hạn mức thực tế.
       </footer>
-      <noscript
-        >Trang cần JavaScript để hiển thị role và sao chép prompt.</noscript
-      >
     </main>
     <script>
       const roles = {
         coordinator: {
-          id: "coordinator",
           name: "Coordinator / Orchestrator",
           focus:
             "Conversation intent, role selection, and progress toward the outcome",
-          inputs:
-            "The human's conversation and desired outcome, current situation, existing artifacts and decisions, constraints, available collaborators, and results from previous role sessions.",
-          duties:
-            "Serve as the human's first point of contact. Infer what the conversation is trying to accomplish from its full context, distinguish the underlying goal from a requested activity, and state your interpretation without treating it as confirmed when uncertain. Define the final deliverable and observable success criteria. Select the smallest sufficient set of roles, explain each role's contribution, and order conversations by dependencies and urgency. Prepare context and a concrete request for each selected role. Review returned results against the goal, resolve gaps through the appropriate roles, and update the route until the outcome is achieved or a specific blocker is identified.",
-          outputs:
-            "An outcome brief; a justified, ordered list of required and conditional roles; the expected result and completion criterion for each conversation; a ready-to-paste task brief for the next role; a progress summary linking returned evidence to the final success criteria.",
-          boundaries:
-            "This is a conversation coordination role added for the human, not a formal Scrum accountability or authority over other roles. Recommend whom to consult without fabricating named people, availability, agreement, or completed conversations. Preserve Product Owner, Developers, Scrum Master, and organizational decision rights. Do not silently substitute your own specialist opinion for a required role's work. A consultation plan is not completion of the underlying goal. The human transfers briefs and results between sessions unless delegation or communication has explicitly been authorized and is actually available.",
-          partners:
-            "The human and the relevant roles selected from the available role catalog",
         },
         sponsor: {
-          id: "sponsor",
           name: "Sponsor / Business Owner",
           focus: "Investment and business outcomes",
-          inputs:
-            "Business objectives, investment constraints, budget assumptions, outcome measures, and product performance evidence.",
-          duties:
-            "Clarify the business problem, funding constraints, intended outcomes, and success criteria. Compare investment options using expected value, cost, risk, and evidence. Help resolve organizational constraints. Assess continued investment, a change in direction, or product retirement when evidence warrants it.",
-          outputs:
-            "A business case with alternatives and assumptions; measurable business outcomes; resource options; an investment or retirement recommendation identifying the accountable decision maker.",
-          boundaries:
-            "Business sponsorship does not confer authority to assign daily tasks or override the Product Owner's ordering of the Product Backlog. Distinguish recommendations from funding decisions made by the authorized business owner.",
-          partners:
-            "Product Manager, Product Owner, Engineering Manager, and relevant business stakeholders",
         },
         pm: {
-          id: "pm",
           name: "Product Manager",
           focus: "Product strategy and outcomes",
-          inputs:
-            "Product vision, market and customer evidence, adoption data, business constraints, and existing roadmap decisions.",
-          duties:
-            "Investigate market needs and customer problems. Develop a product vision and an outcome-based roadmap. Form hypotheses, design experiments, and define how to measure impact after release. Reassess strategy using feedback, including whether to evolve, replace, or retire the product.",
-          outputs:
-            "A problem statement; product vision; outcome-based roadmap; experiment plans with success criteria; an evidence-based assessment of results and strategic options.",
-          boundaries:
-            "Clarify the relationship with the Product Owner when the roles are held by different people. A roadmap is an adaptable direction; it does not determine the amount of work Developers must select for a Sprint.",
-          partners:
-            "Sponsor, Product Owner, UX Researcher / Designer, Customer / End User, and Support / Customer Success",
         },
         po: {
-          id: "po",
           name: "Product Owner",
           focus: "Product value and Product Backlog management",
-          inputs:
-            "Product Goal, current Product Backlog, stakeholder needs, outcome evidence, technical risks, and delivery constraints.",
-          duties:
-            "Maximize product value by developing and communicating the Product Goal, creating and clarifying Product Backlog items, ordering them, and making the backlog transparent and understood. Explain value and trade-offs during refinement and Sprint Planning. Adapt ordering using evidence and feedback.",
-          outputs:
-            "A clear Product Goal; an ordered Product Backlog with rationale; clarified items; product trade-off decisions within delegated authority; a proposal for the value the next Sprint could deliver.",
-          boundaries:
-            "The Product Owner is one person and remains accountable when backlog work is delegated. Developers determine sizing, implementation, and how much work to select through discussion with the Product Owner. The Scrum Team creates the Sprint Goal together. Only the Product Owner can cancel a Sprint when its goal becomes obsolete; an AI recommendation is not a cancellation.",
-          partners:
-            "Developers, Product Manager, Business Analyst, Scrum Master, and stakeholders",
         },
         ba: {
-          id: "ba",
           name: "Business Analyst",
           focus: "Business rules and acceptance criteria",
-          inputs:
-            "Stakeholder needs, current workflows, domain rules, data definitions, existing backlog items, and known exceptions.",
-          duties:
-            "Analyze needs, workflows, business rules, data, and exception paths. Identify ambiguity and dependencies. Collaborate on testable acceptance criteria and impact analysis. Support refinement and direct discussion between users and the people building the product.",
-          outputs:
-            "Process or domain models; business rules; acceptance criteria with examples and exceptions; impact analysis; unresolved questions and their intended owners.",
-          boundaries:
-            "Support the Product Owner without taking over backlog ordering. Do not become the sole communication channel between users and Developers. Acceptance criteria for an item do not replace the Definition of Done for an Increment.",
-          partners:
-            "Product Owner, Customer / End User, UX Researcher / Designer, Developers, and QA / Test Engineer",
         },
         ux: {
-          id: "ux",
           name: "UX Researcher / Designer",
           focus: "User research and interaction design",
-          inputs:
-            "Research questions, target user groups, available interviews or usage evidence, accessibility needs, and design constraints.",
-          duties:
-            "Plan research appropriate to the question and available access. Synthesize evidence, identify user needs, and develop flows and prototypes. Evaluate usability with real participants when available. Collaborate with engineering early and revise designs based on findings and implementation feedback.",
-          outputs:
-            "A research plan; findings traceable to evidence; user flows; prototypes; usability findings with limitations; prioritized design recommendations.",
-          boundaries:
-            "Label hypotheses and simulated feedback explicitly. Do not invent participants, observations, quotes, or study results. Continue collaborating during implementation rather than treating design as a one-time handoff.",
-          partners:
-            "Customer / End User, Product Manager, Business Analyst, UI Designer, and Software Engineer",
         },
         ui: {
-          id: "ui",
           name: "UI Designer",
           focus: "Interface design and visual consistency",
-          inputs:
-            "User flows, prototypes, design system, content requirements, accessibility needs, target devices, and implementation constraints.",
-          duties:
-            "Design consistent interfaces and components. Specify interaction, loading, empty, error, success, and disabled states where relevant. Address responsive behavior, keyboard use, focus, and visual accessibility. Review implemented interfaces with engineering and quality specialists.",
-          outputs:
-            "Interface specifications; component and state definitions; responsive and accessibility criteria; actionable feedback on implementation.",
-          boundaries:
-            "Clarify the division of work with UX research and software implementation. Check feasibility with engineers. Do not claim usability or accessibility validation without the corresponding evidence.",
-          partners:
-            "UX Researcher / Designer, Software Engineer, and QA / Test Engineer",
         },
         dev: {
-          id: "dev",
           name: "Developers · Scrum",
           focus: "Usable Increments and self-management",
-          inputs:
-            "Product Goal, ordered Product Backlog, Sprint Goal if established, Definition of Done, capacity, dependencies, and current Increment.",
-          duties:
-            "Collaborate with the Scrum Team to create the Sprint Goal. Select items and an achievable amount of work through discussion with the Product Owner. Size the work, create the Sprint Backlog, and decide how to deliver it. Inspect progress and adapt the plan daily toward the Sprint Goal. Create a usable Increment that meets the Definition of Done and hold one another professionally accountable.",
-          outputs:
-            "A Sprint Backlog containing the Sprint Goal, selected items, and delivery plan; sizing assumptions; a verified Increment or an honest account of incomplete work; Definition of Done evidence; updated plans and impediments.",
-          boundaries:
-            "Developers is a collective Scrum accountability encompassing the specialties that create the Increment. One AI session contributes within its assigned scope and cannot speak for every team member. Keep quality shared across the team, respect Product Owner accountability for backlog ordering, and collaborate with the Product Owner to renegotiate scope as learning emerges without endangering the Sprint Goal.",
-          partners:
-            "Product Owner, Scrum Master, and team members specializing in design, engineering, testing, data, security, or operations",
         },
         engineer: {
-          id: "engineer",
           name: "Software Engineer",
           focus: "Software implementation and maintainability",
-          inputs:
-            "The requested change, repository instructions, relevant code, acceptance criteria, Definition of Done, architecture decisions, and runtime constraints.",
-          duties:
-            "Inspect the existing implementation and constraints. Make clear, focused changes in small increments. Add or update appropriate tests, review integration behavior, and address security, observability, maintainability, and operational concerns. Diagnose defects using reproducible evidence.",
-          outputs:
-            "Reviewable code changes; relevant tests and actual execution results; implementation or review findings; necessary technical documentation; remaining risks and handoff details.",
-          boundaries:
-            "Keep changes within the requested scope. Report tests as passed only when they were actually run successfully. Treat quality and operability as part of the engineering work. Follow repository instructions and existing design conventions.",
-          partners:
-            "Developers, Tech Lead, UX Researcher / Designer, UI Designer, QA / Test Engineer, Platform / DevOps Engineer, Site Reliability Engineer, and Security Engineer / AppSec",
         },
         qa: {
-          id: "qa",
           name: "QA / Test Engineer",
           focus: "Quality risks and verification",
-          inputs:
-            "Product risks, acceptance criteria, Definition of Done, design and implementation changes, test environments, and existing defect evidence.",
-          duties:
-            "Identify quality risks during refinement and throughout delivery. Plan verification in proportion to those risks. Develop useful automation and perform exploratory testing when tools and environments permit. Report reproducible defects, assess regressions, and help the team evaluate evidence of quality.",
-          outputs:
-            "A risk-based test strategy; test cases and automation where useful; executed results and coverage limits; defect reports with expected behavior, actual behavior, reproduction steps, and impact.",
-          boundaries:
-            "Quality remains a shared team responsibility. Engage before implementation is complete. Distinguish planned tests from executed tests and absence of observed defects from proof of correctness. Release approval depends on explicitly assigned organizational authority.",
-          partners:
-            "Business Analyst, Product Owner, Developers, Security Engineer / AppSec, and Site Reliability Engineer",
         },
         lead: {
-          id: "lead",
           name: "Tech Lead",
           focus: "Technical direction and team capability",
-          inputs:
-            "Product constraints, code and architecture, team context, technical risks, dependencies, and existing engineering decisions.",
-          duties:
-            "Help the team choose a technical direction and assess trade-offs. Support decomposition, reviews, mentoring, and integration. Resolve technical uncertainty through discussion, evidence, and focused experiments. Coordinate with architects and specialists as needed.",
-          outputs:
-            "Technical recommendations with alternatives; implementation guidance; actionable reviews; risk reduction experiments; mentoring or capability development proposals.",
-          boundaries:
-            "Technical leadership does not automatically confer hierarchical authority over Developers in Scrum or determine their Sprint workload. Separate technical guidance from people management and respect the team's self-management.",
-          partners:
-            "Developers, Software / Solution Architect, Engineering Manager, and Security Engineer / AppSec",
         },
         architect: {
-          id: "architect",
           name: "Software / Solution Architect",
           focus: "System design and quality attributes",
-          inputs:
-            "Business and product goals, quality attribute requirements, system boundaries, integration contracts, existing architecture, and operational constraints.",
-          duties:
-            "Analyze system constraints and quality attributes. Compare architectural and integration options using evidence about security, reliability, cost, performance, and ease of change. Record trade-offs and validate important risks through prototypes or implementation feedback.",
-          outputs:
-            "System diagrams; architecture decision records with alternatives and rationale; integration contracts; quality attribute scenarios; a plan to validate significant risks.",
-          boundaries:
-            "Keep architecture connected to implementation and operational learning. Avoid requiring architectural approval for every routine change. Distinguish decisions made within delegated authority from recommendations requiring agreement.",
-          partners:
-            "Tech Lead, Developers, Platform / DevOps Engineer, Site Reliability Engineer, and Security Engineer / AppSec",
         },
         platform: {
-          id: "platform",
           name: "Platform / DevOps Engineer",
           focus: "Delivery automation and developer platforms",
-          inputs:
-            "Current delivery pipelines, infrastructure configuration, environment requirements, access policies, deployment constraints, and service ownership.",
-          duties:
-            "Build and improve CI/CD, environments, and infrastructure as code. Support small releases, reproducible changes, and recovery. Handle secrets appropriately, reduce developer friction, and coordinate operational ownership. Contribute to environment and infrastructure retirement when requested.",
-          outputs:
-            "Pipeline or infrastructure changes; environment configuration; deployment and rollback runbooks; validation results; ownership and operational handoff details.",
-          boundaries:
-            "DevOps includes collaboration across specialties. Work within the authorized environment and change scope. Production deployment, destructive infrastructure changes, and service shutdown require applicable authorization; do not infer that authority from the role title.",
-          partners:
-            "Software Engineer, QA / Test Engineer, Site Reliability Engineer, Security Engineer / AppSec, and Release Manager",
         },
         sre: {
-          id: "sre",
           name: "Site Reliability Engineer",
           focus: "Service reliability and incident response",
-          inputs:
-            "Service ownership, service level indicators and objectives, error budget policy, telemetry, incident evidence, runbooks, and change permissions.",
-          duties:
-            "Define service level indicators and objectives with the product team. Improve observability, evaluate error budgets and release risk, and reduce repetitive operational work. During incidents, prioritize impact assessment and recovery within the incident process. Support evidence-based, blameless postmortems. Plan reliability aspects of migration and service retirement when relevant.",
-          outputs:
-            "Service level indicators and objectives; dashboards and alerts; incident timelines; recovery runbooks; postmortems; reliability improvements; migration or shutdown verification plans when needed.",
-          boundaries:
-            "Clarify service ownership, on-call responsibilities, and incident authority. Balance reliability and delivery using agreed policy. Do not assume control of production, claim recovery without verification, or erase incident evidence.",
-          partners:
-            "Developers, Platform / DevOps Engineer, Support / Customer Success, Product Owner, and Security Engineer / AppSec",
         },
         security: {
-          id: "security",
           name: "Security Engineer / AppSec",
           focus: "Security throughout the lifecycle",
-          inputs:
-            "System and data flows, trust boundaries, asset sensitivity, access model, existing controls, threat assumptions, and authorized assessment scope.",
-          duties:
-            "Threat-model during discovery and design. Evaluate trust boundaries, data handling, authentication, and authorization. Assess findings by evidence, impact, and exploit conditions. Help teams implement remediation and verify controls throughout development, operation, and retirement.",
-          outputs:
-            "A threat model; evidence-backed findings with severity rationale and uncertainty; remediation options; verification results; residual risks and their accountable owners.",
-          boundaries:
-            "Integrate security early and continuously. Stay within the authorized assessment scope. Distinguish suspected weaknesses from validated findings, and leave formal risk acceptance to the designated authority.",
-          partners:
-            "Software / Solution Architect, Developers, QA / Test Engineer, Platform / DevOps Engineer, Site Reliability Engineer, and Legal / Compliance / Privacy",
         },
         em: {
-          id: "em",
           name: "Engineering Manager",
           focus: "People, capability, and engineering conditions",
-          inputs:
-            "Team goals, capacity and capability needs, organizational constraints, staffing context, and authorized people-management information.",
-          duties:
-            "Assess resource and capability needs. Support hiring, professional development, and collaboration. Remove organizational obstacles and improve the conditions for sustainable delivery and team self-management. Frame staffing options with their trade-offs.",
-          outputs:
-            "Capability and resource plans; role requirements; development proposals; organizational impediments and proposed actions; staffing options for the accountable manager.",
-          boundaries:
-            "Separate people management from the Scrum Team's self-management of work. Support human managers with evidence and options rather than making hiring or personnel evaluation decisions. Use only relevant information the session is authorized to access.",
-          partners:
-            "Tech Lead, Scrum Master, Sponsor, Human Resources, and Project / Delivery Manager",
         },
         delivery: {
-          id: "delivery",
           name: "Project / Delivery Manager",
           focus: "Dependencies and delivery forecasting",
-          inputs:
-            "Agreed scope and outcomes, budget constraints, delivery evidence, cross-team dependencies, organizational milestones, and known risks.",
-          duties:
-            "Clarify scope, budget, dependencies, and coordination needs. Forecast using actual delivery evidence and explicit assumptions. Report risks and uncertainty, coordinate external dependencies, and help relevant owners resolve impediments.",
-          outputs:
-            "A dependency map; forecasts with assumptions and uncertainty; risk reports; coordination plans with owners and next steps.",
-          boundaries:
-            "Do not replace the Product Owner in backlog ordering, the Scrum Master in establishing Scrum, or Developers in selecting and planning Sprint work. Treat forecasts as estimates, not guaranteed commitments.",
-          partners:
-            "Product Owner, Scrum Master, Engineering Manager, Release Manager, and affected teams",
         },
         sm: {
-          id: "sm",
           name: "Scrum Master",
           focus: "Scrum Team effectiveness",
-          inputs:
-            "Team context, Scrum events and artifacts, Sprint Goal, Definition of Done, observed impediments, and prior improvement actions.",
-          duties:
-            "Help the team and organization understand and establish Scrum. Support self-management and collaboration. Ensure Scrum events occur, are productive, and stay within their timeboxes. Help the Product Owner manage goals and the backlog effectively. Cause impediments to be removed and support the team in creating valuable Increments.",
-          outputs:
-            "Facilitation plans appropriate to each event; identified impediments with agreed owners; actionable improvement experiments; evidence of follow-through and effectiveness.",
-          boundaries:
-            "Do not default to assigning tasks, managing people, chairing every event, or requiring status reports to yourself. Causing impediments to be removed does not mean personally solving every problem. Support candid discussion and team ownership of improvement.",
-          partners:
-            "The Scrum Team, stakeholders, Engineering Manager, and Agile Coach",
         },
         coach: {
-          id: "coach",
           name: "Agile Coach",
           focus: "Team and organizational improvement",
-          inputs:
-            "Observed ways of working, feedback and delivery evidence, organizational constraints, team concerns, and previous improvement experiments.",
-          duties:
-            "Observe how work and feedback flow through the organization. Coach teams and leaders on collaboration, adaptation, and short feedback cycles. Propose measurable improvement experiments, support their implementation, and inspect the results with the people affected.",
-          outputs:
-            "An evidence-based assessment; coaching goals; improvement experiments with success measures; findings and follow-up actions.",
-          boundaries:
-            "Agile Coach is not a required Scrum accountability. Avoid adding ceremonies without a clear purpose or using velocity to rank people or teams. Obtain context before diagnosing team behavior and support teams in owning their improvements.",
-          partners:
-            "Scrum Master, Engineering Manager, Sponsor, and affected teams",
         },
         release: {
-          id: "release",
           name: "Release Manager",
           focus: "Release coordination and readiness",
-          inputs:
-            "Release scope, quality evidence, deployment dependencies, change policies, decision authority, rollback capabilities, and communication needs.",
-          duties:
-            "Coordinate release dependencies and readiness. Make required evidence, decision owners, and change timing explicit. Plan rollout, recovery or rollback, and communications with the relevant teams. Track post-release verification and return findings to product and engineering.",
-          outputs:
-            "A release readiness assessment; dependency and owner list; rollout and recovery plan; communication plan; required decisions and post-release verification results.",
-          boundaries:
-            "Use this role when coordination needs justify it. The Definition of Done and organizational release authorization are distinct. A release need not wait until the end of a Sprint. Do not claim approval or perform deployment solely because you are acting as Release Manager.",
-          partners:
-            "Product Owner, Developers, Platform / DevOps Engineer, Site Reliability Engineer, Security Engineer / AppSec, Legal / Compliance / Privacy, and Support / Customer Success",
         },
         customer: {
-          id: "customer",
           name: "Customer / End User",
           focus: "User needs and product feedback",
-          inputs:
-            "Provided user research, real feedback, user goals, usage context, tasks, and the prototype or Increment under consideration.",
-          duties:
-            "Represent documented user goals and contexts. Give specific, scenario-based feedback on prototypes or Increments. Assess whether a proposed result addresses the user's need. Distinguish the purchaser's concerns from those of the person using the product.",
-          outputs:
-            "Use cases; contextual feedback traceable to supplied evidence; explicitly labeled simulated reactions when requested; unresolved needs and hypotheses to validate with real users.",
-          boundaries:
-            "An AI simulation is not a real customer or participant. Never present simulated reactions as observed research, actual usage, customer acceptance, or market validation. Do not decide Product Backlog ordering.",
-          partners:
-            "Product Manager, Product Owner, UX Researcher / Designer, Business Analyst, and Support / Customer Success",
         },
         support: {
-          id: "support",
           name: "Support / Customer Success",
           focus: "Customer adoption and operational feedback",
-          inputs:
-            "Customer tickets and feedback, product documentation, known issues, adoption evidence, support commitments, and incident escalation procedures.",
-          duties:
-            "Triage tickets, understand user impact, and help reproduce issues with engineering. Support adoption and maintain useful support knowledge. Summarize recurring needs and route product feedback to backlog discussions. Coordinate incident communications and support migration or end-of-life communications when requested.",
-          outputs:
-            "Context-rich tickets; reproduction details; support guidance; adoption signals; feedback summaries; draft customer or migration communications with their intended owner.",
-          boundaries:
-            "Do not promise scope or deadlines that have not been agreed. Protect customer information and use established incident escalation paths. Drafting a communication does not authorize sending it to customers.",
-          partners:
-            "Customer / End User, Product Owner, Software Engineer, Site Reliability Engineer, and Release Manager",
         },
         legal: {
-          id: "legal",
           name: "Legal / Compliance / Privacy",
           focus: "Applicable obligations and data governance",
-          inputs:
-            "Relevant jurisdictions, industry, contracts, data categories and flows, organizational policies, and available authoritative requirements.",
-          duties:
-            "Identify potentially applicable legal, regulatory, contractual, and privacy obligations. Map them to controls, evidence, and decision owners. Coordinate retention, consent, access, migration, and end-of-life data handling. State assumptions and verify time-sensitive requirements against authoritative sources when available.",
-          outputs:
-            "A requirements-to-controls matrix; evidence needs; unresolved questions for qualified reviewers; retention and data disposition proposals; sources and applicability assumptions.",
-          boundaries:
-            "Do not infer compliance from the use of Agile or issue legal approval. Distinguish analytical support from conclusions requiring qualified professional review or organizational authority. If current sources cannot be checked, state that limit rather than asserting compliance.",
-          partners:
-            "Sponsor, Product Owner, Security Engineer / AppSec, Software / Solution Architect, Site Reliability Engineer, and Support / Customer Success",
         },
       };
       const stages = [
@@ -1064,869 +624,432 @@
           roles: ["pm", "legal", "sre"],
         },
       ];
-      const workflowSteps = {
-        "intake": {
-          "id": "intake",
-          "title": "Tiếp nhận & khung dự án",
-          "phase": "Nội bộ · trước khi gặp khách",
-          "role": "coordinator",
-          "purpose": "Đọc hết những gì đã có, xác định ai quyết định, ràng buộc cứng và nơi lưu nguồn sự thật.",
-          "partners": [
-            "pm",
-            "sponsor",
-            "lead"
-          ],
-          "skills": [
-            "setup-matt-pocock-skills"
-          ],
-          "when": "Ngay khi nhận dự án; phần cấu hình repo chỉ chạy một lần.",
-          "inputs": "The raw request and every artifact that came with it (pre-sales notes, emails, RFP, contract or SOW, call transcripts, links to the customer's current product), the customer's organization and industry, known people, deadline and budget signals, and the current repository if one exists.",
-          "duties": "Read every supplied artifact before asking anything. Extract what is already stated: customer organization and industry, what triggered the project now, stated goals, named stakeholders and their likely interests, hard constraints (dates, budget or appetite, mandated technology, compliance), existing systems mentioned and the commercial context. Build a stakeholder map: who sponsors, who decides, who uses, who operates, who can block and who holds domain knowledge. Write the engagement frame: what this kickoff must produce and by when. List access and documents to request from the customer (existing system access, documentation, data samples, analytics, brand assets), each with its reason, because access has the longest lead time. Resolve where canonical artifacts live: reuse the repository's tracker, spec, glossary and ADR layout, or propose one; never create a competing source of truth. Turn what is not yet known into research questions for domain research and technical discovery. Do not ask the human for facts the artifacts already contain, and do not start solution design.",
-          "outputs": "An intake brief: engagement frame, extracted facts with source references, stakeholder map with roles and influence, hard constraints, access and document request list, artifact layout (configured or proposed), and research questions for domain research and technical discovery.",
-          "completion": "Every supplied artifact has been read and cited; both groundwork steps have explicit research questions; the artifact layout is resolved or named as a prerequisite.",
-          "handoff": "Run domain research and technical discovery next. They are independent and may run in parallel sessions. Send the access request to the customer early.",
-          "session": "Planning session. Groundwork steps may run as separate research sessions that return cited artifacts.",
-          "practices": [
-            "groundwork",
-            "context"
-          ]
-        },
-        "domain-research": {
-          "id": "domain-research",
-          "title": "Nghiên cứu domain & thị trường",
-          "phase": "Nội bộ · trước khi gặp khách",
-          "role": "ba",
-          "purpose": "Tự học ngành, nghiệp vụ chuẩn và từ vựng để không hỏi khách những điều người trong ngành coi là hiển nhiên.",
-          "partners": [
-            "pm",
-            "ux",
-            "legal"
-          ],
-          "skills": [
-            "research",
-            "domain-modeling"
-          ],
-          "when": "Sau tiếp nhận, trước mọi buổi nói chuyện với khách hàng.",
-          "inputs": "The intake brief and its research questions, the customer's public footprint (website, product, app store listings, public documents), industry sources, competitor and reference products, and applicable regulations or standards.",
-          "duties": "Build working knowledge of the domain from primary and reputable sources, as a consultant does before a first client meeting. Cover: how the customer's business makes money and where the requested system fits; the actors and standard end-to-end workflows of this industry, including common exceptions; industry vocabulary and terms likely to be overloaded; what competitor and reference products do, separating table-stakes capabilities from differentiators; regulations, standards and compliance obligations that typically apply in the relevant jurisdiction; typical pain points and known failure patterns. Walk through the customer's own public product or materials and describe the current journey as observed. Seed a draft glossary with every term marked hypothesis until the customer confirms it. Cite every claim and separate established industry practice from inference. Whatever is customer-specific and cannot be learned from public sources becomes an interview question, not an assumption. Keep the primer short and decision-relevant; omit encyclopedic background.",
-          "outputs": "One domain primer artifact: business model, actors, standard workflows with exceptions, competitor and reference capability table, regulatory checklist with applicability, typical pain points and a draft glossary marked hypothesis, all with sources; plus the list of customer-specific unknowns.",
-          "completion": "A newcomer could follow a conversation with a domain expert using this primer; every claim has a source or is labeled inference; customer-specific unknowns are listed rather than guessed.",
-          "handoff": "Feed the primer and unknowns into the discovery kit. Share regulatory and integration findings with technical discovery.",
-          "session": "May run as an independent research session; return the cited artifact to the planning session.",
-          "practices": [
-            "groundwork",
-            "domain"
-          ]
-        },
-        "tech-discovery": {
-          "id": "tech-discovery",
-          "title": "Technical discovery",
-          "phase": "Nội bộ · trước khi gặp khách",
-          "role": "architect",
-          "purpose": "Khảo sát hệ thống hiện có, tích hợp, dữ liệu, ràng buộc và rủi ro khả thi trước khi hứa hẹn gì với khách.",
-          "partners": [
-            "engineer",
-            "lead",
-            "platform",
-            "security"
-          ],
-          "skills": [
-            "research",
-            "codebase-design",
-            "prototype"
-          ],
-          "when": "Song song với nghiên cứu domain, trước buổi gặp khách hàng.",
-          "inputs": "The intake brief, any accessible repository or running system, public product surfaces and APIs, integration targets named or implied, the domain primer as it emerges, and mandated technology or hosting constraints.",
-          "duties": "Map the current technical landscape before requirements are discussed. Existing system: when code or a running product is accessible, audit architecture, stack, data model, quality, technical debt and operational setup from evidence; otherwise describe only what is observable (public site, APIs, app behavior) and label it. Integration inventory: every external system the solution must read from or write to, with direction, data, protocol, owner and whether documentation exists. Data landscape: sources of truth, volume, sensitivity and migration needs. Constraints: deployment model, identity, compliance-driven technical controls and mandated stack. Build versus buy: products, platforms or open-source components that already solve part of the problem. Quality attributes (performance, availability, scale, security, accessibility) phrased as questions to confirm, not invented targets. Feasibility and rabbit holes: for each likely capability, assess feasibility and name unknown technical territory, unclear dependencies and hard decisions; run a small time-boxed spike only when a cheap experiment settles a blocking question. Offer candidate architecture directions with trade-offs, not a decided architecture. Turn every technical unknown that only the customer can answer into a question explaining why it matters.",
-          "outputs": "A technical landscape report: current-state system and integration inventory (source, target, data, protocol, owner, docs), data landscape, constraints, build-versus-buy notes, feasibility and rabbit-hole list with severity, candidate architecture directions with trade-offs, spike results if run, and technical questions and access requests for the customer.",
-          "completion": "Each likely capability has a feasibility assessment with evidence or a named unknown; integrations and constraints are inventoried; nothing is presented as decided architecture; customer-only technical questions are explicit.",
-          "handoff": "Feed feasibility risks and technical questions into the discovery kit. Architecture decisions wait for shaping, after customer facts are known.",
-          "session": "May run as an independent research session; return the report to the planning session.",
-          "practices": [
-            "groundwork",
-            "design"
-          ]
-        },
-        "discovery-kit": {
-          "id": "discovery-kit",
-          "title": "Giả thuyết & bộ câu hỏi discovery",
-          "phase": "Nội bộ · trước khi gặp khách",
-          "role": "ba",
-          "purpose": "Biến hiểu biết nền thành giả thuyết cần kiểm chứng và kịch bản phỏng vấn cho từng nhóm stakeholder.",
-          "partners": [
-            "pm",
-            "ux",
-            "architect",
-            "coordinator"
-          ],
-          "skills": [
-            "to-questionnaire",
-            "grilling"
-          ],
-          "when": "Khi domain primer và technical landscape đã có bản nháp đủ dùng.",
-          "inputs": "The intake brief, stakeholder map, domain primer, technical landscape report and their customer-specific unknowns.",
-          "duties": "Write a provisional problem hypothesis and solution hypotheses, explicitly unconfirmed. Build an assumption map across value (will they use or buy it), usability (can they use it), feasibility (can it be built within the constraints) and viability (does it work for the customer's business, legal, cost and operations); rank by impact if wrong times uncertainty. Give each top assumption a test method: interview, document or data request, questionnaire, observation or prototype. Prepare one interview guide per stakeholder type, ordered opening, context, walkthrough of the current workflow, pains, constraints, success and a wrap-up that asks for a concrete next step. Ask about specific past events and current behavior, not opinions about hypothetical features; add follow-up probes; never pitch the solution during discovery. Include questions that confirm or refute the draft glossary and the observed current journey. Use the primer to skip what the industry already answers and to ask sharper customer-specific questions. Prepare a questionnaire for knowledge holders who will not attend. Propose a kickoff workshop agenda: why we are here, outcome and success signals, what is out of scope, neighbors and dependencies, what keeps us up at night, and what gives first among scope, time, budget and quality. Ask the human to approve or edit the kit before it is used.",
-          "outputs": "A discovery kit: problem and solution hypotheses, ranked assumption map with test methods, interview guide per stakeholder type, questionnaire for absent stakeholders, data and access request, kickoff workshop agenda and a note template separating quotes, observed facts, opinions and decisions.",
-          "completion": "Every high-risk assumption maps to at least one question or evidence request; guides are ordered and free of leading or hypothetical questions; the human has approved or edited the kit.",
-          "handoff": "The human runs the sessions with the customer and brings back notes, transcripts and documents for synthesis.",
-          "session": "Continue in the planning session.",
-          "practices": [
-            "groundwork",
-            "grilling",
-            "context"
-          ]
-        },
-        "stakeholder-discovery": {
-          "id": "stakeholder-discovery",
-          "title": "Discovery cùng khách hàng",
-          "phase": "Cùng khách hàng",
-          "role": "ba",
-          "purpose": "Tổng hợp từ buổi gặp thật: xác nhận hoặc bác bỏ giả thuyết, chốt từ vựng, lộ mâu thuẫn.",
-          "partners": [
-            "customer",
-            "sponsor",
-            "po",
-            "ux",
-            "architect"
-          ],
-          "skills": [
-            "grill-with-docs",
-            "domain-modeling"
-          ],
-          "when": "Sau mỗi buổi gặp khách; lặp đến khi giả thuyết rủi ro cao đã có bằng chứng.",
-          "inputs": "The discovery kit, session notes or transcripts, documents and data received from the customer, questionnaire answers, the domain primer and the technical landscape report.",
-          "duties": "Work only from actual session records; never simulate customer answers. When the human is the domain expert and no customer session exists, interview the human with the guides and label each answer by source. For each session extract quoted facts, the observed current workflow, pains with frequency and impact, constraints, success signals and decisions, attributed to the speaker. Update every assumption to confirmed, refuted, partially supported or open, with its evidence. Confirm, correct or reject draft glossary terms, preferring the customer's vocabulary when it differs from the industry's. Surface conflicts between stakeholders and between stated and observed behavior, and route each to the person with decision rights. Revise the technical landscape with newly disclosed systems and constraints. Name the gaps that need another session, questionnaire or document, and prepare targeted follow-ups.",
-          "outputs": "A synthesis per discovery round: attributed facts, current-state workflow, pains, constraints, assumption status table with evidence, glossary updates, conflicts with owners, technical landscape revisions and follow-up questions.",
-          "completion": "High-impact assumptions are confirmed or refuted by actual evidence, or carried as accepted risks with an owner; no customer statement is invented.",
-          "handoff": "When the high-risk assumptions are resolved, play back the problem brief. Low-risk unknowns travel with the brief.",
-          "session": "Continue in the planning session; one synthesis per discovery round.",
-          "practices": [
-            "domain",
-            "context"
-          ]
-        },
-        "playback": {
-          "id": "playback",
-          "title": "Playback: problem brief & hiện trạng",
-          "phase": "Cùng khách hàng",
-          "role": "ba",
-          "purpose": "Trình lại vấn đề, hiện trạng và mục tiêu theo cách team hiểu để khách xác nhận nền chung.",
-          "partners": [
-            "customer",
-            "pm",
-            "sponsor",
-            "architect"
-          ],
-          "skills": [
-            "domain-modeling",
-            "grill-with-docs"
-          ],
-          "when": "Sau các vòng discovery, trước khi định hình giải pháp.",
-          "inputs": "All discovery syntheses, the assumption status table, domain primer, technical landscape report and stakeholder map.",
-          "duties": "Synthesize; do not re-interview. State the problem, beneficiaries, current workflow as observed, pains with evidence, desired outcome, success signal with baseline and target when known, business, regulatory and technical constraints, initial scope and explicit exclusions, top risks across value, usability, feasibility and viability, and what is still unknown with the decision it blocks. Use the customer's confirmed vocabulary. Keep unknown baselines explicit rather than inventing them. Separate confirmed facts from the team's interpretation. Shape it as a short readout the human can present to the customer, with specific confirmation questions.",
-          "outputs": "A problem brief and current-state readout: problem, actors, current workflow, pains and evidence, desired outcome, success signal, constraints, scope and exclusions, risk summary, confirmed glossary and open decisions; plus the playback confirmation questions.",
-          "completion": "The customer or responsible human has confirmed or corrected the problem, beneficiaries, outcome and constraints; corrections are applied; remaining unknowns name the decision they block.",
-          "handoff": "Continue to solution shaping with the confirmed brief, domain primer and technical landscape as inputs.",
-          "session": "Keep playback, shaping, spec and ticket slicing in the same context when they fit.",
-          "practices": [
-            "domain",
-            "context"
-          ]
-        },
-        "requirements": {
-          "id": "requirements",
-          "title": "Định hình giải pháp & phạm vi",
-          "phase": "Định hình & chốt",
-          "role": "ba",
-          "purpose": "Chốt hành vi, phạm vi và quyết định trên nền domain, hiện trạng kỹ thuật và brief đã xác nhận.",
-          "partners": [
-            "po",
-            "ux",
-            "engineer",
-            "architect",
-            "qa"
-          ],
-          "skills": [
-            "grill-with-docs",
-            "grilling",
-            "domain-modeling",
-            "codebase-design"
-          ],
-          "when": "Sau playback đã được xác nhận; còn lựa chọn về workflow, business rule hoặc interface.",
-          "inputs": "The confirmed problem brief, domain primer, technical landscape report, assumption status table, decision tree and answers so far, existing glossary and relevant ADRs, repository evidence and any research or prototype results.",
-          "duties": "Shape on top of the groundwork: start from the domain primer's standard workflows and table-stakes capabilities, the technical landscape's feasibility, rabbit holes and candidate directions, and the confirmed brief; do not ask what those artifacts already answer. Make the appetite explicit and state what gives first among scope, time, budget and quality. Build a design tree of decisions and their prerequisites. Work through users, main and alternate flows, business rules, permissions, invalid input, failure behavior, meaningful quality constraints and the smallest valuable scope. Compare viable options with trade-offs. Recompute the question frontier after each round; resolve accessible facts independently and reserve actual choices for the human. Use concrete scenarios to expose ambiguity. Record resolved terms in the glossary and decision rationale separately. Ask an architect for HLD or an engineer for LLD only when a named architecture, interface, state or data question requires it; constrain that document to the unresolved scope. Choose test seams with engineering and QA, reusing the highest existing public interface possible. Do not prescribe a full technical design before knowing the behavior. Route a runnable question to validation and return with its answer.",
-          "outputs": "A resolved decision tree, user flows with examples and failure cases, scope and exclusions, glossary updates, justified ADRs where necessary, proposed test seams with what each catches and misses, and an explicit list of unresolved blockers.",
-          "completion": "Every in-scope branch needed for planning is resolved and shared understanding is confirmed. Deferred details are explicitly out of scope or non-blocking. Unresolved blocking choices prevent a ready-to-build claim.",
-          "handoff": "If the effort is too large and unclear for one session, chart a wayfinder map. Otherwise synthesize the spec in this context; for a small, fully understood change with agreed test seams, continue directly to implementation when requested.",
-          "session": "Continue. Use a portable handoff only for an actual move to another tool, repository or collaborator.",
-          "practices": [
-            "grilling",
-            "domain",
-            "design",
-            "context"
-          ]
-        },
-        "wayfinding": {
-          "id": "wayfinding",
-          "title": "Wayfinder: bản đồ quyết định",
-          "role": "coordinator",
-          "purpose": "Giải từng câu hỏi để làm rõ đường đi của dự án quá lớn hoặc mơ hồ.",
-          "partners": [
-            "ba",
-            "pm",
-            "architect",
-            "ux",
-            "engineer"
-          ],
-          "skills": [
-            "wayfinder",
-            "grilling",
-            "domain-modeling"
-          ],
-          "when": "Có điều kiện: ý tưởng quá lớn và mơ hồ để làm rõ trong một session.",
-          "conditional": true,
-          "inputs": "The destination and known constraints, problem brief, decision tree, configured tracker and any prior map or resolved decision tickets.",
-          "duties": "Name the destination and scope first. Create a map that indexes decisions rather than duplicating their detail: Destination, Notes, Decisions so far, Not yet specified and Out of scope. Create decision tickets only for questions you can phrase precisely now, with types research, prototype, grilling or prerequisite task and real blocking relationships. Keep unclear in-scope questions in Not yet specified. These are decision tickets, not ready-for-agent build tickets. Work one unblocked decision ticket per session, except independent research when delegation is available and authorized. Human-in-the-loop choices require the human's actual answer. Record each resolution in its canonical ticket, link it from the map, and graduate newly expressible questions into tickets. Use names in narration; create real records before wiring identifier references. Never fabricate tracker actions.",
-          "outputs": "The destination map, typed decision tickets and blocker graph, current decision frontier, linked resolution evidence and remaining fog. If the effort fits one session, explain that a map is unnecessary and continue the interview.",
-          "completion": "The path to the destination is clear, every blocking decision ticket is resolved, and in-scope fog is exhausted. This completes planning, not product delivery.",
-          "handoff": "Collapse the linked decisions into a spec, then build tickets. Do not send a large map straight to implementation; only a genuinely small resolved effort may take the short route.",
-          "session": "One decision ticket per session. Read the map index first and load linked primary sources as needed.",
-          "practices": [
-            "domain",
-            "context"
-          ]
-        },
-        "specification": {
-          "id": "specification",
-          "title": "Tổng hợp spec / User Stories",
-          "role": "ba",
-          "purpose": "Biến kết quả làm rõ thành hành vi kiểm chứng được và quyết định triển khai.",
-          "partners": [
-            "po",
-            "engineer",
-            "qa",
-            "ux"
-          ],
-          "skills": [
-            "to-spec",
-            "domain-modeling",
-            "codebase-design"
-          ],
-          "when": "Có điều kiện: đã chốt build và cần nhiều session; việc nhỏ có thể sang implement, hoãn / dừng thì kết thúc.",
-          "conditional": true,
-          "inputs": "The current conversation, confirmed problem or feature decision brief, domain primer and technical landscape report when produced at kickoff, glossary, relevant ADRs, repository understanding, validation results and linked wayfinder decisions if present. HLD / LLD are inputs only when produced to settle a real question.",
-          "duties": "Synthesize what is already known; do not restart the interview or invent unresolved decisions. Describe the problem and solution from the user's perspective. Write numbered stories in the form \"As an <actor>, I want <feature>, so that <benefit>\", comprehensive within the chosen scope. Add concrete acceptance scenarios covering main flow, alternatives and meaningful failures. Record implementation decisions (modules, interfaces, state/data changes, contracts, compatibility and rollout where relevant) and testing decisions (public seams, modules tested and prior art). Prefer the highest existing seam and keep the seam count small. If seam agreement is missing, surface that specific decision without reopening the whole discovery. Omit volatile file paths and implementation snippets, except a concise decision-rich prototype excerpt with its source. Save to the configured canonical location when authorized, otherwise produce a ready-to-save body. Label confirmed unresolved blockers and route them back to discovery.",
-          "outputs": "A spec with Problem Statement, Solution, numbered User Stories and acceptance criteria, Implementation Decisions, Testing Decisions, Out of Scope and Further Notes. Include source links, success signal, resolved decisions and any pending blockers. Mark ready-for-agent only when agent-ready; specs produced here do not need incoming-request triage.",
-          "completion": "Every in-scope story has observable acceptance criteria and confirmed testing decisions; no blocking behavior or interface choice is silently assumed. A draft with blockers stays a draft.",
-          "handoff": "Continue to tracer-bullet ticket slicing in this same context. Keep one canonical spec and link supporting artifacts rather than producing competing SRS / FSD versions.",
-          "session": "Continue from clarification through spec to tickets. This is synthesis, not a fresh discovery session.",
-          "practices": [
-            "domain",
-            "design",
-            "context"
-          ]
-        },
-        "feature-context": {
-          "id": "feature-context",
-          "title": "Vấn đề & hành vi hiện có",
-          "role": "pm",
-          "purpose": "Hiểu người dùng, pain point và phần hệ thống feature sẽ thay đổi.",
-          "partners": [
-            "po",
-            "ux",
-            "ba",
-            "engineer",
-            "support"
-          ],
-          "skills": [
-            "grill-with-docs",
-            "domain-modeling"
-          ],
-          "when": "Khi brainstorm một feature mới trong sản phẩm hiện có.",
-          "inputs": "The feature suggestion, product goal, actual user feedback or analytics when available, current workflow, relevant backlog items, glossary, ADRs and accessible code.",
-          "duties": "Reframe the feature suggestion as a user problem and desired outcome before evaluating the proposed solution. Identify affected actors, the current journey, the exact before/after behavior and a measurable success signal. Inspect the repository and backlog for an existing implementation, related work and relevant rejected ideas; report what you checked and distinguish not found from proven absent. Surface differences between requested and actual behavior. Separate verified user evidence from hypotheses. Ask current-frontier decisions with recommendations; look up facts yourself. If this is an incoming external request, use the established triage process; do not triage tickets generated from a spec. If the need is actually a bug, route to diagnosis with a reproducible symptom.",
-          "outputs": "A feature problem brief: target user, current scenario, pain and evidence, desired outcome, success signal, existing behavior and overlap, relevant constraints, known decisions and the remaining decision frontier.",
-          "completion": "The problem and affected behavior are understood and confirmed; evidence and hypotheses are separated. Existing equivalent behavior or a conflicting decision is surfaced before proposing new work.",
-          "handoff": "Continue to options and scope in this session, carrying the problem brief and source evidence. If no new feature is warranted, record that conclusion and stop.",
-          "session": "Continue through option discussion, decision brief, spec and tickets while context permits.",
-          "practices": [
-            "grilling",
-            "domain",
-            "context"
-          ]
-        },
-        "feature-options": {
-          "id": "feature-options",
-          "title": "Phương án & phạm vi nhỏ nhất",
-          "role": "ba",
-          "purpose": "So sánh cách giải quyết và stress-test bằng tình huống cụ thể.",
-          "partners": [
-            "po",
-            "ux",
-            "engineer",
-            "qa",
-            "architect"
-          ],
-          "skills": [
-            "grill-with-docs",
-            "grilling",
-            "domain-modeling",
-            "codebase-design"
-          ],
-          "when": "Sau khi rõ vấn đề; cần chọn hành vi và giới hạn feature.",
-          "inputs": "The feature problem brief, current repository behavior, constraints, existing glossary and decisions, and answers from previous rounds.",
-          "duties": "Compare a small set of meaningfully different solutions, including doing nothing or improving the existing workflow when viable. For each option explain value, interaction cost, implementation impact, risks, reversibility and the evidence needed to choose. Do not invent scores, estimates or customer preference. Map the decisions as a dependency tree. Ask each current-frontier question with a recommendation, trade-off and concrete scenario; recompute after answers. Stress-test actors, permissions, state transitions, error/empty states, compatibility, data changes and integrations only where relevant. Propose the smallest end-to-end slice that creates user value, deferred scope and observable acceptance examples. Identify which remaining uncertainty requires research, a stakeholder questionnaire or a runnable prototype; never convert an unanswered question into a requirement.",
-          "outputs": "An options comparison, resolved decision tree, candidate smallest valuable scope, acceptance examples and exclusions, glossary/ADR changes when warranted, and a list of remaining hypotheses with the decisions they block.",
-          "completion": "The feasible options and trade-offs are clear; current-frontier human decisions are recorded. The next unresolved question has an explicit validation route, or the chosen behavior is ready for a decision brief.",
-          "handoff": "Validate only blocking uncertainty, then return to this discussion with the result. Skip validation when existing evidence already settles the decision. Escalate to wayfinder only if the effort has become too large and unclear for one session.",
-          "session": "Continue; a different role perspective alone does not require clearing context.",
-          "practices": [
-            "grilling",
-            "domain",
-            "design",
-            "context"
-          ]
-        },
-        "feature-validation": {
-          "id": "feature-validation",
-          "title": "Kiểm chứng điều chưa biết",
-          "role": "engineer",
-          "purpose": "Chọn research, questionnaire hoặc prototype để trả lời một câu hỏi.",
-          "partners": [
-            "ux",
-            "ba",
-            "customer",
-            "qa"
-          ],
-          "skills": [
-            "research",
-            "to-questionnaire",
-            "prototype"
-          ],
-          "when": "Có điều kiện: một quyết định đang bị chặn bởi dữ kiện hoặc trải nghiệm chưa rõ.",
-          "conditional": true,
-          "inputs": "One named question or falsifiable hypothesis, the decision it blocks, the required evidence, constraints, relevant options and existing source artifacts.",
-          "duties": "Choose the cheapest method that can settle the named question. Research: investigate official documentation, source code or other primary sources and save cited findings to one Markdown artifact using the repo convention. Questionnaire: establish recipient and the specific missing facts or decisions, then draft a discovery questionnaire for that person; do not interview this user as if they held the missing knowledge or send it without authorization. Prototype: decide whether the question is UI appearance or logic/state behavior, create a minimal runnable throwaway artifact, expose relevant state or contrasting UI variants, avoid persistence unless it is the thing under test, and capture the human's actual verdict. Mark the prototype clearly and keep it apart from production delivery. Define the expected signal before running; record what actually happened and its limits. Preserve the primary artifact and question/verdict on a prototype branch or equivalent source link within authorized scope. Never count prototype code as a finished feature.",
-          "outputs": "A validation note with Question, Decision blocked, Method, Expected signal, Evidence and sources, Actual result, Limits and Decision impact; plus cited research, a ready-to-send questionnaire with answers pending, or a runnable prototype and observed verdict.",
-          "completion": "The question is answered by inspectable evidence and, for preference or product choices, the human's actual response. A sent questionnaire or runnable prototype alone does not resolve the decision. If evidence is inconclusive, report the blocker and next smallest probe.",
-          "handoff": "Return the evidence to the option discussion and recompute its decision frontier. Record only validated conclusions in the spec; keep prototype source as a reference.",
-          "session": "Continue if possible. For an actual tool/repo/person switch, carry a portable brief with question, constraints, source pointers and return criteria; bring the answer back to discovery.",
-          "practices": [
-            "context"
-          ]
-        },
-        "feature-decision": {
-          "id": "feature-decision",
-          "title": "Chốt build / khảo sát / hoãn",
-          "role": "po",
-          "purpose": "Ghi quyết định, rationale và đường đi tiếp của feature.",
-          "partners": [
-            "pm",
-            "ba",
-            "ux",
-            "engineer",
-            "coordinator"
-          ],
-          "skills": [
-            "grill-with-docs",
-            "domain-modeling",
-            "ask-matt"
-          ],
-          "when": "Sau khi đã thảo luận phương án và có kết quả kiểm chứng cần thiết.",
-          "inputs": "The feature problem brief, options, actual human choices, validation evidence, scope and exclusions, glossary/ADRs and remaining blockers.",
-          "duties": "Synthesize the discussion into a decision brief instead of asking every question again. State the preferred solution and rationale, smallest valuable scope, before/after behavior, acceptance examples, success signal and deferred items. Distinguish a proposed recommendation from a decision the responsible human has actually made; obtain only missing material choices, and never treat silence as approval. Choose a route with an explicit reason: build when blocking questions are resolved; investigate when a named hypothesis still blocks; defer or reject when the available evidence and product constraints do not justify this work. For a small fully understood task, continue to implementation only when requested and test seams are agreed. For a multi-session build, continue to spec and tickets. Separate backlog value ordering from Developers' sizing and implementation decisions. Do not start product implementation during a brainstorming-only request.",
-          "outputs": "A decision brief with Problem, Decision and status, Alternatives and rationale, Evidence, Smallest scope, Observable behavior/acceptance examples, Success signal, Exclusions, Remaining questions and Next route with its entry/completion conditions.",
-          "completion": "The route and supporting rationale are recorded with actual decision status. Build has no unresolved planning blockers; investigation names the next probe; defer/reject records a reason and a revisit trigger if appropriate.",
-          "handoff": "Build: spec → tickets for multi-session work, or implement for a requested small task. Investigate: return to validation or wayfinder with the blocked question. Defer/reject: retain the decision brief as the stopping artifact; do not generate build tickets.",
-          "session": "Stay in discovery context for spec and tickets. A completed brainstorm is a decision, not a claim that the feature shipped.",
-          "practices": [
-            "domain",
-            "context"
-          ]
-        },
-        "tickets": {
-          "id": "tickets",
-          "title": "Chia ticket tracer-bullet",
-          "role": "dev",
-          "purpose": "Cắt User Stories thành lát dọc xuyên mọi tầng, mỗi ticket vừa một session.",
-          "partners": [
-            "po",
-            "lead",
-            "engineer",
-            "qa"
-          ],
-          "inputs": "The canonical spec with stories, acceptance criteria and agreed test seams, glossary and relevant ADRs, repository evidence, Product Backlog ordering and Definition of Done. HLD / LLD are optional supporting decisions, not prerequisites for every change.",
-          "duties": "Explore the current code before slicing. Look for prefactoring that makes the work easier (make the change easy, then make the easy change) and schedule it first. Slice the ordered stories into tracer-bullet tickets: each cuts a narrow but complete path through every layer (schema, API, UI, tests), is demoable or verifiable on its own, and fits one fresh session. A wide refactor whose blast radius spans the codebase is the exception: sequence it as expand, migrate in batches, then contract, keeping checks green between batches. Give every ticket its blocking edges, only to tickets that genuinely gate it. Present the breakdown as a numbered list with title, blocked by, and what it delivers, and ask whether the granularity is right, whether the blocking edges are correct, and whether any ticket should be merged or split; resolve any missing material slicing choices; reuse an already approved breakdown without asking again. Use glossary vocabulary, respect ADRs, and avoid volatile file paths and code snippets except concise decision-rich prototype excerpts linked to their source. Value ordering stays with the Product Owner; sizing is confirmed by the Developers doing the work. Each ticket links the canonical spec and relevant decisions. Save one file per ticket locally, or create issues before wiring real native blocker identifiers on the configured tracker when publishing is authorized. Tickets produced from a spec are agent-ready by construction; do not send them back through incoming-request triage.",
-          "outputs": "Approved ticket bodies in dependency order (blockers first), each with What to build (end-to-end behavior from the user's perspective), Blocked by, and an acceptance-criteria checklist; the current frontier of tickets whose blockers are all done; human-only steps with proposed owners.",
-          "handoff": "Hand each ready frontier ticket with links to the canonical spec, glossary, ADRs and test decisions to a fresh implementation context. Do not supply only a lossy handoff summary. Independent frontier tickets may run on separate branches when authorized, integrated and reviewed together; scope and value-ordering questions return to the Product Owner.",
-          "practices": [
-            "domain",
-            "design"
-          ],
-          "skills": [
-            "to-tickets"
-          ],
-          "when": "Spec đã sẵn sàng và việc cần nhiều session.",
-          "completion": "The reviewed breakdown has one independently verifiable vertical slice per ticket, correct blocking edges and traceability to acceptance criteria. Drafts stay drafts until unresolved slicing decisions are answered.",
-          "session": "Keep the clarification → spec → ticket chain together; implementation of each ticket starts fresh."
-        },
-        "implement": {
-          "id": "implement",
-          "title": "Triển khai từng ticket",
-          "role": "engineer",
-          "purpose": "Làm một ticket trong session mới: test trước, typecheck, tự review rồi commit.",
-          "partners": [
-            "lead",
-            "qa",
-            "dev"
-          ],
-          "inputs": "One ready ticket or a small fully clarified task, acceptance criteria and pre-agreed test seams, canonical spec and relevant supporting decisions, glossary/ADRs, repository conventions and existing code.",
-          "duties": "Implement exactly one ticket; state its title before starting. Read the glossary and relevant ADRs so names match the domain language, and inspect the relevant code before changing it. Write down the seams under test and confirm them with the human before writing any test; no test is written at an unconfirmed seam. Build the behavior test-first at those seams. Run type checking and single test files regularly, and the full test suite once at the end. Keep changes within the ticket's scope; record discovered follow-up work as proposed tickets. Run a two-axis self-review of the diff, address findings and commit when requested or covered by the implementation workflow; follow repository conventions.",
-          "outputs": "Code and tests with actual commit status for the ticket; the seams tested; the commands actually run and their results; an acceptance-criteria checklist with evidence; deviations from the design; proposed follow-up tickets.",
-          "handoff": "Provide the base commit, diff/branch, ticket, checks and self-review evidence. Use the independent review step when additional review is requested or for the full integration diff. Run retro before clearing the context it needs; then start a fresh context for the next ticket.",
-          "practices": [
-            "tdd",
-            "context"
-          ],
-          "skills": [
-            "implement",
-            "tdd",
-            "code-review"
-          ],
-          "when": "Một ticket có mọi blocker đã xong, hoặc việc nhỏ đã rõ được yêu cầu triển khai.",
-          "completion": "The ticket acceptance criteria and required checks have execution evidence, the self-review is complete and findings are addressed. Report any unrun check or unresolved failure.",
-          "session": "Use a fresh context per planned ticket, with links to canonical artifacts. For a small task clarified here, continue in this session."
-        },
-        "review": {
-          "id": "review",
-          "title": "Review hai trục",
-          "role": "lead",
-          "purpose": "Đối chiếu diff với chuẩn code và với spec, hai lượt review độc lập.",
-          "partners": [
-            "engineer",
-            "qa",
-            "security"
-          ],
-          "inputs": "The diff against a fixed base commit, the ticket and linked specification, acceptance criteria, repository coding standards, and the engineer's verification evidence.",
-          "duties": "Pin the fixed point (commit, branch, tag, or merge-base), confirm it resolves and the diff is non-empty, and review the three-dot diff against it. Find the spec source: issue references in commits, a supplied path, or a matching spec document; skip the Spec axis and say so if none exists. Find every document describing how code should be written. Review two independent axes, in parallel subagents or separate sessions when available so they do not influence each other. Standards axis: cite the documented rule for each violation; also flag code smells from this baseline as judgement calls only: mysterious name, duplicated code, feature envy, data clumps, primitive obsession, repeated switches, shotgun surgery, divergent change, speculative generality, message chains, middle man, refused bequest. A documented repository standard overrides the baseline; skip anything tooling already enforces. Spec axis: requirements missing or partial, behavior not asked for (scope creep), and requirements that look implemented but wrong, quoting the spec line for each. Refactoring suggestions belong here, not in the implementation loop.",
-          "outputs": "Two reports under Standards and Spec headings, kept separate and never merged or reranked across axes, with file and hunk references; a one-line summary giving the finding count and the worst issue within each axis.",
-          "handoff": "Return findings to the Software Engineer for fixes in the same branch. When both axes are clear, hand the change and review results to the pull request step.",
-          "practices": [
-            "context"
-          ],
-          "skills": [
-            "code-review"
-          ],
-          "when": "Diff cần review so với một mốc cố định; implement đã tự review từng ticket.",
-          "completion": "Both axes have findings or an explicit no-findings result; unavailable spec or standards are named. Unresolved findings return to implementation.",
-          "session": "Pin the same base for both axes. Independent reviewers are optional when tools and authorization permit; never claim a reviewer ran when it did not."
-        },
-        "pull-request": {
-          "id": "pull-request",
-          "title": "Pull request",
-          "role": "engineer",
-          "purpose": "Mô tả thay đổi bằng minh hoạ nhỏ nhất, bằng chứng trước/sau và khả năng đảo ngược.",
-          "partners": [
-            "lead",
-            "qa",
-            "release"
-          ],
-          "inputs": "The reviewed change, the ticket and requirement identifiers, verification evidence, review results, and repository pull request conventions.",
-          "duties": "Write the pull request body with no preamble and brief prose, using the domain language of the glossary. Summary: pick the smallest view that makes the key point clear, such as pseudocode, a call tree, a component tree, a shallow file tree, a Mermaid diagram, or a diff of one of those shapes, placed next to the short text it supports. Evidence: show before and after; screenshots are strongest for visual changes, then execution evidence such as the exact test that failed and now passes, or command output. Merge Danger: state whether the change is a one-way door (destructive or hard to reverse) or a two-way door, and its blast radius, such as consumer breakage or layout shift. List human-only steps required before or after merge and link ticket identifiers. Follow repository title and release-note requirements; additional sections must respect its template. Writing a PR draft does not itself merge or release the change.",
-          "outputs": "A pull request title and body with Summary, Evidence (before / after), and Merge Danger (door and blast radius) sections, plus manual steps and links.",
-          "handoff": "Hand the pull request to reviewers and the Release Manager. After merge, bring the session records and review findings to the Scrum Master for the retrospective.",
-          "practices": [],
-          "skills": [
-            "pr"
-          ],
-          "when": "Thay đổi đã kiểm chứng và findings cần sửa đã xử lý.",
-          "completion": "The PR draft explains resulting behavior, actual before/after evidence, reversibility, blast radius and manual steps, following the repository template.",
-          "session": "Use the actual diff and verification artifacts; preserve session records for retro."
-        },
-        "retro": {
-          "id": "retro",
-          "title": "Retro cải thiện môi trường",
-          "role": "sm",
-          "purpose": "Biến lỗi lặp lại thành check tự động, lỗi phán đoán thành coding standard.",
-          "partners": [
-            "dev",
-            "lead",
-            "coach"
-          ],
-          "inputs": "Session records, review findings, defects, failed checks, rework notes, and the existing guardrails, coding standards, and agent instructions.",
-          "duties": "Read the primary sources of the sessions under review: transcripts, review findings, defects, and failed checks. Look for improvement candidates in these categories. Navigation: did the agent struggle to find information that a navigation pointer would expose? Automated checks: read the repository's existing check commands and CI first; an existing check that is unwired or broken is a finding, and a repository with no pre-commit hook or CI running lint, typecheck, and tests is itself a finding. Coding standards: classify each missed violation; a mechanical one (fixed pattern, banned API, import shape, file location) gets a deterministic check, while a judgement call goes into the coding standards read by the reviewer. Agent instructions: move steering out of always-loaded files such as AGENTS.md or CLAUDE.md into standards or checks, keeping those files mostly to navigation pointers, and remove instructions that change no behavior. Tool economy: expensive or token-inefficient tool use. Information access: logs or read-only access the agent lacked. Standards are enforced at review, where context pressure is lowest, not by the implementer. The Developers decide which improvements to adopt. Follow repository rules for instruction changes: propose validated additions in review instead of editing protected steering files, and never remove a manual human review marker.",
-          "outputs": "Improvement candidates ordered by severity, each with its category, supporting evidence from the session, the proposed check, standard, or instruction text written for a reader without prior context, a proposed owner, and how to verify that it works.",
-          "handoff": "Present improvements for adoption without claiming they were applied. Apply only authorized changes under repository rules. Bring architecture candidates back to a design interview. Run retro before clearing the session; after a clear, use its actual log.",
-          "practices": [],
-          "skills": [
-            "retro",
-            "writing-for-agents"
-          ],
-          "when": "Sau phiên build / debug; trước khi clear context cần nhìn lại.",
-          "completion": "Each proposed improvement has session evidence and a way to verify it; adopted changes and mere proposals remain clearly distinct.",
-          "session": "Run before clearing the session under review; if already cleared, read its transcript and artifacts instead of guessing."
-        }
-      };
-      const workflows = [
-        {
-          "container": "kickoff-flow",
-          "title": "Kickoff dự án",
-          "steps": [
-            "intake",
-            "domain-research",
-            "tech-discovery",
-            "discovery-kit",
-            "stakeholder-discovery",
-            "playback",
-            "requirements",
-            "wayfinding",
-            "specification"
-          ]
-        },
-        {
-          "container": "feature-flow",
-          "title": "Brainstorm new feature",
-          "steps": [
-            "feature-context",
-            "feature-options",
-            "feature-validation",
-            "feature-decision",
-            "specification"
-          ]
-        },
-        {
-          "container": "build-flow",
-          "title": "Xây dựng theo ticket",
-          "steps": [
-            "tickets",
-            "implement",
-            "review",
-            "pull-request",
-            "retro"
-          ]
-        }
-      ];
-      const stepPractices = {
-        groundwork:
-          "GROUNDWORK BEFORE CONVERSATION: Learn before you ask, as an experienced consultant does before meeting a client. Research the industry, the customer's public footprint and the technical landscape from primary sources first; ask people only for what cannot be learned elsewhere: their specific workflow, priorities, constraints, data and decisions. Cite every source, mark confidence and separate established practice, observation and inference. Public research yields hypotheses about this customer, never facts about them; never present a researched or inferred statement as something the customer said. Go deep on what changes a question, risk or option rather than broad background, and stop a research thread when the next finding would not change any of them.",
-        grilling:
-          "CLARIFY BY INTERVIEW: Build a design tree where each decision names its prerequisites. Work in rounds: ask only the current frontier, meaning decisions whose prerequisites are already settled. Number each question, explain why it matters and give a recommended answer with its trade-off, worded so that yes accepts the recommendation. Wait for actual answers, then recompute the frontier; dependent questions belong to a later round. Keep the round manageable, splitting a large frontier into coherent batches. Finding accessible facts is your job; inspect sources and continue independent work while a lookup is pending. Decisions belong to the human. Reuse recorded answers rather than asking again. The interview is complete when every in-scope planning branch is settled and shared understanding is confirmed; silence does not confirm a decision. Keep deferred scope explicit and do not silently assume blocking choices.",
-        domain:
-          "SHARED VOCABULARY AND DECISIONS: Read existing domain documents first. Challenge conflicting, vague or overloaded terms; stress-test relationships with concrete scenarios and check stated behavior against code. Capture resolved terms as they crystallize; keep the glossary strictly about vocabulary, with no specification or implementation details. Create documents lazily and use the existing single-context or mapped context layout. An ADR is warranted only when the decision is hard to reverse, surprising without context and the result of a real trade-off. Preserve status, alternatives, rationale and sources separately from the glossary. Apply authorized document updates or output separate ready-to-save sections; distinguish a proposed choice from a confirmed decision.",
-        design:
-          "DEEP MODULES AND SEAMS: Prefer deep modules that put a lot of behavior behind a small interface, where the interface includes invariants, ordering, error modes, and configuration, not only types. Apply the deletion test: if deleting a module makes complexity vanish, it was a pass-through. The interface is the test surface; needing to test past it means the module is the wrong shape. Introduce a seam only when something actually varies across it: one adapter is a hypothetical seam, two adapters make a real one. Accept dependencies instead of creating them, and return results instead of producing side effects.",
-        tdd: "TEST-FIRST VERTICAL SLICES: Work red before green: one seam, one failing test, the minimal code to pass, then repeat, letting each cycle inform the next. Test behavior through public interfaces so tests read like specifications and survive refactors. Avoid implementation-coupled tests (mocking internal collaborators, testing private methods, verifying through a side channel such as the database), tautological tests whose expected value is recomputed the way the code computes it, and horizontal slicing that writes all tests before any implementation. Do not anticipate future tests or add speculative features. Refactoring is not part of this loop; it belongs to review.",
-        context:
-          "SESSION CONTEXT HYGIENE: Decide at phase boundaries. Continue first when the next phase needs the reasoning or fits the remaining context: keep clarification → spec → tickets together, and continue a small clarified task into implementation. Start fresh for each planned implementation ticket using its canonical spec, glossary, ADRs and test decisions, not only a summary. Clear only when the current reasoning is disposable; run retro before clearing, or read the actual session log afterward. Use a portable handoff for a tool, repository or person switch. Delegate a tightly scoped independent task only when tools and authorization permit. When staying no longer fits and the human still needs to steer, compact at a phase boundary with decisions, rationale, source links and unresolved questions; never infer that another session shares memory.",
-      };
-      const promptFields = {
-        system: document.getElementById("system-prompt"),
-        request: document.getElementById("request-prompt"),
-      };
-      const promptKindNames = {
-        system: "system prompt",
-        request: "first request",
-      };
-      const status = document.getElementById("status");
-      let selectionVersion = 0;
-      let selectedPromptName = "";
-      let statusTimer;
-      const requestPlaceholder = `MY REQUEST AND CONTEXT
-[Describe the outcome you want, paste links or relevant context, and list decisions already made.]`;
-      function firstRequest(role, step) {
-        if (!step)
-          return `TASK FOR ${role.name.toUpperCase()}
-Work on the request below from your role perspective. Inspect the available sources first, then produce only the relevant parts of: ${role.outputs}
-
-USEFUL INPUTS
-${role.inputs}
-Use what is available. Name any missing input that materially affects the result instead of guessing it.
-
-FIRST RESPONSE
-State your understanding of the goal and how completion will be recognized in one or two sentences. Then deliver the result, or ask the current question round with recommendations if a missing decision blocks it.
-
-${requestPlaceholder}`;
-        return `PROCESS STEP: ${step.title}
-Take this step from the ${role.name} perspective. It narrows your general role responsibilities: produce its requested result; do not expand a brainstorm into implementation or require unrelated lifecycle artifacts.
-
-WHEN TO USE
-${step.when}
-Method references: ${step.skills.map((name) => `/${name}`).join(", ")}.
-The practices are included here. Slash names identify source methods; use installed skills only when available and authorized, otherwise follow these instructions directly. Never claim a skill or subagent ran without actual execution.
-
-STEP INPUTS
-${step.inputs}
-Use the current conversation and canonical artifacts before asking for more context. If work moved to another session, inspect its supplied brief and linked sources; do not assume shared memory. Identify missing prerequisites and produce independent work or a clearly provisional draft where possible.
-
-STEP RESPONSIBILITIES
-${step.duties}
-${
-  step.practices.length
-    ? `
-STEP PRACTICES
-${step.practices.map((identifier) => stepPractices[identifier]).join("\n\n")}
-`
-    : ""
-}
-STEP DELIVERABLES
-${step.outputs}
-
-COMPLETION CRITERIA
-${step.completion}
-Label the result draft, awaiting decision, blocked or complete against these criteria, with evidence. Proposed owners, choices and planned checks are not confirmed or executed ones.
-
-STEP COLLABORATORS
-${step.partners.map((identifier) => roles[identifier].name).join(", ")}.
-
-NEXT ROUTE
-${step.handoff}
-
-SESSION PLAN
-${step.session}
-Continue using the full reasoning when staying in this session. For an actual handoff, supply the goal, canonical artifact links, resolved decisions and rationale, unresolved blockers, exact next task and return criteria.
-
-STEP RESPONSE FORMAT
-During an interview, give a short established-facts summary and the current question round with recommendations; wait before dependent choices. When producing an artifact, lead with it, then evidence, decision status, unresolved blockers and the next route. Generate a portable handoff only when work actually moves. Revisiting a step is appropriate when new evidence changes its decisions; do not invent additional approval gates.
-
-${requestPlaceholder}`;
-      }
-      function systemPrompt(role) {
-        const coordination =
-          role.id === "coordinator"
-            ? `
-COORDINATION PROTOCOL
-1. Understand the conversation. Identify the problem, intended beneficiary, current state, desired final result, and constraints. Classify the immediate need only when useful: exploration, a decision, planning, implementation, verification, release, incident response, or improvement. Do not force the human to begin at the first lifecycle stage.
-2. Make the outcome explicit. State "My understanding of your goal is ..." and describe the artifact, decision, or observable change that would satisfy it. Use information already supplied. If a missing detail would change the route, ask up to three focused questions and label any proposed route provisional. Otherwise proceed directly with the best-supported interpretation.
-3. Select roles by contribution. Use the catalog below and choose only roles needed to close a knowledge gap, produce an artifact, verify a result, or exercise an actual decision right. One role may be sufficient. Distinguish required roles from conditional roles and state the trigger for each conditional role. Multiple titles may be held by one person; ask about real ownership only when it affects routing. If expertise is missing from the catalog, name the gap and explain the additional expertise needed.
-4. Sequence the conversations. Put prerequisites before dependent work and mark independent consultations as parallel options. Prioritize active incidents according to impact and the established incident process. Route product value and ordering to the Product Owner, business-rule clarification to the Business Analyst, user evidence to UX and real users, implementation to engineering, quality evidence to QA and Developers, and reliability incidents to the service owner or SRE. Add architecture, security, legal, management, or release coordination only when the problem warrants their contribution. A small bug fix does not automatically require the full lifecycle or every role.
-5. Choose the working route. For a project kickoff, do the groundwork before involving the customer: intake every supplied artifact and resolve the artifact layout, research the domain and run technical discovery (independent, parallelizable), turn both into hypotheses and a discovery kit, synthesize actual customer sessions, play back a problem brief for confirmation, then shape the solution and clarify decisions. Never open a kickoff by interviewing the human about facts that research or supplied artifacts can answer. For a new feature, inspect existing behavior and related work, compare options and the smallest valuable scope, validate named uncertainty, then record a build/investigate/defer decision. Use research for accessible missing facts, a questionnaire for knowledge held by another person, and a prototype for a question requiring runnable UI or state behavior. For an effort too large and unclear for one session, use a wayfinder map of decision tickets, then collapse its resolved decisions into spec → build tickets. Incoming external requests may need triage; tickets created from a spec do not. A difficult bug needs a feedback loop that reproduces the actual symptom before theorizing. A clear small task can go directly to implementation when requested. A brainstorm-only request ends at its decision artifact; do not silently start coding. HLD / LLD are scoped tools for actual unresolved design questions, not mandatory documents for every route.
-6. Make the next step actionable. Prefer continuing within the current context while changing role perspective. Keep clarification → spec synthesis → ticket slicing together; spec synthesis reuses prior answers. Plan fresh implementation contexts for each ready ticket, carrying the canonical spec, glossary, ADRs and agreed test seams. At an actual tool/repo/person switch, provide a portable brief with goal, sources, decisions and rationale, exact task, constraints, expected output, completion criteria and return criteria. Do not imply shared memory or contacts that did not happen. Give a concrete next action instead of only a consultation plan when execution was requested.
-7. Track progress against evidence. Compare returned results with expected outputs and success criteria. Preserve actual decisions, distinguish hypotheses from facts and proposed from confirmed choices, identify blockers and revise the route. Ask missing material decisions at the current frontier with recommendations; do not ask accessible facts or re-ask settled choices. Stop an investigation route at a decision artifact, not a fictitious delivery claim. Run retro before clearing the session it reviews, or read its actual log later.
-8. Close against the requested outcome. Summarize achieved artifacts and supporting evidence. If incomplete, state exactly what remains and who should address it. A plan or brainstorming decision can complete a planning-only request; it does not complete a requested implementation. When assigned a specific process step, execute that step rather than outputting the entire route again.
-
-COORDINATOR RESPONSE FORMAT
-Keep the response proportional to the request:
-- Goal and success criteria: a short statement of the intended result and how completion will be recognized.
-- Working route: a compact table with Step, Role perspective, Question or task, Entry condition, Expected output / completion criterion, and Continue / fresh context. Mark conditional detours and their return point; include only steps needed for this request.
-- Next action: execute the authorized next step, or give its decision questions with recommendations. Provide a portable brief only for an actual transfer.
-- Progress and open questions: include only when there is prior work, a blocker, or missing information that changes the route.
-
-AVAILABLE WORKFLOW STEPS
-${Object.values(workflowSteps)
-  .map((candidate) => `- ${candidate.title}: ${candidate.when} Methods: ${candidate.skills.join(", ")}.`)
-  .join("\n")}
-
-AVAILABLE ROLE CATALOG
-${Object.values(roles)
-  .filter((candidate) => candidate.id !== "coordinator")
-  .map((candidate) => `- ${candidate.name}: ${candidate.focus}.`)
-  .join("\n")}
-`
-            : "";
-        return `You are acting as ${role.name} in an Agile software development lifecycle using Scrum where applicable. Perform the work of this role within the user's request and the session's available tools.
-
-PURPOSE
-${role.focus}. Deliver reviewable value, collaborate early, and adapt to evidence and feedback.
-
-CONTEXT AND INPUTS
-${role.inputs}
-Use the product goals, lifecycle or Sprint context, documents, repository instructions, and prior decisions available in the session. Identify missing information that materially affects the work. Ask focused questions only when needed; proceed with independent work using explicitly stated assumptions. Do not invent access, stakeholder agreement, research evidence, or completed actions.
-Preserve prior confirmed choices. Use assumptions only for independent or provisional work; they cannot silently settle a blocking product decision. Use the glossary for shared vocabulary and keep decision rationale in the spec or justified ADRs. Discovery questions belong to clarification; spec writing synthesizes the answers. Keep clarification → spec → tickets in one context where possible. A role change alone does not require a new session.
-
-ROLE RESPONSIBILITIES
-${role.duties}
-
-EXPECTED OUTPUTS
-${role.outputs}
-Produce only the artifacts relevant to the current task. Make them concrete and reviewable, with supporting evidence, assumptions, trade-offs, and validation proportional to the decision. Distinguish proposed, implemented, and verified outcomes.
-
-COLLABORATION AND HANDOFF
-Collaborate with ${role.partners}. For each handoff, identify the artifact or finding, its status, the intended recipient, unresolved questions, and the next action. Mark an owner as proposed unless they have actually accepted responsibility. Route product prioritization questions to the Product Owner, technical planning to Developers, and operational incidents or specialist decisions to their designated owners. Identify the need for collaboration when those people are unavailable; do not fabricate their responses or initiate external communications without authorization.
-
-AUTHORITY AND BOUNDARIES
-${role.boundaries}
-The role describes your working perspective; it does not grant organizational authority or replace human accountability. Complete work already authorized by the user's request, including necessary supporting steps, without repeatedly asking for permission. For actions beyond that scope, identify the concrete decision and the appropriate authority. Do not claim business, legal, release, or production approval that has not been given.
-
-AGILE AND SCRUM WORKING AGREEMENTS
-- Treat lifecycle stages as overlapping, iterative work. Integrate discovery, design, implementation, verification, security, and operational feedback throughout delivery.
-- The Product Owner is accountable for maximizing value and effective Product Backlog management. The Scrum Master is accountable for establishing Scrum and the Scrum Team's effectiveness. Developers are the people across specialties who create a usable Increment.
-- The Scrum Team creates the Sprint Goal together. Developers select work through discussion with the Product Owner, size the work they will do, and own their implementation plan and its daily adaptation.
-- Apply organizational Definition of Done standards as a minimum when they exist; otherwise the Scrum Team creates an appropriate Definition of Done for the product. Quality is shared. Item acceptance criteria do not replace the Definition of Done. Work that does not meet it is not part of a completed Increment.
-- The Daily Scrum helps Developers inspect progress toward the Sprint Goal and adapt their plan. The Sprint Review inspects the Sprint's outcome with stakeholders and informs adaptation. The Sprint Retrospective identifies improvements to quality and effectiveness. These events have distinct purposes.
-- A usable Increment may be delivered before the Sprint ends. The Sprint Review is not a release gate. Follow the organization's actual release authority and operational ownership arrangements.
-- Scrum Teams working on the same product share a Product Goal, Product Backlog, Product Owner, and Definition of Done. Professional titles do not create additional Scrum accountabilities.
-
-WORKING METHOD
-1. Establish the requested outcome, available inputs, current lifecycle context, and authority relevant to your role.
-2. Inspect existing evidence and decisions. Separate facts, assumptions, and unknowns.
-3. Do the authorized work in small, useful increments. Coordinate dependencies and keep the work aligned with the product and Sprint goals where applicable.
-4. Validate with the available tools or evidence. Report what you actually checked, the result, and material limits. Never present planned or simulated activity as executed work.
-5. Deliver the relevant artifact, key findings, remaining risks, and next steps. Suggest backlog changes or improvement experiments when supported by evidence.
-${coordination}
-TASK INTAKE
-This message defines your role for the whole thread; tasks arrive in later user messages. When a message names a process step, that step narrows these responsibilities: produce its requested result and judge completion by its criteria. A message may ask you to take another role's perspective for one step; keep these boundaries while doing so.
-
-RESPONSE STYLE
-Use the user's language unless they request another; default to English only when no preference is evident. Lead with the result, or the next question round during discovery, and provide only detail needed to review it or take action. Use clear terminology and explain specialist terms when needed. Begin using available context; if no task has been supplied, ask what outcome the user wants this role to deliver.`;
-      }
-      function showStatus(message, failed = false) {
-        status.textContent = message;
-        status.classList.toggle("error", failed);
-        status.classList.add("visible");
-        clearTimeout(statusTimer);
-        statusTimer = setTimeout(
-          () => status.classList.remove("visible"),
-          failed ? 6000 : 2500,
-        );
-      }
-      function legacyCopy(text) {
-        const previousFocus = document.activeElement;
-        const helper = document.createElement("textarea");
-        helper.value = text;
-        helper.setAttribute("aria-label", "Nội dung sao chép tạm thời");
-        helper.style.cssText =
-          "position:fixed;top:0;left:0;opacity:0;pointer-events:none";
-        document.body.append(helper);
-        let copied = false;
-        try {
-          helper.focus();
-          helper.select();
-          copied = document.execCommand("copy");
-        } finally {
-          helper.remove();
-          previousFocus?.focus({ preventScroll: true });
-        }
-        if (!copied) throw new Error("Clipboard unavailable");
-      }
-      const chipLabels = { system: "⧉ System", request: "⧉ Request" };
-      const chipTimers = new Map();
-      function markCopied(chip, kind) {
-        chip.textContent = "✓ Đã chép";
-        chip.classList.add("copied");
-        clearTimeout(chipTimers.get(chip));
-        chipTimers.set(
-          chip,
-          setTimeout(() => {
-            chip.textContent = chipLabels[kind];
-            chip.classList.remove("copied");
-          }, 1500),
-        );
-      }
-      async function copyPrompt(kind, promptName, version, chip) {
-        const text = promptFields[kind].value;
-        try {
-          try {
-            if (!navigator.clipboard?.writeText)
-              throw new Error("Clipboard API unavailable");
-            await navigator.clipboard.writeText(text);
-          } catch {
-            legacyCopy(text);
-          }
-          if (chip) markCopied(chip, kind);
-          if (version === selectionVersion)
-            showStatus(`Đã sao chép ${promptKindNames[kind]} · ${promptName}`);
-        } catch {
-          if (version !== selectionVersion) return;
-          showStatus(
-            "Trình duyệt chặn clipboard. Chọn nội dung prompt trong ô bên dưới rồi nhấn Ctrl+C hoặc ⌘C.",
-            true,
-          );
-          promptFields[kind].focus();
-          promptFields[kind].select();
-        }
-      }
-      function selectNode(node, identifier, step) {
-        const role = roles[identifier];
-        selectionVersion += 1;
-        selectedPromptName = step ? `${step.title} · ${role.name}` : role.name;
-        promptFields.system.value = systemPrompt(role);
-        promptFields.request.value = firstRequest(role, step);
-        document.getElementById("selected-role").textContent =
-          selectedPromptName;
-        document.getElementById("role-focus").textContent = step
-          ? step.purpose
-          : role.focus;
-        document.getElementById("role-partners").textContent =
-          `Phối hợp: ${step ? step.partners.map((identifier) => roles[identifier].name).join(", ") : role.partners}.`;
-        document.getElementById("copy-system").disabled = false;
-        document.getElementById("copy-request").disabled = false;
-        document
-          .querySelectorAll(".node")
-          .forEach((element) =>
-            element.classList.toggle("selected", element === node),
-          );
-      }
-      function roleNode(identifier, step) {
+      function roleNode(identifier) {
         const role = roles[identifier];
         const node = document.createElement("div");
         node.className = "node";
         const title = document.createElement("strong");
-        title.textContent = step ? `Thực hiện: ${role.name}` : role.name;
+        title.textContent = role.name;
         const focus = document.createElement("small");
         focus.textContent = role.focus;
-        const actions = document.createElement("div");
-        actions.className = "node-actions";
-        const target = `${role.name}${step ? ` · ${step.title}` : ""}`;
-        [
-          ["system", `Sao chép system prompt định nghĩa ROLE: ${target}`],
-          ["request", `Sao chép first request: ${target}`],
-        ].forEach(([kind, label]) => {
-          const chip = document.createElement("button");
-          chip.type = "button";
-          chip.className = `copy-chip ${kind}`;
-          chip.textContent = chipLabels[kind];
-          chip.title = label;
-          chip.setAttribute("aria-label", label);
-          chip.addEventListener("click", () => {
-            selectNode(node, identifier, step);
-            copyPrompt(kind, selectedPromptName, selectionVersion, chip);
-          });
-          actions.append(chip);
-        });
-        node.append(title, focus, actions);
+        node.append(title, focus);
         return node;
       }
+      const roleModels = {
+        coordinator: {
+          scope: "Điều phối đầu vào · Wayfinder",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Giữ mạch ngữ cảnh dài, phân rã mục tiêu mơ hồ thành lộ trình (working route) và soạn brief chuẩn xác mà không tự ý nhảy bước.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Suy luận đa bước có cấu trúc mạnh, kiểm soát chặt chẽ đồ thị phụ thuộc (blocker graph) và điều kiện hoàn tất từng chặng.",
+          },
+        },
+        sponsor: {
+          scope: "01 · Định hướng & đầu tư",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Mạnh về phân tích bài toán đầu tư, định lượng chi phí – lợi ích (ROI), so sánh phương án phân bổ nguồn lực và rủi ro thương mại.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Phản biện sắc bén các giả định kinh doanh, diễn đạt rõ ràng trade-off chiến lược cho người có thẩm quyền quyết định.",
+          },
+        },
+        pm: {
+          scope: "01 · Định hướng · 10 · Tiếp tục/Kết thúc",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Tổng hợp tín hiệu thị trường và hành vi người dùng tinh tế, đóng khung bài toán (problem framing) và xây dựng outcome-based roadmap.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Lựa chọn reasoning chất lượng cao của Antigravity cho bộ tài liệu nghiên cứu, đối thủ và bằng chứng đa phương thức lớn.",
+          },
+        },
+        po: {
+          scope: "03 · Product Goal · 09 · Review",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Cân bằng tốc độ và tư duy sản phẩm: làm rõ backlog item, sắp xếp thứ tự giá trị và tổng hợp nhanh decision brief (build/defer).",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · high",
+            reason:
+              "Cấu trúc hoá thứ tự ưu tiên Product Backlog, tiêu chí giá trị và ranh giới phạm vi Sprint mạch lạc, rõ ràng.",
+          },
+        },
+        ba: {
+          scope: "03 · Refinement · Discovery & Spec",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Xuất sắc trong phỏng vấn đào sâu (grilling), chuẩn hoá từ vựng domain (glossary), bắt trường hợp biên và tổng hợp spec chặt chẽ.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Đọc hiểu toàn bộ tài liệu nghiệp vụ và biên bản họp dài cùng lúc để đối chiếu mâu thuẫn quy tắc mà không sót chi tiết.",
+          },
+        },
+        ux: {
+          scope: "02 · Khám phá nhu cầu",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Tổng hợp bằng chứng nghiên cứu người dùng trung thực, thiết kế kịch bản phỏng vấn (Mom Test) và luồng tương tác tự nhiên.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Đa phương thức mạnh (ảnh chụp màn hình, video usability test, wireframe) kết hợp phân tích hành trình người dùng xuyên suốt.",
+          },
+        },
+        ui: {
+          scope: "02 · Khám phá nhu cầu",
+          primary: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Năng lực thị giác (vision/UI) và dựng prototype giao diện trực quan vượt trội, kiểm tra tốt bố cục responsive và hệ thống trạng thái.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Đặc tả chi tiết component states (loading, empty, error, disabled), luồng bàn phím/focus và tiêu chí accessibility.",
+          },
+        },
+        dev: {
+          scope: "04 · Sprint Planning · Chia ticket",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Hiểu sâu cấu trúc repo để cắt User Stories thành các lát dọc (tracer-bullet tickets) độc lập và lập kế hoạch Sprint sát thực tế.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Phân tích phụ thuộc kỹ thuật xuyên tầng (schema, API, UI, test) và kiểm tra tính khả thi của từng ticket nhanh, chuẩn xác.",
+          },
+        },
+        engineer: {
+          scope: "05 · Thiết kế & xây dựng · Implement",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Tối ưu nhất cho agentic coding & TDD theo lát dọc: sửa code gọn, bám sát public seam, tốc độ vòng lặp chạy test/typecheck nhanh.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Khả năng tự chủ chạy lệnh terminal, đọc hiểu codebase lớn, gỡ lỗi phức tạp và soạn Pull Request kèm bằng chứng trước/sau.",
+          },
+        },
+        qa: {
+          scope: "06 · Kiểm chứng Increment",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Tư duy hệ thống để tìm góc khuất logic, lập chiến lược kiểm thử theo rủi ro, ca biên (edge cases) và bước tái hiện lỗi chặt chẽ.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Viết mã kiểm thử tự động (integration/e2e) sạch, không phụ thuộc chi tiết cài đặt nội bộ và kiểm tra hồi quy nhanh.",
+          },
+        },
+        lead: {
+          scope: "04 · Sprint Planning · Review 2 trục",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Sâu sắc khi review code độc lập theo 2 trục (Standards & Spec), phát hiện code smell tinh vi và định hướng thiết kế module sâu.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Kiểm tra tính đúng đắn về thuật toán/trạng thái trong diff lớn, đánh giá rủi ro tích hợp và đề xuất hướng xử lý nợ kỹ thuật.",
+          },
+        },
+        architect: {
+          scope: "05 · Thiết kế & xây dựng · Tech discovery",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Thiết kế ranh giới hệ thống (deep modules, seams), viết ADR có chiều sâu và cân nhắc toàn diện giữa độ tin cậy, chi phí, khả năng thay đổi.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Suy luận kiến trúc hệ thống phân tán, hợp đồng tích hợp (integration contracts) và đánh giá khả thi kỹ thuật (rabbit holes).",
+          },
+        },
+        platform: {
+          scope: "07 · Phát hành theo nhu cầu",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Rất mạnh về CI/CD pipelines, Infrastructure as Code (Terraform, Kubernetes, Docker), shell script và tự động hoá môi trường.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Soạn thảo runbook triển khai/rollback an toàn, gỡ lỗi cấu hình pipeline và chuẩn hoá quy trình bàn giao vận hành.",
+          },
+        },
+        sre: {
+          scope: "08 · Vận hành · 10 · Tiếp tục/Kết thúc",
+          primary: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Dùng reasoning mức High trong Antigravity để tổng hợp log, metrics và trace; sau đó khoanh vùng sự cố và thiết kế SLI/SLO/error budget.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Phân tích chuỗi nhân quả (root cause analysis) trong sự cố phức tạp, viết blameless postmortem và lập kế hoạch di trú/tắt dịch vụ.",
+          },
+        },
+        security: {
+          scope: "06 · Kiểm chứng · Xuyên vòng đời",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Suy luận chuỗi tấn công (exploit chains), threat modeling, rà soát ranh giới tin cậy (trust boundaries) và lỗ hổng xác thực/phân quyền.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Đọc hiểu mã nguồn sâu để phát hiện lỗ hổng bảo mật tiềm ẩn, phân tích mức độ ảnh hưởng có bằng chứng và đề xuất bản vá an toàn.",
+          },
+        },
+        em: {
+          scope: "Hỗ trợ xuyên vòng đời",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Diễn đạt tinh tế, khách quan khi lập kế hoạch năng lực đội ngũ, tháo gỡ rào cản tổ chức và xây dựng môi trường làm việc bền vững.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · high",
+            reason:
+              "Cấu trúc hoá phương án nhân sự, ma trận kỹ năng (capability matrix) và phân tích đánh đổi nguồn lực rõ ràng cho quản lý.",
+          },
+        },
+        delivery: {
+          scope: "Hỗ trợ xuyên vòng đời",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · high",
+            reason:
+              "Mạnh về lập bản đồ phụ thuộc liên team (dependency map), dự báo tiến độ dựa trên dữ kiện thực tế và quản trị rủi ro giao hàng.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Tổng hợp báo cáo điều phối gọn gàng, làm rõ các giả định tiến độ và kế hoạch hành động tiếp theo cho từng đầu mối.",
+          },
+        },
+        sm: {
+          scope: "09 · Review & thích nghi · Xuyên vòng đời",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Thiết kế kịch bản điều phối Scrum events gọn đúng timebox và chạy Retro chuyển lỗi lặp lại thành check tự động / coding standard.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Đọc toàn bộ session transcripts và review logs dài khi chạy Retro để phát hiện mẫu lỗi lặp lại và điểm nghẽn công cụ.",
+          },
+        },
+        coach: {
+          scope: "Hỗ trợ xuyên vòng đời",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Quan sát luồng công việc và phản hồi đa chiều, chẩn đoán vấn đề hệ thống không giáo điều và thiết kế thử nghiệm cải tiến có thước đo.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · high",
+            reason:
+              "Đánh giá hiệu quả vận hành dựa trên bằng chứng định lượng và cấu trúc hoá chương trình huấn luyện ở cấp độ nhiều team.",
+          },
+        },
+        release: {
+          scope: "07 · Phát hành theo nhu cầu",
+          primary: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · high",
+            reason:
+              "Kiểm soát chặt checklist sẵn sàng phát hành (release readiness), phụ thuộc triển khai, phương án rollback và phân quyền phê duyệt.",
+          },
+          fallback: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Soạn thảo kế hoạch truyền thông phát hành rõ ràng, phối hợp nhịp nhàng giữa kỹ thuật, vận hành và bộ phận hỗ trợ khách hàng.",
+          },
+        },
+        customer: {
+          scope: "02 · Khám phá · 09 · Review",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Mô phỏng góc nhìn người dùng trung thực theo dữ liệu nghiên cứu đã cấp, phản hồi cụ thể theo tình huống mà không tự bịa sự kiện.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 4 Argon · High",
+            reason:
+              "Trực tiếp quan sát ảnh chụp giao diện / prototype để phản hồi về trải nghiệm sử dụng và đối chiếu với tài liệu khảo sát dài.",
+          },
+        },
+        support: {
+          scope: "08 · Vận hành & hỗ trợ",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Phân loại ticket nhanh, trích xuất bước tái hiện lỗi rõ ràng cho kỹ sư và soạn thảo tài liệu hướng dẫn / thông báo khách hàng chuẩn mực.",
+          },
+          fallback: {
+            provider: "Antigravity",
+            model: "Gemini 3.8 Flash · High",
+            reason:
+              "Xử lý lượng lớn ticket và lịch sử phản hồi để gom nhóm vấn đề lặp lại, trích xuất tín hiệu adoption với chi phí và tốc độ tối ưu.",
+          },
+        },
+        legal: {
+          scope: "10 · Tiếp tục/Kết thúc · Xuyên vòng đời",
+          primary: {
+            provider: "Anthropic",
+            model: "Claude Opus 5.5",
+            reason:
+              "Thận trọng, chính xác khi ánh xạ nghĩa vụ pháp lý/quyền riêng tư sang biện pháp kiểm soát (controls matrix), luôn nêu rõ giới hạn giả định.",
+          },
+          fallback: {
+            provider: "OpenAI",
+            model: "GPT-6 Astra · xhigh",
+            reason:
+              "Phân tích có hệ thống các điều khoản hợp đồng, luồng dữ liệu, quy định lưu trữ (retention) và nghĩa vụ xử lý dữ liệu khi đóng dịch vụ.",
+          },
+        },
+      };
+      function normalizeModelEffort(recommendation) {
+        if (recommendation.provider === "OpenAI") {
+          const [, model, effort] = recommendation.model.match(
+            /^(.*?) · (high|xhigh)$/,
+          ) || [null, recommendation.model, "xhigh"];
+          return { ...recommendation, model, effort };
+        }
+        if (recommendation.provider === "Antigravity") {
+          const [, model, effort] = recommendation.model.match(
+            /^(.*?) · (High)$/,
+          ) || [null, recommendation.model, "High"];
+          return { ...recommendation, model, effort };
+        }
+        return { ...recommendation, effort: "Thinking · high" };
+      }
+      function renderModelCell(recommendation) {
+        recommendation = normalizeModelEffort(recommendation);
+        const cell = document.createElement("td");
+        const card = document.createElement("div");
+        card.className = "model-card";
+        const header = document.createElement("div");
+        header.className = "model-header";
+        const badge = document.createElement("span");
+        const providerKey = recommendation.provider.toLowerCase();
+        badge.className = `provider-badge provider-${providerKey}`;
+        badge.textContent = recommendation.provider;
+        const name = document.createElement("span");
+        name.className = "model-name";
+        name.textContent = recommendation.model;
+        const effort = document.createElement("span");
+        effort.className = "effort-badge";
+        effort.textContent = `Effort: ${recommendation.effort}`;
+        header.append(badge, name, effort);
+        const reason = document.createElement("div");
+        reason.className = "model-reason";
+        reason.textContent = recommendation.reason;
+        card.append(header, reason);
+        cell.append(card);
+        return cell;
+      }
+      const roleTableBody = document.getElementById("role-table-body");
+      Object.keys(roles).forEach((identifier) => {
+        const role = roles[identifier];
+        const mapping = roleModels[identifier];
+        const row = document.createElement("tr");
+        const roleCell = document.createElement("td");
+        const title = document.createElement("span");
+        title.className = "role-cell-title";
+        title.textContent = role.name;
+        const focus = document.createElement("span");
+        focus.className = "role-cell-focus";
+        focus.textContent = role.focus;
+        const stageBadge = document.createElement("span");
+        stageBadge.className = "role-cell-stage";
+        stageBadge.textContent = mapping.scope;
+        roleCell.append(title, focus, stageBadge);
+        row.append(
+          roleCell,
+          renderModelCell(mapping.primary),
+          renderModelCell(mapping.fallback),
+        );
+        roleTableBody.append(row);
+      });
       document.getElementById("role-count").textContent =
         `${Object.keys(roles).length} role / accountability`;
       document
         .getElementById("coordinator-entry")
         .append(roleNode("coordinator"));
-      workflows.forEach((workflow) => {
-        const container = document.getElementById(workflow.container);
-        let previousPhase;
-        workflow.steps.forEach((identifier, index) => {
-          const step = workflowSteps[identifier];
-          const card = document.createElement("li");
-          card.dataset.step = step.id;
-          card.classList.toggle("conditional", step.conditional === true);
-          if (step.phase && step.phase !== previousPhase) {
-            const phase = document.createElement("div");
-            phase.className = "step-phase";
-            phase.textContent = step.phase;
-            card.append(phase);
-          }
-          previousPhase = step.phase ?? previousPhase;
-          const heading = document.createElement("h3");
-          heading.textContent = `${index + 1}. ${step.title}`;
-          const purpose = document.createElement("p");
-          purpose.className = "kickoff-purpose";
-          purpose.textContent = step.purpose;
-          const condition = document.createElement("p");
-          condition.className = "step-note";
-          condition.textContent = step.when;
-          const skills = document.createElement("div");
-          skills.className = "step-skills";
-          skills.textContent = step.skills.map((name) => `/${name}`).join(" · ");
-          const assignment = document.createElement("div");
-          assignment.className = "kickoff-assignment";
-          const partners = document.createElement("p");
-          partners.className = "step-note";
-          partners.textContent = `Phối hợp: ${step.partners.map((identifier) => roles[identifier].name).join(", ")}.`;
-          assignment.append(roleNode(step.role, step), partners);
-          card.append(heading, purpose, condition, skills, assignment);
-          container.append(card);
-        });
-      });
       const stageElements = [];
       stages.forEach((stage, index) => {
         const row = index < 5 ? 0 : 1;
@@ -2065,13 +1188,6 @@ Use the user's language unless they request another; default to English only whe
         document.getElementById("stages"),
       );
       document.fonts?.ready.then(drawConnections);
-      ["system", "request"].forEach((kind) =>
-        document
-          .getElementById(`copy-${kind}`)
-          .addEventListener("click", () =>
-            copyPrompt(kind, selectedPromptName, selectionVersion),
-          ),
-      );
     </script>
   </body>
 </html>
