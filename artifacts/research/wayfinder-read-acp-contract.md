@@ -1,0 +1,83 @@
+# #38 buffered filesystem and unchanged ACP source contract
+
+Status: read-only source research, not runtime verification or a production design choice. Audited local pinned public Codex rust-v0.160.1 source plus #37 fixture and installed unchanged ACP 2.2.2. No native source, profile, binary, runtime or tracker mutation; only this report was written. Parent may mutate files concurrently; hashes below identify the inspected snapshot and four-file #37 match at capture. Snapshot time: 2026-10-13T09:21:58.656403+00:00.
+
+## Actual patch reads are inside the runtime scope
+
+`core/src/tools/runtimes/apply_patch.rs:168–207` calls post-approval public admission check, derives thread/turn/call/workspace/role/executor source scope from actual native context, and wraps `apply_patch_with_options` in SOURCE_SCOPE. The sandbox is derived from the actual SandboxAttempt, not supplied patch text or telemetry. `file_system_sandbox_context_for_attempt:86–112` returns None only if sandbox_requested is false; otherwise uses effective PermissionProfile including additional request permissions, sandbox cwd, workspace roots, actual executor user home and native sandbox selections.
+
+`apply-patch/src/lib.rs:478–818` has more than the final mutation: Add obtains optional prior metadata and buffered text for the delta before writing; Update obtains metadata then derives original content; Delete reads content and requires metadata before remove; Move reads source and destination, writes destination, obtains source metadata, then removes source. `apply-patch/src/file_update.rs:26–46` uses `ExecutorFileSystem::read_file_text` for the original update bytes and produces a contextual read failure on error. Metadata/delta support failures may make delta.exact=false and optional reads may be discarded, but the required Update read or Delete/Move metadata failures stop the corresponding operation. Later Move remove failure preserves an already written destination; do not promise rollback or frozen source.
+
+`exec-server/src/remote_file_system.rs:80–98,161–214,321–330` sends buffered text through fs/readFile and metadata through fs/getMetadata, including cloned actual sandbox and optional followSymlinks=false. Sandboxed metadata bypasses the unsandboxed in-flight deduplication and calls get_metadata_uncached. Stream open/readBlock is a different route, not justified by this buffered patch scope.
+
+At the inspected #37 baseline, `server/registry.rs:137–144,210–216` simply decode read/metadata wire params and dispatch handler; `server/handler.rs:341–348,397–404` only require initialization then call native filesystem. Unlike the four mutation registry paths, they do not acquire FsOwner or populate RECEIVER_EFFECT. Therefore the installed external helper launcher observes absent receiving effect scope on a sandboxed read/metadata. The precise minimal extension is typed read/metadata normalization + sender admission inside actual SOURCE_SCOPE + actual receiver admission/effect-owned task around the native handler, preserving its return type and native errors. This is a proposal for the scoped fixture, not an implemented claim in this report.
+
+Admission should be limited to the sandboxed buffered route that this session owns, or an explicit non-patch context must be created for every other caller. Globally requiring SOURCE_SCOPE for ordinary unsandboxed read/metadata breaks startup/config discovery that occurs outside the patch task-local. Treat such routes separately and record what remains outside verification. Ensure sandboxed calls without context fail closed rather than silently bypass the owner.
+
+## Why the old ACP positive does not reach the helper
+
+Installed ACP 2.2.2 `dist/index.js:34263–34319` declares ReadOnly, WorkspaceWrite, Agent and AgentFullAccess; full-access uses approvalPolicy never and sandboxPolicy dangerFullAccess. `getInitialAgentMode:34362–34370` reads INITIAL_AGENT_MODE and defaults to Agent. `sendPrompt:35595–35617` sends the selected mode's approvalPolicy and sandboxPolicy on every native runTurn. Config overrides alone do not prove the mode's per-turn request changed.
+
+The public native bridge driver `codex-fs-matrix-native-bridge-probe.py:244` explicitly forces INITIAL_AGENT_MODE=agent-full-access. Hence its historical patch success usually uses sandbox:null. In `core/src/tools/orchestrator.rs:266–304`, sandbox_requested comes from native SandboxManager.should_sandbox after any bypass override; remote apply_patch marks executor-managed process sandbox, so SandboxType::None is compatible with sandbox_requested=true. `sandboxing/src/manager.rs:331–349` and `policy_transforms.rs:646–666` show Disabled/unrestricted+enabled network does not require a platform sandbox, while managed restricted network normally does. External profile is its own externally enforced state; do not reinterpret it as a managed restricted profile.
+
+A public fixture selecting the actual unchanged ACP workspace-write or agent mode can generate real sandboxed patch requests. Record this mode selection explicitly as fixture setup, not as preserved full-access behavior. Native approval escalation retries may set sandbox_requested=false (`orchestrator.rs:450–478`); deny this unsupported unsandboxed helper route rather than accidentally granting it or calling a synthetic retry a successful sandbox integration. Actual ACP permission responses are test controls, not Human production authority.
+
+## Native permission shape is not the #37 hand-written shape
+
+`protocol/src/models.rs:422–438` serializes Managed as type managed with file_system and network, Disabled as its own type, and External as type external with network. `protocol/src/permissions.rs:823–876,2039–2070` converts legacy workspaceWrite to a restricted policy containing special root read, project_roots write, slash_tmp and tmpdir write unless excluded, then protected project-root .git/.agents/.codex/.aws read entries and explicit writable roots. Special paths serialize as type special with a value tagged kind; skip-missing metadata may be present. ReadOnly compiles root read. These are not the disjoint explicit path roots accepted by #37 profile_for.
+
+`core/src/tools/orchestrator.rs:153–159` intentionally preserves symbolic workspace roots for executor-managed environments. The receiver's resolve_filesystem_sandbox (`server/registry.rs:288–308`) supplies/requires cwd and builds a context; it does not materialize the symbolic roots. Stock FileSystemSandboxRunner normally materializes project roots, validates native paths, adds helper runtime grants and forces network restricted (`exec-server/src/fs_sandbox.rs:110–153`). The external helper seam is invoked earlier in run (`fs_sandbox.rs:93–103`), so it receives the raw actual native context before those stock normalization/materialization/runtime additions. A Python adapter must not claim native normalization has already happened.
+
+Actual user_home_dir is populated from remote executor configuration/info (`core/src/environment_selection.rs:845–870`; `exec-server/src/environment_config.rs:54–55` uses native home_dir). With the public receiver's HOME=scratch it is expected to be the scratch URI, but this is a source inference requiring runtime evidence. #37 profile_for rejects any non-null userHomeDir and any special, deny, overlap or nonexact entries, so it deliberately rejects usual actual managed workspace-write shapes. Do not clear this field or rewrite actual policy merely to make a fixture pass. Bind a precisely supported actual home to trusted registered receiver facts, and keep it a context identity rather than an extra filesystem grant.
+
+An acceptable bounded subset extension can recognize the exact native workspace-write/read-only shape and trusted project-root/temp bindings while retaining floor intersection and protected paths; any unknown kind, deny/glob/default shape, root overlap, home mismatch, new field or unsupported Windows/legacy policy should explicitly fail. This is a scoped option, not a choice silently made here. Temp paths must come from authoritative registered executor facts, not arbitrary request environment. macOS /tmp aliases and symlink targets require actual OS denials in the matrix.
+
+`protocol/src/permission_profile_intersection.rs:20–160` already provides intersect_effective_permission_profiles for materialized local profiles. It fails for ExternalSandbox, PlatformDefaults and unsupported paths, rejects unmaterialized project roots, and treats executor-dependent tmpdir shapes specially. It canonicalizes concrete grants and intersects network. Its existence is useful evidence; it neither validates raw ACP contexts automatically nor proves a Python SBPL translator reproduces native semantics. Likewise native seatbelt (`sandboxing/src/seatbelt.rs:920–943`) protects ancestors of read-only carveouts against relocation. A hardcoded .git deny alone is not a proof of full native policy equivalence.
+
+## Keep process admission without two publishers
+
+At #37 baseline external_filesystem_main installs FsOwner and helper launcher, but not AdmissionOwner (`exec-server/src/crew_receiver_fixture.rs:316–341`). `crew_receiver_admission.rs:46–60` returns no guard / success if no AdmissionOwner is installed. Running unchanged ACP/MCP matrix against this isolated fixture would therefore bypass the prior process admission seam; its success must not be described as preserved process protection.
+
+Simply reinstalling the old local Owner alongside external FsOwner is insufficient: old Owner has its own revision/grants/RwLock while external host has a different source revision/grants/condition/leases. They are separate authority states unless truly coordinated; mirroring revisions does not make publication atomic across them. Existing `codex-fs-admission-probe.py:85–169` broker validates public registered sender PID, scope/manifest and six-file source generation, then mints filesystem or process grants through one owner channel. Keep that validation, including actual native session/connection and processId, as synthetic public scope rather than production attestation.
+
+A minimal single-fixture-state option is one external adapter implementing both existing traits and sending typed processPrepared/processAcquire/completed/release on the same dedicated receiver-instance channel. The single external host can retain separate grant/effect kinds in its one publication lock/source state. Process admission must compare raw normalized ExecParams, native session/connection/executor, processId and receiver instance, enforce one use and preserve prior guard order. FS helper grants cannot be reused as arbitrary process grants. Publication waits for both kinds of active leases, with no gap between a lock release and admission registration. Abrupt receiver loss with process spawn beyond the original spawn guard is outside the old process contract; do not claim this patch newly governs every process lifetime. This report proposes the seam and tests, not production topology or ownership.
+
+The external host currently validates a trusted source.json digest, while ACP issuer verifies six public source-generation files. If those remain independent publishers, restoring process owner does not resolve full-context atomic source publication; explicitly retain that limit or prove a unified fixture publication event actually covers the relevant files. Do not downgrade independent digest checks into a transactional claim.
+
+## Required evidence at this decision frontier
+
+1. Actual unchanged ACP mode selection and native turn request; actual sandbox context observed at issuer/receiver/helper, not a rewritten synthetic context.
+2. Add/Update/Delete/Move positive content, real helper results, complete read/metadata/mutation guard events with same scope and exact request binding. Show required denied reads stop update; optional-delta errors retain native exact/partial semantics.
+3. Read-only, outside/sibling/traversal/symlink/reserved/temp and unsupported-profile negatives with invocation/non-invocation and OS result recorded; no loose concatenation of allow rules masquerading as intersection.
+4. Stable/mutated/restored source, post-approval failure, fresh grants and publication/revocation/cancel/receiver death ordering through actual helper reaping. Keep #37 abrupt-owner-after-input supervision limits.
+5. Real native process grant positive + forged/stale/misbound denial through the same state, or precise explicitly unsupported process contract with no integration completion claim.
+
+No actual runtime or tracker result is certified by this source audit. It uses local primary source; no browser evidence was needed. The upstream baseline can be compared at https://github.com/openai/codex/tree/rust-v0.160.1/codex-rs ; local Crew fixture modifications are evidenced by canonical issue #37 and exact source hashes below.
+
+## Inspected source fingerprints
+
+| File | Bytes | SHA-256 | Matches #37 four-file index |
+|---|---:|---|---|
+| `core/src/tools/runtimes/apply_patch.rs` | 9719 | `fb71704636bed947e5c804283b29c9f9ef27eed6449d95ee2e87f390ce1238d2` | not in four-file #37 index |
+| `core/src/tools/orchestrator.rs` | 24264 | `bc818810e1bd48001157d33df59b4624033595d13fd5070598b997627ee2e2f3` | not in four-file #37 index |
+| `core/src/environment_selection.rs` | 99522 | `b0965914a955882755876915b2af963ee3a44aa8a31a611c6a9c12ffae4a8a52` | not in four-file #37 index |
+| `apply-patch/src/lib.rs` | 47610 | `5e6f736f3a4b66c1d651baa9b85ce6e6921de170faf901e6c2f78ad9a383eaf9` | not in four-file #37 index |
+| `apply-patch/src/file_update.rs` | 12338 | `f954105ba036f1c3748fc2ed605ce9a677d619e56ce25f89bffdcad3377734f9` | not in four-file #37 index |
+| `exec-server/src/remote_file_system.rs` | 15968 | `4be3c98e04bdb8a225c3e53dd90506e197a37f2717d57619d21db9501d65c93a` | not in four-file #37 index |
+| `exec-server/src/server/registry.rs` | 15438 | `c54748c4ee04594a08d51dc490b5ef76ffaa39c5989de0352f4119c5bc08d25f` | yes |
+| `exec-server/src/server/handler.rs` | 19170 | `be0073842033f7c4811d1cf60fdb19964a7f93754f1b914526205f4027d7a0ec` | not in four-file #37 index |
+| `exec-server/src/crew_receiver_admission.rs` | 1743 | `30305e9caa081f1074dc353ae1ec7dcb72c0335530d9242a58caa857651ff47c` | yes |
+| `exec-server/src/crew_fs_admission.rs` | 5165 | `a9a7917f714b2e38f92dd632f872505a15ed454c59404b7d2bb16e8639777dfd` | yes |
+| `exec-server/src/crew_receiver_fixture.rs` | 20397 | `e1bc06b7b96025778c8e6270addaf17f6852bd924d78a3be190413ce2734a4e6` | yes |
+| `exec-server/src/fs_sandbox.rs` | 40203 | `bc4500b3d5e91e3377e2eca232655b03f473b5d68a0de177ef4d60f9351a1839` | not in four-file #37 index |
+| `exec-server/src/environment_config.rs` | 7371 | `f18fdcb95067d757e8e3dd58e674657eb4564ccf61d3499b7862ba77ebac5a1d` | not in four-file #37 index |
+| `protocol/src/models.rs` | 159721 | `916a595e136f4d7e32ce259f50678ffe818af2ea6a92f54d8628f57bfd4d43e7` | not in four-file #37 index |
+| `protocol/src/permissions.rs` | 179643 | `78a1c80b9b5cda29c563538d90003005d26c411eea533bd00db54a185a6aed54` | not in four-file #37 index |
+| `protocol/src/permission_profile_intersection.rs` | 17083 | `de8a315b73d900f8b4ae4b83ed56a98f50f6170058ae7d6f2a079bc8b67330d9` | not in four-file #37 index |
+| `sandboxing/src/manager.rs` | 33156 | `a25017d49bb2876d1694a77efb30d4fb971ae0d6d8fd98a74bc08728d738c0af` | not in four-file #37 index |
+| `sandboxing/src/policy_transforms.rs` | 24634 | `476149951168b716e0010985e5c98b1e6bb7f9627c074621aa22249964b983a9` | not in four-file #37 index |
+| `sandboxing/src/seatbelt.rs` | 42832 | `03beaaaac24b6b856d4860ba4c1a6e3818e8cd2432dac7f23eddaef77e745ab5` | not in four-file #37 index |
+| `/Users/binn/Projects/app-factory/zed-ai-crew/artifacts/evidence/wayfinder/confinement/codex-fs-owner-host.py` | 17031 | `a86be6a7f0cd35ed83370aef2e90bd6c17b5da1747d1c6473236fb85c792364e` | fixture or installed adapter |
+| `/Users/binn/Projects/app-factory/zed-ai-crew/artifacts/evidence/wayfinder/confinement/codex-fs-admission-probe.py` | 38054 | `1c0c28cc15a85ca36fba1390a6efafe5aa47906cc930b5f431a1ad40e276699f` | fixture or installed adapter |
+| `/Users/binn/Projects/app-factory/zed-ai-crew/artifacts/evidence/wayfinder/confinement/codex-fs-matrix-native-bridge-probe.py` | 29177 | `6c32c513ce1d88260767743515823f456beca1fdea27d3c7f0858dff1ba8e114` | fixture or installed adapter |
+| `/Users/binn/Library/Application Support/Zed/external_agents/registry/npx/codex-acp/node_modules/@agentclientprotocol/codex-acp/dist/index.js` | 1728337 | `6b1bb4e7e9caaf4aeca1042ae4aec2dc2433b0b0e4b1614b38a4d41699902aaa` | fixture or installed adapter |

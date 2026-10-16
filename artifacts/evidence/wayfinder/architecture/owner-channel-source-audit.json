@@ -1,0 +1,128 @@
+{
+  "head": "de4ca3f4d415da54fe002f06656f2ded9fb1fcf0",
+  "source_files": [
+    {
+      "path": "crates/net/src/net.rs",
+      "bytes": 3430,
+      "sha256": "78d035c638e563ab37c2b1d1c5b1ad038a323956768d5c28b333a0b1fd92ac18",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 21,
+          "text": "pub mod async_net;\n#[cfg(target_os = \"windows\")]\npub mod listener;\n#[cfg(target_os = \"windows\")]\npub mod socket;\n#[cfg(target_os = \"windows\")]\npub mod stream;\n#[cfg(target_os = \"windows\")]\nmod util;\n\n#[cfg(target_os = \"windows\")]\npub use listener::*;\n#[cfg(target_os = \"windows\")]\npub use socket::*;\n#[cfg(not(target_os = \"windows\"))]\npub use std::os::unix::net::{UnixListener, UnixStream};\n#[cfg(target_os = \"windows\")]\npub use stream::*;\n\n#[cfg(test)]\nmod tests {\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/net/src/async_net.rs",
+      "bytes": 1920,
+      "sha256": "437bb0aeb0a265ef809826528edccd4e8f32de395c7e2a0988dfe972ad812502",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 5,
+          "text": "#[cfg(not(target_os = \"windows\"))]\npub use smol::net::unix::{UnixListener, UnixStream};\n\n#[cfg(target_os = \"windows\")]\npub use windows::{UnixListener, UnixStream};\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/util/src/command/darwin.rs",
+      "bytes": 35339,
+      "sha256": "edbbe2ac59bde7569043ae4b39fcff27a6174cf97bf478f9b9a995665aa2882b",
+      "excerpts": [
+        {
+          "start_line": 64,
+          "end_line": 90,
+          "text": "#[derive(Debug)]\npub struct Command {\n    program: OsString,\n    args: Vec<OsString>,\n    envs: BTreeMap<OsString, Option<OsString>>,\n    env_clear: bool,\n    current_dir: Option<PathBuf>,\n    stdin_cfg: Option<Stdio>,\n    stdout_cfg: Option<Stdio>,\n    stderr_cfg: Option<Stdio>,\n    kill_on_drop: bool,\n}\n\nimpl Command {\n    pub fn new(program: impl AsRef<OsStr>) -> Self {\n        Self {\n            program: program.as_ref().to_owned(),\n            args: Vec::new(),\n            envs: BTreeMap::new(),\n            env_clear: false,\n            current_dir: None,\n            stdin_cfg: None,\n            stdout_cfg: None,\n            stderr_cfg: None,\n            kill_on_drop: false,\n        }\n    }\n"
+        },
+        {
+          "start_line": 139,
+          "end_line": 174,
+          "text": "\n    pub fn env_clear(&mut self) -> &mut Self {\n        self.env_clear = true;\n        self.envs.clear();\n        self\n    }\n\n    pub fn current_dir(&mut self, dir: impl AsRef<Path>) -> &mut Self {\n        self.current_dir = Some(dir.as_ref().to_owned());\n        self\n    }\n\n    pub fn stdin(&mut self, cfg: Stdio) -> &mut Self {\n        self.stdin_cfg = Some(cfg);\n        self\n    }\n\n    pub fn stdout(&mut self, cfg: Stdio) -> &mut Self {\n        self.stdout_cfg = Some(cfg);\n        self\n    }\n\n    pub fn stderr(&mut self, cfg: Stdio) -> &mut Self {\n        self.stderr_cfg = Some(cfg);\n        self\n    }\n\n    pub fn kill_on_drop(&mut self, kill_on_drop: bool) -> &mut Self {\n        self.kill_on_drop = kill_on_drop;\n        self\n    }\n\n    pub fn spawn(&mut self) -> io::Result<Child> {\n        let current_dir = self\n            .current_dir\n            .as_deref()\n"
+        },
+        {
+          "start_line": 232,
+          "end_line": 258,
+          "text": "    inner: smol::process::Child,\n    pub stdin: Option<Async<std::fs::File>>,\n    pub stdout: Option<Async<std::fs::File>>,\n    pub stderr: Option<Async<std::fs::File>>,\n}\n\nimpl Child {\n    pub fn id(&self) -> u32 {\n        self.inner.id()\n    }\n\n    pub fn kill(&mut self) -> io::Result<()> {\n        self.inner.kill()\n    }\n\n    pub fn try_status(&mut self) -> io::Result<Option<ExitStatus>> {\n        self.inner.try_status()\n    }\n\n    pub fn status(\n        &mut self,\n    ) -> impl std::future::Future<Output = io::Result<ExitStatus>> + Send + 'static {\n        self.stdin.take();\n        self.inner.status()\n    }\n\n    pub async fn output(mut self) -> io::Result<Output> {\n"
+        },
+        {
+          "start_line": 407,
+          "end_line": 448,
+          "text": "        }\n        if libc::sigaddset(&mut default_set, libc::SIGPIPE) == -1 {\n            return Err(io::Error::last_os_error());\n        }\n        cvt_nz(libc::posix_spawnattr_setsigdefault(&mut attr, &default_set))?;\n\n        cvt_nz(libc::posix_spawnattr_setflags(\n            &mut attr,\n            (libc::POSIX_SPAWN_CLOEXEC_DEFAULT | libc::POSIX_SPAWN_SETSIGDEF) as libc::c_short,\n        ))?;\n\n        cvt_nz(posix_spawnattr_setexceptionports_np(\n            &mut attr,\n            EXC_MASK_ALL,\n            MACH_PORT_NULL,\n            EXCEPTION_DEFAULT as exception_behavior_t,\n            THREAD_STATE_NONE,\n        ))?;\n\n        cvt_nz(posix_spawn_file_actions_addchdir_np(\n            &mut file_actions,\n            current_dir_cstr.as_ptr(),\n        ))?;\n\n        // With POSIX_SPAWN_CLOEXEC_DEFAULT, any fd without a file action is\n        // closed in the child, so inheriting a stdio fd requires an explicit\n        // addinherit_np action; without one the child's fd 0/1/2 would start\n        // out closed and could be silently reused by its first open().\n        if let Some(fd) = &stdin_read {\n            cvt_nz(libc::posix_spawn_file_actions_adddup2(\n                &mut file_actions,\n                fd.as_raw_fd(),\n                libc::STDIN_FILENO,\n            ))?;\n        }\n        if stdin_read.is_some() || stdin_cfg == Stdio::Inherit {\n            cvt_nz(posix_spawn_file_actions_addinherit_np(\n                &mut file_actions,\n                libc::STDIN_FILENO,\n            ))?;\n        }\n\n"
+        },
+        {
+          "start_line": 479,
+          "end_line": 507,
+          "text": "        let spawn_result = libc::posix_spawnp(\n            &mut pid,\n            program_cstr.as_ptr(),\n            &file_actions,\n            &attr,\n            argv_ptrs.as_ptr(),\n            if envs.is_some() {\n                envp_ptrs.as_ptr()\n            } else {\n                environ\n            },\n        );\n\n        libc::posix_spawnattr_destroy(&mut attr);\n        libc::posix_spawn_file_actions_destroy(&mut file_actions);\n\n        cvt_nz(spawn_result)?;\n\n        let inner = smol::process::Child::adopt_raw_pid(pid as u32, true, kill_on_drop)?;\n\n        Ok(Child {\n            inner,\n            stdin: stdin_write.map(Async::new).transpose()?,\n            stdout: stdout_read.map(Async::new).transpose()?,\n            stderr: stderr_read.map(Async::new).transpose()?,\n        })\n    }\n}\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/gpui/src/app.rs",
+      "bytes": 137521,
+      "sha256": "dcde9e61f8f13da16d045d7d977731add76e317b3c6283fb61deb299b6e8418b",
+      "excerpts": [
+        {
+          "start_line": 1788,
+          "end_line": 1807,
+          "text": "    /// Writes credentials to the platform keychain.\n    pub fn write_credentials(\n        &self,\n        url: &str,\n        username: &str,\n        password: &[u8],\n    ) -> Task<Result<()>> {\n        self.platform.write_credentials(url, username, password)\n    }\n\n    /// Reads credentials from the platform keychain.\n    pub fn read_credentials(&self, url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {\n        self.platform.read_credentials(url)\n    }\n\n    /// Deletes credentials from the platform keychain.\n    pub fn delete_credentials(&self, url: &str) -> Task<Result<()>> {\n        self.platform.delete_credentials(url)\n    }\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/gpui_macos/src/platform.rs",
+      "bytes": 60684,
+      "sha256": "1bf0adb67969e7389063de4d54efa70e9bb0a7ac7331a74ba74245d3bb87d801",
+      "excerpts": [
+        {
+          "start_line": 1250,
+          "end_line": 1272,
+          "text": "    }\n\n    fn write_credentials(&self, url: &str, username: &str, password: &[u8]) -> Task<Result<()>> {\n        let url = url.to_string();\n        let username = username.to_string();\n        let password = password.to_vec();\n        self.background_executor()\n            .spawn(async move { Ok(keychain::write_credentials(&url, &username, &password)?) })\n    }\n\n    fn read_credentials(&self, url: &str) -> Task<Result<Option<(String, Vec<u8>)>>> {\n        let url = url.to_string();\n        self.background_executor()\n            .spawn(async move { Ok(keychain::read_credentials(&url)?) })\n    }\n\n    fn delete_credentials(&self, url: &str) -> Task<Result<()>> {\n        let url = url.to_string();\n        self.background_executor()\n            .spawn(async move { Ok(keychain::delete_credentials(&url)?) })\n    }\n}\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/gpui_apple/src/keychain.rs",
+      "bytes": 7785,
+      "sha256": "c7067d3cc5961690f7f398750fa443e9349a8234f2ef5f630fa5e2223ee1dadd",
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 26,
+          "text": "use objc2_core_foundation::{CFData, CFDictionary, CFRetained, CFString, CFType, kCFBooleanTrue};\nuse objc2_security::{\n    SecItemAdd, SecItemCopyMatching, SecItemDelete, SecItemUpdate, errSecItemNotFound,\n    errSecSuccess, errSecUserCanceled, kSecAttrAccount, kSecAttrServer, kSecClass,\n    kSecClassInternetPassword, kSecReturnAttributes, kSecReturnData, kSecValueData,\n};\nuse std::ptr;\n\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub enum KeychainOperation {\n    Read,\n    Update,\n    Create,\n    Delete,\n}\n\n#[derive(Debug, thiserror::Error, PartialEq, Eq)]\npub enum KeychainError {\n    #[error(\"keychain {operation:?} failed with OSStatus {status}\")]\n    Security {\n        operation: KeychainOperation,\n        status: i32,\n    },\n    #[error(\"invalid keychain response: {0}\")]\n    InvalidResponse(&'static str),\n}\n"
+        },
+        {
+          "start_line": 28,
+          "end_line": 72,
+          "text": "pub fn write_credentials(\n    server: &str,\n    account: &str,\n    password: &[u8],\n) -> Result<(), KeychainError> {\n    let server = CFString::from_str(server);\n    let account = CFString::from_str(account);\n    let password = CFData::from_bytes(password);\n    // SAFETY: Reading immutable constants exported by the Security framework.\n    let (class_key, server_key, account_key, data_key, internet_password) = unsafe {\n        (\n            kSecClass,\n            kSecAttrServer,\n            kSecAttrAccount,\n            kSecValueData,\n            kSecClassInternetPassword,\n        )\n    };\n    let query = CFDictionary::<CFString, CFType>::from_slices(\n        &[class_key, server_key],\n        &[internet_password, &server],\n    );\n    let attributes = CFDictionary::<CFString, CFType>::from_slices(\n        &[account_key, data_key],\n        &[&account, &password],\n    );\n    let mut operation = KeychainOperation::Update;\n    // SAFETY: Both dictionaries map Security attribute keys to CF values.\n    let mut status = unsafe { SecItemUpdate(query.as_opaque(), attributes.as_opaque()) };\n    if status == errSecItemNotFound {\n        operation = KeychainOperation::Create;\n        let attributes = CFDictionary::<CFString, CFType>::from_slices(\n            &[class_key, server_key, account_key, data_key],\n            &[internet_password, &server, &account, &password],\n        );\n        // SAFETY: The dictionary maps Security attribute keys to CF values, and a\n        // null result pointer asks Security not to return the new item.\n        status = unsafe { SecItemAdd(attributes.as_opaque(), ptr::null_mut()) };\n    }\n    check_status(operation, status)\n}\n\npub fn read_credentials(server: &str) -> Result<Option<(String, Vec<u8>)>, KeychainError> {\n    let server = CFString::from_str(server);\n    // SAFETY: Reading immutable constants exported by Core Foundation and Security.\n"
+        },
+        {
+          "start_line": 130,
+          "end_line": 159,
+          "text": "        ))?\n        .downcast::<CFData>()\n        .map_err(|_| KeychainError::InvalidResponse(\"password was not data\"))?;\n    Ok(Some((account.to_string(), password.to_vec())))\n}\n\npub fn delete_credentials(server: &str) -> Result<(), KeychainError> {\n    let server = CFString::from_str(server);\n    // SAFETY: Reading immutable constants exported by the Security framework.\n    let (class_key, server_key, internet_password) =\n        unsafe { (kSecClass, kSecAttrServer, kSecClassInternetPassword) };\n    let query = CFDictionary::<CFString, CFType>::from_slices(\n        &[class_key, server_key],\n        &[internet_password, &server],\n    );\n    // SAFETY: The query maps Security attribute keys to CF values.\n    let status = unsafe { SecItemDelete(query.as_opaque()) };\n    check_status(KeychainOperation::Delete, status)\n}\n\nfn read_status(status: i32) -> Result<bool, KeychainError> {\n    if status == errSecItemNotFound || status == errSecUserCanceled {\n        Ok(false)\n    } else {\n        check_status(KeychainOperation::Read, status)?;\n        Ok(true)\n    }\n}\n\nfn check_status(operation: KeychainOperation, status: i32) -> Result<(), KeychainError> {\n"
+        }
+      ]
+    },
+    {
+      "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/un.h",
+      "bytes": 4671,
+      "sha256": "a733cb89955ef81312f4bc3a42002c6cc873e27381eb43656c7158ef9a433c24",
+      "excerpts": [
+        {
+          "start_line": 78,
+          "end_line": 103,
+          "text": "\tsa_family_t     sun_family;     /* [XSI] AF_UNIX */\n\tchar            sun_path[104];  /* [XSI] path name (gag) */\n};\n\n#if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)\n\n/* Level number of get/setsockopt for local domain sockets */\n#define SOL_LOCAL               0\n\n/* Socket options. */\n#define LOCAL_PEERCRED          0x001           /* retrieve peer credentials */\n#define LOCAL_PEERPID           0x002           /* retrieve peer pid */\n#define LOCAL_PEEREPID          0x003           /* retrieve eff. peer pid */\n#define LOCAL_PEERUUID          0x004           /* retrieve peer UUID */\n#define LOCAL_PEEREUUID         0x005           /* retrieve eff. peer UUID */\n#define LOCAL_PEERTOKEN         0x006           /* retrieve peer audit token */\n\n#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */\n\n\n\n#if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)\n/* actual length of an initialized sockaddr_un */\n#define SUN_LEN(su) \\\n\t(sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))\n#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */\n"
+        }
+      ]
+    }
+  ],
+  "production_source_changed": false,
+  "real_keychain_or_database_accessed": false,
+  "native_or_model_requested": false,
+  "primary_web_sources": [
+    "https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/getpeereid.3.html",
+    "https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/flock.2.html",
+    "https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/waitpid.2.html",
+    "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/un.h"
+  ]
+}

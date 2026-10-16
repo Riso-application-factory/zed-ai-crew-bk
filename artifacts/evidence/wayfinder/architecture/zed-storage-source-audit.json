@@ -1,0 +1,193 @@
+{
+  "head": "de4ca3f4d415da54fe002f06656f2ded9fb1fcf0",
+  "source_files": [
+    {
+      "path": "crates/db/src/db.rs",
+      "sha256": "784711f3bfd1e46b5c1a0474b7c4cc13f9d62d3ed0cd7193c89642b91e2e8f42",
+      "bytes": 13348,
+      "excerpts": [
+        {
+          "start_line": 29,
+          "end_line": 85,
+          "text": "/// A migration registered via `static_connection!` and collected at link time.\npub struct DomainMigration {\n    pub name: &'static str,\n    pub migrations: &'static [&'static str],\n    pub dependencies: &'static [&'static str],\n    pub should_allow_migration_change: fn(usize, &str, &str) -> bool,\n}\n\ninventory::collect!(DomainMigration);\n\n/// The shared database connection backing all domain-specific DB wrappers.\n/// Set as a GPUI global per-App. Falls back to a shared LazyLock if not set.\npub struct AppDatabase(pub ThreadSafeConnection);\n\nimpl Global for AppDatabase {}\n\n/// Migrator that runs all inventory-registered domain migrations.\npub struct AppMigrator;\n\nimpl Migrator for AppMigrator {\n    fn migrate(connection: &sqlez::connection::Connection) -> anyhow::Result<()> {\n        let registrations: Vec<&DomainMigration> = inventory::iter::<DomainMigration>().collect();\n        let sorted = topological_sort(&registrations);\n        for reg in &sorted {\n            let mut should_allow = reg.should_allow_migration_change;\n            connection.migrate(reg.name, reg.migrations, &mut should_allow)?;\n        }\n        Ok(())\n    }\n}\n\nimpl AppDatabase {\n    /// Opens the production database and runs all inventory-registered\n    /// migrations in dependency order.\n    pub fn new() -> Self {\n        let db_dir = database_dir();\n        let connection = gpui::block_on(open_db::<AppMigrator>(db_dir, *RELEASE_CHANNEL));\n        Self(connection)\n    }\n\n    /// Creates a new in-memory database with a unique name and runs all\n    /// inventory-registered migrations in dependency order.\n    #[cfg(any(test, feature = \"test-support\"))]\n    pub fn test_new() -> Self {\n        let name = format!(\"test-db-{}\", uuid::Uuid::new_v4());\n        let connection = gpui::block_on(open_test_db::<AppMigrator>(&name));\n        Self(connection)\n    }\n\n    /// Returns the per-App connection if set, otherwise falls back to\n    /// the shared LazyLock.\n    pub fn global(cx: &App) -> &ThreadSafeConnection {\n        #[allow(unreachable_code)]\n        if let Some(db) = cx.try_global::<Self>() {\n            return &db.0;\n        } else {\n            #[cfg(any(feature = \"test-support\", test))]\n"
+        },
+        {
+          "start_line": 125,
+          "end_line": 223,
+          "text": "const CONNECTION_INITIALIZE_QUERY: &str = sql!(\n    PRAGMA foreign_keys=TRUE;\n);\n\nconst DB_INITIALIZE_QUERY: &str = sql!(\n    PRAGMA journal_mode=WAL;\n    PRAGMA busy_timeout=500;\n    PRAGMA case_sensitive_like=TRUE;\n    PRAGMA synchronous=NORMAL;\n);\n\nconst FALLBACK_DB_NAME: &str = \"FALLBACK_MEMORY_DB\";\n\nconst DB_FILE_NAME: &str = \"db.sqlite\";\n\npub static ALL_FILE_DB_FAILED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(false));\n\n/// A type that can be used as a database scope for path construction.\npub trait DbScope {\n    fn scope_name(&self) -> &str;\n}\n\nimpl DbScope for ReleaseChannel {\n    fn scope_name(&self) -> &str {\n        self.dev_name()\n    }\n}\n\n/// A database scope shared across all release channels.\npub struct GlobalDbScope;\n\nimpl DbScope for GlobalDbScope {\n    fn scope_name(&self) -> &str {\n        \"global\"\n    }\n}\n\n/// Returns the path to the `AppDatabase` SQLite file for the given scope\n/// under `db_dir`.\npub fn db_path(db_dir: &Path, scope: impl DbScope) -> PathBuf {\n    db_dir\n        .join(format!(\"0-{}\", scope.scope_name()))\n        .join(DB_FILE_NAME)\n}\n\n/// Open or create a database at the given directory path.\n/// This will retry a couple times if there are failures. If opening fails once, the db directory\n/// is moved to a backup folder and a new one is created. If that fails, a shared in memory db is created.\n/// In either case, static variables are set so that the user can be notified.\npub async fn open_db<M: Migrator + 'static>(\n    db_dir: &Path,\n    scope: impl DbScope,\n) -> ThreadSafeConnection {\n    if *ZED_STATELESS {\n        return open_fallback_db::<M>().await;\n    }\n\n    let db_path = db_path(db_dir, scope);\n\n    let connection = maybe!(async {\n        if let Some(parent) = db_path.parent() {\n            create_dir_all(parent)\n                .context(\"Could not create db directory\")\n                .log_err()?;\n        }\n        open_main_db::<M>(&db_path).await\n    })\n    .await;\n\n    if let Some(connection) = connection {\n        return connection;\n    }\n\n    // Set another static ref so that we can escalate the notification\n    ALL_FILE_DB_FAILED.store(true, Ordering::Release);\n\n    // If still failed, create an in memory db with a known name\n    open_fallback_db::<M>().await\n}\n\nasync fn open_main_db<M: Migrator>(db_path: &Path) -> Option<ThreadSafeConnection> {\n    log::trace!(\"Opening database {}\", db_path.display());\n    ThreadSafeConnection::builder::<M>(db_path.to_string_lossy().as_ref(), true)\n        .with_db_initialization_query(DB_INITIALIZE_QUERY)\n        .with_connection_initialize_query(CONNECTION_INITIALIZE_QUERY)\n        .build()\n        .await\n        .log_err()\n}\n\nasync fn open_fallback_db<M: Migrator>() -> ThreadSafeConnection {\n    log::warn!(\"Opening fallback in-memory database\");\n    ThreadSafeConnection::builder::<M>(FALLBACK_DB_NAME, false)\n        .with_db_initialization_query(DB_INITIALIZE_QUERY)\n        .with_connection_initialize_query(CONNECTION_INITIALIZE_QUERY)\n        .build()\n        .await\n        .expect(\n            \"Fallback in memory database failed. Likely initialization queries or migrations have fundamental errors\",\n"
+        },
+        {
+          "start_line": 243,
+          "end_line": 294,
+          "text": "/// Arguments:\n/// - type of connection wrapper\n/// - dependencies, whose migrations should be run prior to this domain's migrations\n#[macro_export]\nmacro_rules! static_connection {\n    ($t:ident, [ $($d:ty),* ]) => {\n        impl ::std::ops::Deref for $t {\n            type Target = $crate::sqlez::thread_safe_connection::ThreadSafeConnection;\n\n            fn deref(&self) -> &Self::Target {\n                &self.0\n            }\n        }\n\n        impl ::std::clone::Clone for $t {\n            fn clone(&self) -> Self {\n                $t(self.0.clone())\n            }\n        }\n\n        impl $t {\n            /// Returns an instance backed by the per-App database if set,\n            /// or the shared fallback connection otherwise.\n            pub fn global(cx: &$crate::gpui::App) -> Self {\n                $t($crate::AppDatabase::global(cx).clone())\n            }\n\n            #[cfg(any(test, feature = \"test-support\"))]\n            pub async fn open_test_db(name: &'static str) -> Self {\n                $t($crate::open_test_db::<$t>(name).await)\n            }\n        }\n\n        $crate::inventory::submit! {\n            $crate::DomainMigration {\n                name: <$t as $crate::sqlez::domain::Domain>::NAME,\n                migrations: <$t as $crate::sqlez::domain::Domain>::MIGRATIONS,\n                dependencies: &[$(<$d as $crate::sqlez::domain::Domain>::NAME),*],\n                should_allow_migration_change: <$t as $crate::sqlez::domain::Domain>::should_allow_migration_change,\n            }\n        }\n    }\n}\n\npub fn write_and_log<F>(cx: &App, db_write: impl FnOnce() -> F + Send + 'static)\nwhere\n    F: Future<Output = anyhow::Result<()>> + Send,\n{\n    cx.background_spawn(async move { db_write().await.log_err() })\n        .detach()\n}\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/sqlez/src/connection.rs",
+      "sha256": "f1bfc7e3fefa3409ce32f50d40ef41d338cf0427c4114e709c5fafb62152cd8e",
+      "bytes": 17404,
+      "excerpts": [
+        {
+          "start_line": 19,
+          "end_line": 86,
+          "text": "\nimpl Connection {\n    fn open_with_flags(uri: &str, persistent: bool, flags: i32) -> Result<Self> {\n        let mut connection = Self {\n            sqlite3: ptr::null_mut(),\n            persistent,\n            write: RefCell::new(true),\n            _sqlite: PhantomData,\n        };\n\n        unsafe {\n            sqlite3_open_v2(\n                CString::new(uri)?.as_ptr(),\n                &mut connection.sqlite3,\n                flags,\n                ptr::null(),\n            );\n\n            // Turn on extended error codes\n            sqlite3_extended_result_codes(connection.sqlite3, 1);\n\n            // Wait for the database lock to be released instead of failing\n            // immediately with SQLITE_BUSY. Some databases (e.g. the agent\n            // threads database) are shared between Zed instances, so transient\n            // lock contention is expected; failing fast turns it into a\n            // storm of dropped saves and retry churn.\n            if !connection.sqlite3.is_null() {\n                sqlite3_busy_timeout(connection.sqlite3, 5000);\n            }\n\n            connection.last_error()?;\n        }\n\n        Ok(connection)\n    }\n\n    pub(crate) fn open(uri: &str, persistent: bool) -> Result<Self> {\n        Self::open_with_flags(\n            uri,\n            persistent,\n            SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_READWRITE,\n        )\n    }\n\n    /// Attempts to open the database at uri. If it fails, a shared memory db will be opened\n    /// instead.\n    pub fn open_file(uri: &str) -> Self {\n        Self::open(uri, true).unwrap_or_else(|_| Self::open_memory(Some(uri)))\n    }\n\n    pub fn open_memory(uri: Option<&str>) -> Self {\n        if let Some(uri) = uri {\n            let in_memory_path = format!(\"file:{}?mode=memory&cache=shared\", uri);\n            return Self::open_with_flags(\n                &in_memory_path,\n                false,\n                SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI,\n            )\n            .expect(\"Could not create fallback in memory db\");\n        } else {\n            Self::open(\":memory:\", false).expect(\"Could not create fallback in memory db\")\n        }\n    }\n\n    pub fn persistent(&self) -> bool {\n        self.persistent\n    }\n\n"
+        },
+        {
+          "start_line": 232,
+          "end_line": 238,
+          "text": "    pub(crate) fn with_write<T>(&self, callback: impl FnOnce(&Connection) -> T) -> T {\n        *self.write.borrow_mut() = true;\n        let result = callback(self);\n        *self.write.borrow_mut() = false;\n        result\n    }\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/sqlez/src/thread_safe_connection.rs",
+      "sha256": "2e7d8880d63adb35134e79525723cd9e068c52d8cfcb365a203b2e79aa5df04c",
+      "bytes": 13680,
+      "excerpts": [
+        {
+          "start_line": 24,
+          "end_line": 50,
+          "text": "/// List of queues of tasks by database uri. This lets us serialize writes to the database\n/// and have a single worker thread per db file. This means many thread safe connections\n/// (possibly with different migrations) could all be communicating with the same background\n/// thread.\nstatic QUEUES: LazyLock<RwLock<HashMap<Arc<str>, WriteQueue>>> = LazyLock::new(Default::default);\n\n/// Thread safe connection to a given database file or in memory db. This can be cloned, shared, static,\n/// whatever. It derefs to a synchronous connection by thread that is read only. A write capable connection\n/// may be accessed by passing a callback to the `write` function which will queue the callback\n#[derive(Clone)]\npub struct ThreadSafeConnection {\n    uri: Arc<str>,\n    persistent: bool,\n    connection_initialize_query: Option<&'static str>,\n    connections: Arc<ThreadLocal<Connection>>,\n}\n\nunsafe impl Send for ThreadSafeConnection {}\nunsafe impl Sync for ThreadSafeConnection {}\n\npub struct ThreadSafeConnectionBuilder<M: Migrator + 'static = ()> {\n    db_initialize_query: Option<&'static str>,\n    write_queue_constructor: Option<WriteQueueConstructor>,\n    connection: ThreadSafeConnection,\n    _migrator: PhantomData<*mut M>,\n}\n\n"
+        },
+        {
+          "start_line": 79,
+          "end_line": 126,
+          "text": "    pub async fn build(self) -> anyhow::Result<ThreadSafeConnection> {\n        self.connection\n            .initialize_queues(self.write_queue_constructor);\n\n        let db_initialize_query = self.db_initialize_query;\n\n        self.connection\n            .write(move |connection| {\n                if let Some(db_initialize_query) = db_initialize_query {\n                    connection.exec(db_initialize_query).with_context(|| {\n                        format!(\n                            \"Db initialize query failed to execute: {}\",\n                            db_initialize_query\n                        )\n                    })?()?;\n                }\n\n                // Retry failed migrations in case they were run in parallel from different\n                // processes. This gives a best attempt at migrating before bailing\n                let mut migration_result =\n                    anyhow::Result::<()>::Err(anyhow::anyhow!(\"Migration never run\"));\n\n                let foreign_keys_enabled: bool =\n                    connection.select_row::<i32>(\"PRAGMA foreign_keys\")?()\n                        .unwrap_or(None)\n                        .map(|enabled| enabled != 0)\n                        .unwrap_or(false);\n\n                connection.exec(\"PRAGMA foreign_keys = OFF;\")?()?;\n\n                for _ in 0..MIGRATION_RETRIES {\n                    migration_result = connection\n                        .with_savepoint(\"thread_safe_multi_migration\", || M::migrate(connection));\n\n                    if migration_result.is_ok() {\n                        break;\n                    }\n                }\n\n                if foreign_keys_enabled {\n                    connection.exec(\"PRAGMA foreign_keys = ON;\")?()?;\n                }\n                migration_result\n            })\n            .await?;\n\n        Ok(self.connection)\n    }\n"
+        },
+        {
+          "start_line": 180,
+          "end_line": 213,
+          "text": "        // so we can await on the result\n        let (sender, receiver) = oneshot::channel();\n\n        let thread_safe_connection = (*self).clone();\n        write_channel(Box::new(move || {\n            let connection = thread_safe_connection.deref();\n            let result = connection.with_write(|connection| callback(connection));\n            sender.send(result).ok();\n        }));\n        receiver.map(|response| response.expect(\"Write queue unexpectedly closed\"))\n    }\n\n    pub(crate) fn create_connection(\n        persistent: bool,\n        uri: &str,\n        connection_initialize_query: Option<&'static str>,\n    ) -> Connection {\n        let mut connection = if persistent {\n            Self::open_file(uri)\n        } else {\n            Self::open_shared_memory(uri)\n        };\n\n        if let Some(initialize_query) = connection_initialize_query {\n            let mut last_error = None;\n            let initialized = (0..CONNECTION_INITIALIZE_RETRIES).any(|attempt| {\n                match connection\n                    .exec(initialize_query)\n                    .and_then(|mut statement| statement())\n                {\n                    Ok(()) => true,\n                    Err(err)\n                        if is_schema_lock_error(&err)\n                            && attempt + 1 < CONNECTION_INITIALIZE_RETRIES =>\n"
+        },
+        {
+          "start_line": 252,
+          "end_line": 299,
+          "text": "    /// Special constructor for ThreadSafeConnection which disallows db initialization and migrations.\n    /// This allows construction to be infallible and not write to the db.\n    pub fn new(\n        uri: &str,\n        persistent: bool,\n        connection_initialize_query: Option<&'static str>,\n        write_queue_constructor: Option<WriteQueueConstructor>,\n    ) -> Self {\n        let connection = Self {\n            uri: Arc::from(uri),\n            persistent,\n            connection_initialize_query,\n            connections: Default::default(),\n        };\n\n        connection.initialize_queues(write_queue_constructor);\n        connection\n    }\n}\n\nimpl Deref for ThreadSafeConnection {\n    type Target = Connection;\n\n    fn deref(&self) -> &Self::Target {\n        self.connections.get_or(|| {\n            Self::create_connection(self.persistent, &self.uri, self.connection_initialize_query)\n        })\n    }\n}\n\npub fn background_thread_queue() -> WriteQueueConstructor {\n    use std::sync::mpsc::channel;\n\n    Box::new(|| {\n        let (sender, receiver) = channel::<QueuedWrite>();\n\n        thread::Builder::new()\n            .name(\"sqlezWorker\".to_string())\n            .spawn(move || {\n                while let Ok(write) = receiver.recv() {\n                    write()\n                }\n            })\n            .unwrap();\n\n        let sender = UnboundedSyncSender::new(sender);\n        Box::new(move |queued_write| {\n            sender\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/sqlez/src/domain.rs",
+      "sha256": "4eaf07abbda65c68958a345d489e75c5468063b60bdbc0b56dd582acb1516c5b",
+      "bytes": 1768,
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 29,
+          "text": "use crate::connection::Connection;\n\npub trait Domain: 'static {\n    const NAME: &str;\n    const MIGRATIONS: &[&str];\n\n    fn should_allow_migration_change(_index: usize, _old: &str, _new: &str) -> bool {\n        false\n    }\n}\n\npub trait Migrator: 'static {\n    fn migrate(connection: &Connection) -> anyhow::Result<()>;\n}\n\nimpl Migrator for () {\n    fn migrate(_connection: &Connection) -> anyhow::Result<()> {\n        Ok(()) // Do nothing\n    }\n}\n\nimpl<D: Domain> Migrator for D {\n    fn migrate(connection: &Connection) -> anyhow::Result<()> {\n        connection.migrate(\n            Self::NAME,\n            Self::MIGRATIONS,\n            &mut Self::should_allow_migration_change,\n        )\n    }\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/sqlez/src/migrations.rs",
+      "sha256": "36185a798d67a0bb28385180849567521ea7962eebebe09cab0fe8e84c5f5f1a",
+      "bytes": 13008,
+      "excerpts": [
+        {
+          "start_line": 34,
+          "end_line": 109,
+          "text": "    /// Note: Unlike everything else in SQLez, migrations are run eagerly, without first\n    /// preparing the SQL statements. This makes it possible to do multi-statement schema\n    /// updates in a single string without running into prepare errors.\n    pub fn migrate(\n        &self,\n        domain: &'static str,\n        migrations: &[&'static str],\n        should_allow_migration_change: &mut dyn FnMut(usize, &str, &str) -> bool,\n    ) -> Result<()> {\n        self.with_savepoint(\"migrating\", || {\n            // Setup the migrations table unconditionally\n            self.exec(indoc! {\"\n                CREATE TABLE IF NOT EXISTS migrations (\n                    domain TEXT,\n                    step INTEGER,\n                    migration TEXT\n                )\"})?()?;\n\n            let completed_migrations =\n                self.select_bound::<&str, (String, usize, String)>(indoc! {\"\n                    SELECT domain, step, migration FROM migrations\n                    WHERE domain = ?\n                    ORDER BY step\n                    \"})?(domain)?;\n\n            let mut store_completed_migration = self\n                .exec_bound(\"INSERT INTO migrations (domain, step, migration) VALUES (?, ?, ?)\")?;\n\n            let mut did_migrate = false;\n            for (index, migration) in migrations.iter().enumerate() {\n                if completed_migrations\n                    .get(index)\n                    .is_some_and(|(_, _, completed)| completed.as_str() == *migration)\n                {\n                    continue;\n                }\n                let migration =\n                    sqlformat::format(migration, &sqlformat::QueryParams::None, Default::default());\n                if let Some((_, _, completed_migration)) = completed_migrations.get(index) {\n                    // Reformat completed migrations with the current `sqlformat` version, so that past migrations stored\n                    // conform to the new formatting rules.\n                    let completed_migration = sqlformat::format(\n                        completed_migration,\n                        &sqlformat::QueryParams::None,\n                        Default::default(),\n                    );\n                    if completed_migration == migration {\n                        // Migration already run. Continue\n                        continue;\n                    } else if should_allow_migration_change(index, &completed_migration, &migration)\n                    {\n                        continue;\n                    } else {\n                        anyhow::bail!(formatdoc! {\"\n                            Migration changed for {domain} at step {index}\n\n                            Stored migration:\n                            {completed_migration}\n\n                            Proposed migration:\n                            {migration}\"});\n                    }\n                }\n\n                self.eager_exec(&migration)?;\n                did_migrate = true;\n                store_completed_migration((domain, index, migration))?;\n            }\n\n            if did_migrate {\n                self.delete_rows_with_orphaned_foreign_key_references()?;\n                self.exec(\"PRAGMA foreign_key_check;\")?()?;\n            }\n\n            Ok(())\n        })\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/sqlez/src/savepoint.rs",
+      "sha256": "cb45bed25930ad5326b01c62226699d20b4e22a427af94f832bcea9c9d055054",
+      "bytes": 4724,
+      "excerpts": [
+        {
+          "start_line": 1,
+          "end_line": 29,
+          "text": "use anyhow::Result;\nuse indoc::formatdoc;\n\nuse crate::connection::Connection;\n\nimpl Connection {\n    // Run a set of commands within the context of a `SAVEPOINT name`. If the callback\n    // returns Err(_), the savepoint will be rolled back. Otherwise, the save\n    // point is released.\n    pub fn with_savepoint<R, F>(&self, name: impl AsRef<str>, f: F) -> Result<R>\n    where\n        F: FnOnce() -> Result<R>,\n    {\n        let name = name.as_ref();\n        self.exec(&format!(\"SAVEPOINT {name}\"))?()?;\n        let result = f();\n        match result {\n            Ok(_) => {\n                self.exec(&format!(\"RELEASE {name}\"))?()?;\n            }\n            Err(_) => {\n                self.exec(&formatdoc! {\"\n                    ROLLBACK TO {name};\n                    RELEASE {name}\"})?()?;\n            }\n        }\n        result\n    }\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/agent/src/db.rs",
+      "sha256": "3fb7a86484a3eec7747d09f6e219bf7fd65f0e71451e72be27c0b2dc39e15772",
+      "bytes": 48401,
+      "excerpts": [
+        {
+          "start_line": 410,
+          "end_line": 455,
+          "text": "impl ThreadsDatabase {\n    pub fn connect(cx: &mut App) -> Shared<Task<Result<Arc<ThreadsDatabase>, Arc<anyhow::Error>>>> {\n        if cx.has_global::<GlobalThreadsDatabase>() {\n            return cx.global::<GlobalThreadsDatabase>().0.clone();\n        }\n        let executor = cx.background_executor().clone();\n        let task = executor\n            .spawn({\n                let executor = executor.clone();\n                async move {\n                    match ThreadsDatabase::new(executor) {\n                        Ok(db) => Ok(Arc::new(db)),\n                        Err(err) => Err(Arc::new(err)),\n                    }\n                }\n            })\n            .shared();\n\n        cx.set_global(GlobalThreadsDatabase(task.clone()));\n        task\n    }\n\n    pub fn new(executor: BackgroundExecutor) -> Result<Self> {\n        let connection = if *ZED_STATELESS {\n            Connection::open_memory(Some(\"THREAD_FALLBACK_DB\"))\n        } else if cfg!(any(feature = \"test-support\", test)) {\n            // rust stores the name of the test on the current thread.\n            // We use this to automatically create a database that will\n            // be shared within the test (for the test_retrieve_old_thread)\n            // but not with concurrent tests.\n            let thread = std::thread::current();\n            let test_name = thread.name();\n            Connection::open_memory(Some(&format!(\n                \"THREAD_FALLBACK_{}\",\n                test_name.unwrap_or_default()\n            )))\n        } else {\n            let threads_dir = paths::data_dir().join(\"threads\");\n            std::fs::create_dir_all(&threads_dir)?;\n            let sqlite_path = threads_dir.join(\"threads.db\");\n            Connection::open_file(&sqlite_path.to_string_lossy())\n        };\n\n        connection.exec(indoc! {\"\n            CREATE TABLE IF NOT EXISTS threads (\n                id TEXT PRIMARY KEY,\n"
+        },
+        {
+          "start_line": 500,
+          "end_line": 564,
+          "text": "    }\n\n    fn save_thread_sync(\n        connection: &Arc<Mutex<Connection>>,\n        id: acp::SessionId,\n        thread: DbThread,\n        folder_paths: &PathList,\n    ) -> Result<()> {\n        const COMPRESSION_LEVEL: i32 = 3;\n\n        #[derive(Serialize)]\n        struct SerializedThread {\n            #[serde(flatten)]\n            thread: DbThread,\n            version: &'static str,\n        }\n\n        let title = thread.title.to_string();\n        let updated_at = thread.updated_at.to_rfc3339();\n        let parent_id = thread\n            .subagent_context\n            .as_ref()\n            .map(|ctx| ctx.parent_thread_id.0.clone());\n        let serialized_folder_paths = folder_paths.serialize();\n        let (folder_paths_str, folder_paths_order_str): (Option<String>, Option<String>) =\n            if folder_paths.is_empty() {\n                (None, None)\n            } else {\n                (\n                    Some(serialized_folder_paths.paths),\n                    Some(serialized_folder_paths.order),\n                )\n            };\n        let json_data = serde_json::to_string(&SerializedThread {\n            thread,\n            version: DbThread::VERSION,\n        })?;\n\n        let connection = connection.lock();\n\n        let compressed = zstd::encode_all(json_data.as_bytes(), COMPRESSION_LEVEL)?;\n        let data_type = DataType::Zstd;\n        let data = compressed;\n\n        // Use the thread's updated_at as created_at for new threads.\n        // This ensures the creation time reflects when the thread was conceptually\n        // created, not when it was saved to the database.\n        let created_at = updated_at.clone();\n\n        let mut insert = connection.exec_bound::<(Arc<str>, Option<Arc<str>>, Option<String>, Option<String>, String, String, DataType, Vec<u8>, String)>(indoc! {\"\n            INSERT INTO threads (id, parent_id, folder_paths, folder_paths_order, summary, updated_at, data_type, data, created_at)\n            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)\n            ON CONFLICT(id) DO UPDATE SET\n                parent_id = excluded.parent_id,\n                folder_paths = excluded.folder_paths,\n                folder_paths_order = excluded.folder_paths_order,\n                summary = excluded.summary,\n                updated_at = excluded.updated_at,\n                data_type = excluded.data_type,\n                data = excluded.data\n        \"})?;\n\n        insert((\n            id.0,\n            parent_id,\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/agent/src/thread_store.rs",
+      "sha256": "44c97689232357b8d0ac22e080dd57c4e5cd46c663c0eb6251f083742ad15b3e",
+      "bytes": 10639,
+      "excerpts": [
+        {
+          "start_line": 49,
+          "end_line": 76,
+          "text": "\n    pub fn load_thread(\n        &mut self,\n        id: acp::SessionId,\n        cx: &mut Context<Self>,\n    ) -> Task<Result<Option<DbThread>>> {\n        let database_future = ThreadsDatabase::connect(cx);\n        cx.background_spawn(async move {\n            let database = database_future.await.map_err(|err| anyhow!(err))?;\n            database.load_thread(id).await\n        })\n    }\n\n    pub fn save_thread(\n        &mut self,\n        id: acp::SessionId,\n        thread: crate::DbThread,\n        folder_paths: PathList,\n        cx: &mut Context<Self>,\n    ) -> Task<Result<()>> {\n        let database_future = ThreadsDatabase::connect(cx);\n        cx.spawn(async move |this, cx| {\n            let database = database_future.await.map_err(|err| anyhow!(err))?;\n            database.save_thread(id, thread, folder_paths).await?;\n            this.update(cx, |this, cx| this.reload(cx))\n        })\n    }\n\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/agent_ui/src/thread_metadata_store.rs",
+      "sha256": "d7fb27901f3823c8b8c1ffc5c2afb4f63dfdb82fd73afce0262069a5fdb70fe4",
+      "bytes": 157271,
+      "excerpts": [
+        {
+          "start_line": 1369,
+          "end_line": 1391,
+          "text": "struct ThreadMetadataDb(ThreadSafeConnection);\n\nimpl Domain for ThreadMetadataDb {\n    const NAME: &str = stringify!(ThreadMetadataDb);\n\n    const MIGRATIONS: &[&str] = &[\n        sql!(\n            CREATE TABLE IF NOT EXISTS sidebar_threads(\n                session_id TEXT PRIMARY KEY,\n                agent_id TEXT,\n                title TEXT NOT NULL,\n                updated_at TEXT NOT NULL,\n                created_at TEXT,\n                folder_paths TEXT,\n                folder_paths_order TEXT\n            ) STRICT;\n        ),\n        sql!(ALTER TABLE sidebar_threads ADD COLUMN archived INTEGER DEFAULT 0),\n        sql!(ALTER TABLE sidebar_threads ADD COLUMN main_worktree_paths TEXT),\n        sql!(ALTER TABLE sidebar_threads ADD COLUMN main_worktree_paths_order TEXT),\n        sql!(\n            CREATE TABLE IF NOT EXISTS archived_git_worktrees(\n                id INTEGER PRIMARY KEY,\n"
+        },
+        {
+          "start_line": 1536,
+          "end_line": 1548,
+          "text": "        self.write(move |conn| {\n            let sql = \"INSERT INTO sidebar_threads(thread_id, session_id, agent_id, title, updated_at, created_at, interacted_at, folder_paths, folder_paths_order, archived, main_worktree_paths, main_worktree_paths_order, remote_connection, title_override) \\\n                       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14) \\\n                       ON CONFLICT(thread_id) DO UPDATE SET \\\n                           session_id = excluded.session_id, \\\n                           agent_id = excluded.agent_id, \\\n                           title = excluded.title, \\\n                           updated_at = excluded.updated_at, \\\n                           created_at = excluded.created_at, \\\n                           interacted_at = excluded.interacted_at, \\\n                           folder_paths = excluded.folder_paths, \\\n                           folder_paths_order = excluded.folder_paths_order, \\\n                           archived = excluded.archived, \\\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/paths/src/paths.rs",
+      "sha256": "fb9eb3e24c641b7f53b300ec0bc1396ff06d1522377f8734d23a324b75820efd",
+      "bytes": 23643,
+      "excerpts": [
+        {
+          "start_line": 143,
+          "end_line": 163,
+          "text": "/// Returns the path to the data directory used by Zed.\npub fn data_dir() -> &'static PathBuf {\n    CURRENT_DATA_DIR.get_or_init(|| {\n        if let Some(custom_dir) = CUSTOM_DATA_DIR.get() {\n            custom_dir.clone()\n        } else if cfg!(target_os = \"macos\") {\n            home_dir()\n                .join(\"Library/Application Support\")\n                .join(APP_NAME)\n        } else if cfg!(any(target_os = \"linux\", target_os = \"freebsd\")) {\n            if let Ok(flatpak_xdg_data) = std::env::var(\"FLATPAK_XDG_DATA_HOME\") {\n                flatpak_xdg_data.into()\n            } else {\n                dirs::data_local_dir().expect(\"failed to determine XDG_DATA_HOME directory\")\n            }\n            .join(APP_NAME_LOWERCASE)\n        } else if cfg!(target_os = \"windows\") {\n            dirs::data_local_dir()\n                .expect(\"failed to determine LocalAppData directory\")\n                .join(APP_NAME)\n        } else {\n"
+        },
+        {
+          "start_line": 257,
+          "end_line": 261,
+          "text": "/// Returns the path to the database directory.\npub fn database_dir() -> &'static PathBuf {\n    static DATABASE_DIR: OnceLock<PathBuf> = OnceLock::new();\n    DATABASE_DIR.get_or_init(|| data_dir().join(\"db\"))\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "crates/zed/src/main.rs",
+      "sha256": "ca8c842ddfccf4626ae664d319b4aa8b605ca20cd32251844dc3d5faf1140b4e",
+      "bytes": 77141,
+      "excerpts": [
+        {
+          "start_line": 341,
+          "end_line": 355,
+          "text": "\n    let app = build_application()\n        .with_assets(Assets)\n        .with_restart_arguments(restart_arguments);\n\n    let app_db = db::AppDatabase::new();\n    let system_id = app.background_executor().spawn(system_id());\n    let installation_id = app\n        .background_executor()\n        .spawn(installation_id(KeyValueStore::from_app_db(&app_db)));\n    let session_id = Uuid::new_v4().to_string();\n    let session = app.background_executor().spawn(Session::new(\n        session_id.clone(),\n        KeyValueStore::from_app_db(&app_db),\n    ));\n"
+        }
+      ]
+    }
+  ],
+  "inspection_only": true,
+  "real_database_opened": false,
+  "runtime_tests_executed": false,
+  "code_or_settings_modified": false,
+  "findings": [
+    "Zed SQLite db/sqlez foundation selected by Human; shared app DB domain mapping",
+    "Native threads also use sqlez SQLite, but separate threads/threads.db",
+    "Connection::persistent detects lower-level silent memory fallback not necessarily signalled by App flag",
+    "open_db comment describes backup/retry not present in inspected body",
+    "No power-loss or future-schema refusal guarantee inferred from current defaults/migration loop"
+  ]
+}

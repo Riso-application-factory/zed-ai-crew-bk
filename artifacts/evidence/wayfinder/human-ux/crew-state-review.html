@@ -1,0 +1,188 @@
+<meta charset="utf-8">
+<div id="crew-state-review" lang="vi">
+  <div class="c-harness">
+    <label for="crew-scenario">Tình huống mẫu</label>
+    <select id="crew-scenario" aria-label="Chọn tình huống mẫu"></select>
+    <span class="c-small">Mô phỏng · không gọi GitHub, model hoặc tác vụ thật</span>
+  </div>
+  <div class="c-guides" aria-label="Các lượt xem có hướng dẫn">
+    <button type="button" data-guide="recovery" aria-pressed="true">Phục hồi</button>
+    <button type="button" data-guide="versions" aria-pressed="false">Phiên bản</button>
+    <button type="button" data-guide="boundaries" aria-pressed="false">Quyền và dữ liệu</button>
+    <div id="crew-guide-steps" class="c-guide-steps"></div>
+  </div>
+  <section class="c-app" aria-label="Zed AI Crew — giao diện mẫu">
+    <header class="c-chrome"><strong>Zed · project mẫu</strong><span id="crew-session-label">Story mẫu · session implement</span><span class="c-prototype">Bản mô phỏng</span></header>
+    <div class="c-panes">
+      <section class="c-evidence-pane" aria-label="Pane giữa: kết quả và Run log">
+        <nav class="c-tabs" aria-label="Nội dung pane giữa">
+          <button type="button" data-view="review" aria-pressed="true">Bản review</button>
+          <button type="button" data-view="log" aria-pressed="false">Run log</button>
+        </nav>
+        <div id="crew-review-pane">
+          <p class="c-kicker">Kết quả hiện tại</p>
+          <h2 id="crew-outcome"></h2>
+          <p id="crew-fact"></p>
+          <dl class="c-facts"><div><dt>Điểm chặn</dt><dd id="crew-blocker"></dd></div><div><dt>Phiên bản</dt><dd id="crew-version"></dd></div><div><dt>Tiếp theo</dt><dd id="crew-next"></dd></div></dl>
+          <details id="crew-evidence"><summary>Bằng chứng và giới hạn</summary><p id="crew-evidence-text"></p><p><a href="https://github.com/Riso-application-factory/zed-ai-crew/issues/12#issuecomment-6194840806" target="_blank" rel="noreferrer">Contract canonical #12</a> · <a href="https://github.com/Riso-application-factory/zed-ai-crew/issues/19#issuecomment-6194553428" target="_blank" rel="noreferrer">Bằng chứng thực #19</a></p><p class="c-small">Trạng thái trên màn hình là dữ liệu mẫu; liên kết là nguồn lịch sử, không phải nút thực thi.</p></details>
+          <div class="c-node-detail" id="crew-node-detail" hidden><h3 id="crew-node-title"></h3><p id="crew-node-description"></p></div>
+        </div>
+        <div id="crew-log-pane" hidden><h2>Run log</h2><ol id="crew-events"></ol><p class="c-small">Tóm tắt có version. Không đưa credentials hoặc raw private transcript vào bản review.</p></div>
+      </section>
+      <section class="c-chat-pane" aria-label="Hội thoại Orchestrator">
+        <header class="c-chat-title">Orchestrator <span id="crew-attention"></span></header>
+        <div class="c-message c-human">Tiếp tục công việc theo yêu cầu đã chốt của US này.</div>
+        <div class="c-message c-orchestrator" id="crew-message"></div>
+        <div id="crew-local-reply" class="c-message" hidden></div>
+        <form id="crew-chat-form">
+          <label for="crew-message-input">Nói với Orchestrator</label>
+          <textarea id="crew-message-input" rows="2" placeholder="Nhắn trong bản mô phỏng…" aria-describedby="crew-input-help"></textarea>
+          <div class="c-compose-footer"><span id="crew-input-help" class="c-small">⌘/Ctrl + Enter để gửi · chỉ lưu trong lượt xem này</span><button id="crew-send-message" type="button">Gửi lời nhắn mẫu</button></div>
+          <p id="crew-input-error" role="alert" hidden></p>
+        </form>
+        <div class="c-pipeline" aria-label="Pipeline 32px dưới ô chat"><span id="crew-pipeline-label"></span><button id="crew-graph-toggle" type="button" aria-expanded="false" aria-controls="crew-graph">Đồ thị</button></div>
+        <div id="crew-graph" class="c-graph" hidden aria-label="Đồ thị cycle và step run"></div>
+      </section>
+    </div>
+    <p id="crew-announcement" class="c-announcement" role="status" aria-live="polite"></p>
+  </section>
+</div>
+<style>
+#crew-state-review{--c-bg:light-dark(#f8f8fa,#212126);--c-pane:light-dark(#fff,#28282e);--c-input:light-dark(#f2f2f5,#33333b);--c-fg:light-dark(#25252c,#ededf2);--c-muted:light-dark(#62626e,#b3b3bf);--c-border:light-dark(#d9d9e0,#474750);--c-accent:light-dark(#365d9c,#aac6f2);--c-bad:light-dark(#a23432,#ffb1a9);--c-good:light-dark(#226442,#a0d6b5);width:100%;max-width:none;color:var(--c-fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+#crew-state-review,#crew-state-review *{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans",sans-serif}
+#crew-state-review *{box-sizing:border-box;min-width:0}
+#crew-state-review button,#crew-state-review select,#crew-state-review textarea{font:inherit;color:var(--c-fg);background:var(--c-input);border:1px solid var(--c-border);border-radius:5px}
+#crew-state-review button{padding:5px 10px}
+#crew-state-review button[aria-pressed="true"]{background:var(--c-fg);color:var(--c-bg)}
+#crew-state-review button[aria-current="step"]{border-color:var(--c-accent)}
+#crew-state-review .c-small{font-size:12px;color:var(--c-muted)}
+#crew-state-review .c-harness{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 100px 8px 0}
+#crew-state-review select{padding:5px;max-width:100%}
+#crew-state-review .c-guides{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+#crew-state-review .c-guide-steps{display:flex;flex-wrap:wrap;gap:5px;width:100%}
+#crew-state-review .c-guide-steps button{background:transparent;color:var(--c-muted)}
+#crew-state-review .c-app{width:100%;max-width:none;background:var(--c-bg);border:1px solid var(--c-border);border-radius:8px;overflow-wrap:anywhere}
+#crew-state-review .c-chrome{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;border-bottom:1px solid var(--c-border)}
+#crew-state-review .c-chrome strong{font-weight:500}
+#crew-state-review .c-chrome>span{color:var(--c-muted);font-size:12px}
+#crew-state-review .c-prototype{margin-left:auto}
+#crew-state-review .c-panes{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+#crew-state-review .c-evidence-pane{padding:12px 16px;background:var(--c-pane);border-right:1px solid var(--c-border)}
+#crew-state-review .c-tabs{display:flex;gap:6px;margin-bottom:18px}
+#crew-state-review .c-kicker{margin:0;color:var(--c-muted);font-size:12px}
+#crew-state-review h2{font-size:19px;line-height:1.3;font-weight:500;margin:6px 0 12px}
+#crew-state-review h3{font-size:14px;font-weight:500}
+#crew-state-review p{margin:8px 0 12px}
+#crew-state-review .c-facts{display:grid;gap:14px;margin:20px 0}
+#crew-state-review .c-facts div{display:grid;grid-template-columns:85px minmax(0,1fr);gap:12px}
+#crew-state-review dt{color:var(--c-muted)}
+#crew-state-review dd{margin:0}
+#crew-state-review summary{color:var(--c-accent);padding:6px 0}
+#crew-state-review a{color:var(--c-accent)}
+#crew-state-review .c-node-detail{border-top:1px solid var(--c-border);margin-top:12px}
+#crew-state-review .c-chat-pane{padding:12px 14px}
+#crew-state-review .c-chat-title{display:flex;justify-content:space-between;gap:8px;font-weight:500;margin-bottom:12px}
+#crew-state-review #crew-attention{font-weight:400;font-size:12px;color:var(--c-muted)}
+#crew-state-review .c-message{padding:10px 12px;margin:8px 0 12px;background:var(--c-pane);border-radius:6px;white-space:pre-line}
+#crew-state-review .c-human{color:var(--c-muted)}
+#crew-state-review label{display:block}
+#crew-state-review textarea{display:block;width:100%;resize:vertical;padding:9px;margin-top:6px}
+#crew-state-review .c-compose-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:7px 0 12px}
+#crew-state-review #crew-input-error{color:var(--c-bad)}
+#crew-state-review .c-pipeline{height:32px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--c-input);padding-left:8px;border-radius:4px;font-size:12px}
+#crew-state-review #crew-pipeline-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#crew-state-review .c-pipeline button{height:32px;font-size:12px;padding:2px 8px;flex-shrink:0}
+#crew-state-review .c-graph{padding-top:10px}
+#crew-state-review .c-lane{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}
+#crew-state-review .c-lane>span{width:100%;font-size:12px;color:var(--c-muted)}
+#crew-state-review .c-lane button{text-align:left;font-size:12px;flex:1 1 95px}
+#crew-state-review .c-lane button span{display:block;color:var(--c-muted)}
+#crew-state-review .c-announcement{border-top:1px solid var(--c-border);padding:8px 14px;margin:0;font-size:12px;color:var(--c-muted)}
+#crew-state-review ol{padding-left:20px}
+#crew-state-review li{margin:12px 0}
+@media(max-width:760px){#crew-state-review .c-panes{grid-template-columns:1fr}#crew-state-review .c-evidence-pane{border-right:0;border-bottom:1px solid var(--c-border)}#crew-state-review .c-harness{padding-right:0}#crew-state-review .c-facts div{grid-template-columns:75px minmax(0,1fr)}}
+@media(pointer:coarse){#crew-state-review button,#crew-state-review select{min-height:44px}#crew-state-review .c-pipeline{height:44px}#crew-state-review textarea{font-size:16px}}
+</style>
+<script id="crew-state-model">
+const CrewStateReviewModel = (() => {
+  const cases = {
+    recovering:{label:"Mất phản hồi sau merge",outcome:"OUTPUT chưa xác định",fact:"Yêu cầu merge đã được gửi, nhưng kết quả chưa được ghi nhận. Chưa biết PR đã merge hay chưa.",blocker:"Đang đối soát kết quả trên GitHub.",version:"Head H2 · criteria C2 · operation M7",next:"Crew đọc lại đúng PR và commit. Chưa cần Human thao tác.",message:"Tôi mất phản hồi sau yêu cầu merge. Tôi đang đọc lại GitHub; tôi chưa gửi merge lần hai. Chưa có bằng chứng để báo hoàn tất.",pipeline:"Đang đối soát · chưa biết kết quả",attention:"Không cần bạn thao tác lúc này",evidence:"Có durable intent M7; chưa có merged receipt. EOF/timeout không chứng minh effect chưa xảy ra.",events:["M7: lưu intent với H2/C2.","M7: gửi yêu cầu merge; phản hồi bị mất.","Giữ reservation; bắt đầu readback, không phát lại mutation."],phase:"recover"},
+    stale:{label:"Head đổi, evidence cũ",outcome:"OUTPUT chưa đạt",fact:"Check và approval cũ thuộc H1. Code hiện tại là H2; evidence cũ không chứng minh H2 đạt. Yêu cầu của US vẫn là C2.",blocker:"Chưa có check và review áp dụng cho H2.",version:"Hiện tại H2/C2 · evidence cũ H1/C2",next:"Crew chạy check phù hợp cho H2, sau đó Human review phiên bản mới trên GitHub.",message:"Head đã đổi từ H1 sang H2 trong cùng yêu cầu C2. Tôi giữ check/approval H1 trong lịch sử nhưng không dùng chúng để merge H2. Tôi sẽ gửi link review mới sau khi check hiện tại đạt.",pipeline:"Phiên bản code đã đổi · check mới đang chờ",attention:"Chờ check mới trước khi review",evidence:"PASS H1 và APPROVED H1 là facts cũ. Chưa có PASS/APPROVED H2; yêu cầu C2 không đổi.",events:["H1/C2: check PASS và Human APPROVED.","Rework tạo H2 theo cùng yêu cầu C2; affected evidence stale.","H2: chờ check mới; merge admission bị chặn."],phase:"verify"},
+    merged_new_story:{label:"US đã xong, có ý tưởng mới",outcome:"US hiện tại đã đạt OUTPUT",fact:"PR đã merge và đáp ứng yêu cầu ban đầu: kiểm tra định dạng email. Ý tưởng bổ sung chặn email dùng một lần thuộc US mới.",blocker:"Không có điểm chặn của US đã hoàn thành.",version:"US hiện tại · H2/C2 · merged receipt M7",next:"Ghi nhận ý tưởng thành US mới để làm rõ và sắp thứ tự; US mới chưa được tạo trong bản mô phỏng.",message:"US hiện tại đã hoàn thành đúng yêu cầu C2. Tôi giữ nguyên kết quả và PR đã merge. Ý tưởng chặn email dùng một lần cần US mới; tôi không dùng nó để đánh giá lại OUTPUT của US cũ.",pipeline:"US hoàn thành · ý tưởng mới là US riêng",attention:"US cũ đã xong",evidence:"Merged receipt, check và review áp dụng cho yêu cầu C2 đã chốt. Ý tưởng mới không phải bằng chứng US cũ bị thiếu yêu cầu ban đầu.",events:["US hiện tại: chốt yêu cầu C2 là kiểm tra định dạng email.","H2/C2: check/review phù hợp, PR merged và đối soát đạt.","Ý tưởng bổ sung: ghi nhận cho US mới; không đổi OUTPUT của US đã hoàn thành."],phase:"done"},
+    merged_wrong_head:{label:"Merge sai phiên bản đã duyệt",outcome:"Cần xử lý sai lệch so với yêu cầu đã chốt",fact:"Readback xác nhận PR đã merge H1, trong khi phiên bản được duyệt và ghi trong thao tác là H2. Đây là sai lệch thực của thao tác, không phải yêu cầu mới.",blocker:"Chưa xác nhận kết quả đúng phiên bản H2 đã chốt.",version:"Yêu cầu C2 · head đã duyệt H2 · actual merged H1",next:"Ghi nhận sai lệch và xử lý phần sửa bằng công việc riêng theo quyền hiện có; không tự rollback main hoặc merge lại PR cũ.",message:"Kết quả merge thực tế là H1, khác H2 đã duyệt cho yêu cầu C2. Tôi ghi rõ sai lệch của thao tác và phần cần sửa. Tôi không gán lỗi từ ý tưởng mới và không tự rollback main.",pipeline:"Sai lệch actual head · cần đối soát",attention:"Có sai lệch thao tác cần xử lý",evidence:"Expected head H2 và actual merged head H1 là hai facts có identity riêng. Chỉ phát hiện sai lệch với chính binding đã chốt mới là gap của thao tác cũ.",events:["Dispatch: approved H2/C2.","Readback: actual merged head H1, không khớp H2.","Giữ merged fact, ghi sai lệch và route sửa riêng; không tự rollback."],phase:"gap"},
+    waiting_review:{label:"Chờ Human review PR",outcome:"OUTPUT chưa đạt",fact:"PR hiện tại và các check bắt buộc đã sẵn sàng. Chưa có Human review áp dụng cho phiên bản này.",blocker:"Chờ review trên GitHub.",version:"H2/C2 · check PASS H2",next:"Human review PR trên GitHub; Crew đọc lại review ID/head rồi xét merge.",message:"Bản H2 đã đạt checks. Bạn cần review PR hiện tại trên GitHub. Trả lời “đồng ý” trong chat không thay thế GitHub review.",pipeline:"Chờ Human review · H2",attention:"Cần Human trên GitHub",evidence:"Check xanh không là approval. Không có nút Approve hoặc Re-run trong Crew.",events:["H2/C2: checks phù hợp đã đạt.","Review request gắn bundle H2/C2.","Đang chờ actual review; chưa gửi merge."],phase:"review"},
+    running:{label:"Đang chạy, có nhánh song song",outcome:"Chưa đạt OUTPUT",fact:"Bước kiểm tra đang chạy; nhánh tài liệu độc lập vẫn tiếp tục.",blocker:"Không có yêu cầu quyết định của Human.",version:"H2/C2 · attempt A3",next:"Crew ghi result theo đúng attempt và tiếp tục khi verifier đủ evidence.",message:"Tôi đang kiểm tra bản tích hợp H2. Nhánh tài liệu độc lập vẫn chạy. Bạn chưa cần thao tác; tôi sẽ báo khi có quyết định hoặc kết quả có ý nghĩa.",pipeline:"Đang kiểm tra · 3/5 bước",attention:"Đang chạy",evidence:"Progress không phải terminal result. Không dùng native end_turn để tự ghi check pass.",events:["A3 được admission với H2/C2.","Check đang chạy.","Nhánh tài liệu không bị chặn bởi check này."],phase:"verify"},
+    conflict:{label:"Conflict cần làm rõ nghiệp vụ",outcome:"OUTPUT chưa đạt",fact:"Hai task sửa cùng một hành vi theo hai cách khác nhau. Integration đang conflict; main chưa đổi.",blocker:"Cần chọn hành vi đúng, không phải chọn ours/theirs bằng phỏng đoán.",version:"Task A/T1 + task B/T2 · integration I1",next:"Human trả lời câu hỏi nghiệp vụ trong chat. Crew chỉ tiếp tục phần độc lập trong lúc chờ.",message:"Hai task đề xuất khác nhau: dữ liệu thiếu thì (A) báo lỗi hay (B) bỏ qua? Criteria hiện tại chưa chọn. Bạn muốn hành vi nào? Tôi giữ các worktree và chưa sửa main.",pipeline:"Conflict · chờ câu trả lời",attention:"Cần Human trong hội thoại",evidence:"Unmerged index/MERGE_HEAD là evidence conflict; resolution phải kiểm lại integration tree mới.",events:["Nhận task heads T1 và T2.","Git merge conflict; main giữ nguyên.","Giữ worktrees; hỏi hành vi chưa có quyết định."],phase:"integrate"},
+    quota:{label:"Provider hết quota",outcome:"OUTPUT chưa đạt",fact:"Bước dùng profile hiện tại đã dừng vì quota. Các nhánh độc lập còn đủ quyền vẫn có thể tiếp tục.",blocker:"Profile của bước này chưa thể tiếp tục.",version:"Attempt A3 · profile đã admission P1",next:"Human chọn chờ hoặc đề xuất profile được phép; Crew không tự đổi provider/account/billing.",message:"Provider báo hết quota cho bước A3. Tôi đã dừng nhánh đó, không đổi account hay provider. Bạn muốn chờ hay chọn một profile khác đã được phép?",pipeline:"Chờ quota · nhánh liên quan dừng",attention:"Cần lựa chọn của Human",evidence:"Quyền dùng P1 không tự cấp quyền sang P2. Giữ intent/history; chờ tạm không kích hoạt raw-retention expiry.",events:["A3 nhận lỗi quota từ provider.","Dừng dispatch phụ thuộc P1.","Nhánh độc lập tiếp tục; chờ lựa chọn profile."],phase:"blocked"},
+    api_error:{label:"Không đọc được kết quả GitHub",outcome:"Kết quả merge vẫn chưa xác định",fact:"Readback GitHub trả lỗi 403. Chưa thể chứng minh merged hoặc not-applied.",blocker:"Không có quyền đọc cần thiết cho đối soát.",version:"Operation M7 · H2/C2",next:"Kiểm tra đúng quyền của integration; giữ reservation và không gửi merge lại.",message:"GitHub readback trả HTTP 403. Tôi chưa biết kết quả merge và sẽ không coi đó là “chưa chạy”. Cần xử lý đúng quyền đọc của integration; tôi không đổi PAT hoặc mở rộng scope tự động.",pipeline:"Đối soát bị chặn · HTTP 403",attention:"Cần xử lý quyền integration",evidence:"Lỗi là HTTP 403 của readback, không phải một thông báo rủi ro chung hoặc completed status.",events:["M7 có intent, thiếu receipt.","Readback trả403.","Giữ uncertain/reservation; không replay."],phase:"recover"},
+    privacy:{label:"Profile chưa đủ điều kiện dữ liệu",outcome:"Chưa chạy bước gửi nội dung riêng",fact:"Chưa có evidence profile đáp ứng điều kiện dữ liệu private. Nội dung chưa được gửi qua đường này.",blocker:"Profile admission thiếu bằng chứng bắt buộc.",version:"Data policy D1 · profile P1 chưa admitted",next:"Làm rõ profile/integration hợp lệ. Phần public synthetic có quyền riêng vẫn độc lập.",message:"Tôi chưa gửi nội dung private vì profile này thiếu evidence điều kiện đã chốt. Đây là chặn đúng route, không phải yêu cầu bạn dán key vào chat hoặc đổi quyền toàn máy.",pipeline:"Bị chặn trước effect · dữ liệu private",attention:"Cần điều kiện profile phù hợp",evidence:"No-training và retention là hai điều khác nhau; initialized adapter không chứng minh private admission.",events:["Đọc source/policy của payload.","Profile evidence thiếu → từ chối admission.","Không có effect gửi private; route độc lập không bị suy permission."],phase:"blocked"},
+    cancel_pending:{label:"Yêu cầu dừng, effect chưa terminal",outcome:"OUTPUT chưa đạt · đang dừng",fact:"Đã gửi yêu cầu dừng. Native turn báo cancelled, nhưng owner chưa xác nhận các effect đã terminal.",blocker:"Chưa đủ terminal/lifetime evidence.",version:"Attempt A3 · effect E7 còn custody",next:"Crew chặn dispatch mới, giữ custody và đối soát. Không nói mọi effect đã dừng.",message:"Tôi đã nhận yêu cầu dừng. Turn đã cancelled nhưng effect E7 chưa có terminal proof; nó vẫn có thể hoàn tất một phần. Tôi giữ custody và chưa mở generation thay thế.",pipeline:"Đang dừng · chờ effect terminal",attention:"Crew đang đối soát",evidence:"Native cancelled/EOF không thay effect terminal receipt. Giữ facts đã xảy ra, không tự rollback.",events:["Nhận cancel intent.","Native turn cancelled; E7 chưa terminal.","Giữ reservation, chặn dispatch mới và chờ owner evidence."],phase:"recover"},
+    stopped:{label:"Đã dừng, chưa đạt mục tiêu",outcome:"Đã dừng · OUTPUT chưa đạt",fact:"Các effect thuộc route được quản lý đã terminal và phần đã xảy ra được đối soát. Mục tiêu yêu cầu chưa hoàn tất.",blocker:"Run đã dừng theo yêu cầu; không phải successful delivery.",version:"Attempt A3 · terminal receipts và partial facts",next:"Human có thể nêu mục tiêu tiếp theo; Crew revalidate trước resume, không replay mù.",message:"Run đã dừng. Tôi giữ phần effect đã xảy ra và evidence terminal của route này; tôi không báo mục tiêu đã hoàn thành. Nếu tiếp tục, tôi sẽ revalidate binding và đối soát trước dispatch.",pipeline:"Đã dừng · chưa hoàn tất OUTPUT",attention:"Chờ yêu cầu tiếp theo",evidence:"Stopped execution và achieved OUTPUT là hai verdict khác nhau. Không suy arbitrary process-tree guarantee từ một terminal receipt.",events:["Chặn dispatch mới.","Owner trả terminal receipts cho route được quản lý.","Giữ partial effects; OUTPUT vẫn unachieved."],phase:"done"},
+    export_scope:{session:"Session xuất bằng chứng",label:"Xuất dữ liệu cần scope/đích đến",outcome:"Chưa công bố nội dung private",fact:"Bản xuất có nội dung target-project private; đích đề nghị là issue Crew public. Chưa có quyền cho đích đó.",blocker:"Không được tự public hóa private payload.",version:"Export E4 · audience public · data private",next:"Human chọn đích local/private hoặc quyết định phạm vi redaction/công bố cụ thể trong chat.",message:"Bản xuất chứa nội dung target-project private, còn đích là issue public. Tôi chưa gửi. Bạn muốn giữ local/private, hay xác định chính xác phần được redaction và công bố? Tôi không cần key/token trong chat.",pipeline:"Chặn export public · cần phạm vi",attention:"Cần quyết định đích và nội dung",evidence:"Hiển thị audience/classification/store coverage trước publication. Permission của main-model không cấp mọi export destination.",events:["Inventory chọn payload target-derived private.","Audience public chưa có authority.","Không dispatch publication; hỏi phạm vi/đích phù hợp."],phase:"blocked"},
+    delete_partial:{session:"Session xóa dữ liệu",label:"Xóa dữ liệu chỉ đạt một phần",outcome:"Xóa chưa hoàn tất",fact:"Bản raw trong store Crew đã xóa; bản ngoài phạm vi Crew chưa được xác nhận xóa.",blocker:"Bản provider/export bên ngoài không nằm trong capability đã xác minh.",version:"Yêu cầu xóa D4 · inventory v3",next:"Xem rõ succeeded/failed/not-controlled; không coi archive hoặc đóng cửa sổ là xóa mọi bản.",message:"Tôi chỉ xác nhận store Crew đã xóa. Bản provider/export ngoài Crew chưa được xác nhận. Tôi ghi riêng giới hạn này, không báo “đã xóa toàn bộ”.",pipeline:"Xóa một phần · còn bản ngoài scope",attention:"Cần xem phạm vi còn lại",evidence:"Receipt theo từng store: Crew=succeeded; external=not-controlled. Không có server-erasure proof.",events:["D4: kiểm inventory/retention/hold.","Crew store xóa thành công.","External copy not-controlled; toàn yêu cầu chưa achieved."],phase:"gap"},
+    empty:{label:"Chưa có run",outcome:"Chưa bắt đầu",fact:"Chưa có session run để hiển thị.",blocker:"Chưa nhận yêu cầu công việc.",version:"Không có binding/attempt",next:"Human nêu mục tiêu trong hội thoại; Crew kiểm INPUT trước khi chạy.",message:"Bạn muốn đạt kết quả gì? Tôi sẽ dùng đầu vào đã có trước khi hỏi phần còn thiếu.",pipeline:"Chưa có run",attention:"Chờ yêu cầu",evidence:"Empty state không là lỗi và không tự tạo history hoặc fake progress.",events:["Chưa có run fact."],phase:"empty"},
+    merged_clean:{label:"Đã merge, OUTPUT đạt",outcome:"OUTPUT đã đạt",fact:"Đã đối soát PR merged, đúng head/base và binding; required checks và actual Human review đều áp dụng.",blocker:"Không còn blocker của OUTPUT này.",version:"H2/C2 · merged receipt M7",next:"Crew báo kết quả và giữ evidence; release/deploy là mục tiêu/quyền riêng.",message:"Session mẫu đã đạt OUTPUT: PR merged, actual readback khớp binding và không có gap quan sát được. Điều này không có nghĩa đã release/deploy.",pipeline:"Hoàn tất OUTPUT · đã đối soát",attention:"Có kết quả để xem",evidence:"Bounded preflight/readback không là full-tuple atomicity certificate. Merged receipt và OUTPUT evaluation được lưu riêng.",events:["H2/C2: checks/review phù hợp.","M7: actual merged + commit/ref readback.","Verifier credit OUTPUT theo binding/evidence/limits."],phase:"done"}
+  };
+  const guides = {recovery:["recovering","api_error","merged_wrong_head"],versions:["waiting_review","stale","merged_clean","merged_new_story"],boundaries:["quota","privacy","delete_partial"]};
+  function initial(saved){return {scenario:cases[saved?.scenario]?saved.scenario:"merged_new_story",guide:guides[saved?.guide]?saved.guide:"versions",graph:!!saved?.graph,view:saved?.view==="log"?"log":"review",selected:null,message:"",error:""};}
+  function reduce(state,action){
+    if(action.type==="scenario"&&cases[action.value])return {...state,scenario:action.value,selected:null,message:"",error:""};
+    if(action.type==="guide"&&guides[action.value])return {...state,guide:action.value,scenario:guides[action.value][0],selected:null,message:"",error:""};
+    if(action.type==="graph")return {...state,graph:!state.graph};
+    if(action.type==="view"&&(action.value==="review"||action.value==="log"))return {...state,view:action.value};
+    if(action.type==="node")return {...state,selected:action.value,view:"review"};
+    if(action.type==="message")return action.value.trim()?{...state,message:action.value.trim(),error:""}:{...state,error:"Nhập lời nhắn trước khi gửi."};
+    return state;
+  }
+  return {cases,guides,initial,reduce};
+})();
+</script>
+<script>
+(() => {
+  const root=document.getElementById("crew-state-review");
+  const find=id=>root.querySelector("#"+id);
+  const model=CrewStateReviewModel;
+  const saved=window.openai?.widgetState;
+  let state=model.initial(saved?.privateContent||saved||{});
+  const scenario=find("crew-scenario");
+  Object.entries(model.cases).forEach(([id,item])=>{const option=document.createElement("option");option.value=id;option.textContent=item.label;scenario.appendChild(option);});
+  const nodes=[{id:"input",title:"INPUT",detail:"Đúng yêu cầu/source/authority trước dispatch; implement còn cần Story Ready."},{id:"integrate",title:"Tích hợp nếu có",detail:"Với Story: giữ task heads/worktrees; conflict chưa phải OUTPUT."},{id:"verify",title:"Kiểm tra",detail:"Evidence phải đúng source/criteria/producer; với code còn đúng tree/base."},{id:"review",title:"Human nếu cần",detail:"Implement: review PR trên GitHub. Clarification hoặc quyền/scope: câu hỏi trong hội thoại."},{id:"recover",title:"Effect và đối soát",detail:"Giữ intent; đọc actual external state, không replay mù. Merge, export và delete có receipt riêng."}];
+  const graph=find("crew-graph");
+  const lane=document.createElement("div");lane.className="c-lane";const laneLabel=document.createElement("span");laneLabel.textContent="Cycle mẫu · các step theo tình huống";lane.appendChild(laneLabel);
+  nodes.forEach(node=>{const button=document.createElement("button");button.type="button";button.dataset.node=node.id;button.className="cursor-interaction";button.textContent=node.title;const sub=document.createElement("span");sub.textContent="Xem step";button.appendChild(sub);button.addEventListener("click",()=>dispatch({type:"node",value:node.id}));lane.appendChild(button);});graph.appendChild(lane);
+  const independent=document.createElement("p");independent.className="c-small";independent.textContent="Làn độc lập: tài liệu tiếp tục khi không phụ thuộc blocker hiện tại.";graph.appendChild(independent);
+  const set=(id,value)=>find(id).textContent=value;
+  let renderedGuide=null;
+  function render(){
+    const item=model.cases[state.scenario];scenario.value=state.scenario;
+    set("crew-session-label",item.session||"Story mẫu · session implement");set("crew-outcome",item.outcome);set("crew-fact",item.fact);set("crew-blocker",item.blocker);set("crew-version",item.version);set("crew-next",item.next);set("crew-message",item.message);set("crew-pipeline-label",item.pipeline);set("crew-attention",item.attention);set("crew-evidence-text",item.evidence);
+    set("crew-announcement",item.label+" · "+item.outcome);set("crew-local-reply",state.message?"Lời nhắn mẫu: "+state.message+"\nChỉ cập nhật bản mô phỏng; không gửi task ra hệ thống.":"");find("crew-local-reply").hidden=!state.message;
+    set("crew-input-error",state.error);find("crew-input-error").hidden=!state.error;find("crew-message-input").setAttribute("aria-invalid",state.error?"true":"false");
+    graph.hidden=!state.graph;find("crew-graph-toggle").setAttribute("aria-expanded",String(state.graph));find("crew-graph-toggle").textContent=state.graph?"Ẩn đồ thị":"Đồ thị";
+    find("crew-review-pane").hidden=state.view!=="review";find("crew-log-pane").hidden=state.view!=="log";
+    root.querySelectorAll("[data-view]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.view===state.view)));
+    root.querySelectorAll("[data-guide]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.guide===state.guide)));
+    const guideContainer=find("crew-guide-steps");
+    if(renderedGuide!==state.guide){guideContainer.replaceChildren();model.guides[state.guide].forEach((id,index)=>{const button=document.createElement("button");button.type="button";button.className="cursor-interaction";button.dataset.scenario=id;button.textContent=(index+1)+". "+model.cases[id].label;button.addEventListener("click",()=>dispatch({type:"scenario",value:id}));guideContainer.appendChild(button);});renderedGuide=state.guide;}
+    guideContainer.querySelectorAll("[data-scenario]").forEach(button=>button.setAttribute("aria-pressed",String(state.scenario===button.dataset.scenario)));
+    const events=find("crew-events");events.replaceChildren();item.events.forEach(text=>{const li=document.createElement("li");li.textContent=text;events.appendChild(li);});
+    const activePhase=item.phase==="gap"?"recover":item.phase==="blocked"?(state.scenario==="quota"?"verify":"input"):item.phase;
+    root.querySelectorAll("[data-node]").forEach(button=>{if(button.dataset.node===activePhase)button.setAttribute("aria-current","step");else button.removeAttribute("aria-current");});
+    const selected=nodes.find(node=>node.id===state.selected);find("crew-node-detail").hidden=!selected;if(selected){set("crew-node-title",selected.title);set("crew-node-description",selected.detail);}
+  }
+  function remember(){if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{prototype:"Crew UX #13",selectedScenario:state.scenario},privateContent:{scenario:state.scenario,guide:state.guide,graph:state.graph,view:state.view}}).catch(()=>{});}
+  function dispatch(action){state=model.reduce(state,action);render();remember();}
+  scenario.addEventListener("change",()=>dispatch({type:"scenario",value:scenario.value}));
+  root.querySelectorAll("[data-guide]").forEach(button=>button.addEventListener("click",()=>dispatch({type:"guide",value:button.dataset.guide})));
+  root.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>dispatch({type:"view",value:button.dataset.view})));
+  find("crew-graph-toggle").addEventListener("click",()=>dispatch({type:"graph"}));
+  function submitMessage(){dispatch({type:"message",value:find("crew-message-input").value});if(!state.error)find("crew-message-input").value="";else find("crew-message-input").focus();}
+  const form=find("crew-chat-form");form.addEventListener("submit",event=>{event.preventDefault();submitMessage();});
+  find("crew-send-message").addEventListener("click",submitMessage);
+  find("crew-message-input").addEventListener("keydown",event=>{if(event.key==="Enter"&&(event.metaKey||event.ctrlKey)){event.preventDefault();submitMessage();}});
+  root.addEventListener("keydown",event=>{if(event.key!=="Escape")return;const evidence=find("crew-evidence");if(evidence.open&&evidence.contains(document.activeElement)){evidence.open=false;evidence.querySelector("summary").focus();}else if(state.graph&&graph.contains(document.activeElement)){dispatch({type:"graph"});find("crew-graph-toggle").focus();}});
+  window.addEventListener("openai:set_globals",event=>{const globals=event.detail?.globals;if(globals&&Object.prototype.hasOwnProperty.call(globals,"widgetState")){const snapshot=globals.widgetState;const restored=model.initial(snapshot?.privateContent||snapshot||{});if(["scenario","guide","graph","view"].every(key=>state[key]===restored[key]))return;state=restored;render();}});
+  root.querySelectorAll("button,select,summary").forEach(element=>element.classList.add("cursor-interaction"));
+  render();
+})();
+</script>

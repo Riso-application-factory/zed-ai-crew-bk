@@ -1,0 +1,1539 @@
+{
+  "checked_at_utc": "2026-10-15T18:29:39.033516+00:00",
+  "nodes": [
+    {
+      "number": 2,
+      "title": "Lưu baseline quyết định và nguồn Wayfinder vào tracker",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2",
+      "labels": [
+        "wayfinder:task"
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Chốt quan hệ Session, run, cycle, step và Story Ready",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/3",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Chốt INPUT và OUTPUT cho các kịch bản ngoài refine và implement",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/4",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Xác định hợp đồng worker tối thiểu qua ba provider ACP",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Xác định cơ chế cưỡng chế ranh giới worker và thao tác Crew",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Chốt phạm vi dữ liệu gửi, lưu và công bố của Crew",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/7",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Cụ thể hóa khung G6 thành tiêu chí chất lượng đo được",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Kiểm hợp đồng session plan và ranh giới LLM với engine",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/9",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Kiểm phục hồi run sau mutation và dữ liệu trở nên lỗi thời",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Chốt cấu hình, version và cách xử lý thay đổi khi session chạy",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/11",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 12,
+      "title": "Chốt xử lý conflict, rework và merge PR đúng phiên bản",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/12",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 13,
+      "title": "Kiểm trải nghiệm Human khi chờ, lỗi, phục hồi và xem evidence",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/13",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 14,
+      "title": "Chọn storage, transport và điểm móc Zed theo contract đã kiểm",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/14",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 15,
+      "title": "Chốt lát Epic và đối chiếu đủ toàn cảnh trước tổng hợp spec",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/15",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 16,
+      "title": "Chọn danh tính tạo PR để Human có thể approve",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/16",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 17,
+      "title": "Kiểm chứng kênh role và skills trên ba adapter ACP",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/17",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 18,
+      "title": "Kiểm chứng confinement worker và đường bypass Crew gateway",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/18",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 19,
+      "title": "Kiểm chứng gateway mutation và approval đúng head",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/19",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 20,
+      "title": "Kiểm chứng active cancel và resume không phát lại side effect",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/20",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 21,
+      "title": "Xác định cơ chế GitHub identity riêng cho Crew",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/21",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 22,
+      "title": "Xác định chính sách dữ liệu và auth của ba provider ACP",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/22",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 23,
+      "title": "Xác định đường checks khả dụng và evidence trước merge trên fork Crew",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/23",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 24,
+      "title": "Xác định launch contract cho native state, managed policy và auth trong confinement",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/24",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 25,
+      "title": "Xác định bootstrap dependency của Claude native trước tool dispatch",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/25",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 26,
+      "title": "Xác định bootstrap dependency của Codex native trước tool dispatch",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/26",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 27,
+      "title": "Xác định contract policy và local execution của Codex control plane",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/27",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 28,
+      "title": "Kiểm native Codex policy và effective-config snapshot trước tool dispatch",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/28",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 29,
+      "title": "Chọn hướng khảo sát admission Codex sau incompatibility của stock runtime",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/29",
+      "labels": [
+        "ready-for-human",
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 30,
+      "title": "Kiểm native admission tại tool dispatch và ràng buộc generation",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/30",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 31,
+      "title": "Kiểm receiver-side admission lease trên native executor",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/31",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 32,
+      "title": "Kiểm admission từ ACP tới receiver qua sender native",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/32",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 33,
+      "title": "Kiểm filesystem mutation admission sau approval",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/33",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 34,
+      "title": "Kiểm native filesystem helper trong macOS confinement",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/34",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 35,
+      "title": "Chốt ranh giới tin cậy cho native filesystem helper",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/35",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 36,
+      "title": "Kiểm tích hợp native filesystem launcher giới hạn",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/36",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 37,
+      "title": "Kiểm authority và helper lease qua receiver death",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/37",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 38,
+      "title": "Kiểm admitted read và metadata trong native apply_patch",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/38",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 39,
+      "title": "Kiểm quiescence của helper qua owner crash và restart",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/39",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 40,
+      "title": "Kiểm endpoint local và tool boundary của Antigravity",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/40",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 41,
+      "title": "Kiểm public bridge cho endpoint và tool boundary Antigravity",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/41",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 42,
+      "title": "Kiểm admission và ranh giới native MCP Antigravity",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/42",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 43,
+      "title": "Kiểm contract ACP cho status và result của MCP resource Antigravity",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/43",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 44,
+      "title": "Kiểm chứng lifetime và owner recovery của Antigravity MCP",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/44",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 45,
+      "title": "Kiểm contract sở hữu và thu hồi toàn Antigravity ACP/native engine",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/45",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 46,
+      "title": "Kiểm contract launch và lifetime cho native Antigravity command descendants",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/46",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 47,
+      "title": "Kiểm command receipt nhất quán giữa model và ACP client",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/47",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 48,
+      "title": "Kiểm chứng survivor cho command helper và nonce/result khi controller mất",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/48",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 49,
+      "title": "Kiểm chứng receipt lịch sử qua ACP load và native continuation sau restart",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/49",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 50,
+      "title": "Preserve distinct command receiver facts across controller loss and historical replay",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/50",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 51,
+      "title": "Gate native engine replacement during same-session ACP restoration",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/51",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 52,
+      "title": "Identify a supported Antigravity model producer admission seam",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/52",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 53,
+      "title": "Test Antigravity gateway epoch capability and custody",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/53",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 54,
+      "title": "Compose owned MCP relay admission with native incarnation fences",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/54",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 55,
+      "title": "Retire poisoned native graphs without enrolling replacement processes",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/55",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 56,
+      "title": "Verify joined MCP effect custody across owner loss",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/56",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 57,
+      "title": "Validate joined MCP configuration and kernel-watch admission faults",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/57",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 58,
+      "title": "Own kernel-watch lifetime and fence MCP success publication",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/58",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 59,
+      "title": "Retain independent terminal custody after primary watch loss",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/59",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 60,
+      "title": "Find a supported ACP policy for app-state file-tool access",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/60",
+      "labels": [
+        "wayfinder:research"
+      ]
+    },
+    {
+      "number": 61,
+      "title": "Test project PreToolUse hook loading in pinned Antigravity ACP",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/61",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 62,
+      "title": "Bind ACP hook-command children to independent terminal custody",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/62",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 63,
+      "title": "Keep ACP hook policy mandatory across late configuration changes",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/63",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 64,
+      "title": "Bind native file policy to the resolved target before read effects",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/64",
+      "labels": [
+        "wayfinder:prototype"
+      ]
+    },
+    {
+      "number": 65,
+      "title": "Chọn phạm vi tích hợp Antigravity sau bằng chứng confinement",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/65",
+      "labels": [
+        "wayfinder:grilling"
+      ]
+    },
+    {
+      "number": 66,
+      "title": "Cung cấp repo thử và identity Crew riêng cho gateway GitHub",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/66",
+      "labels": [
+        "ready-for-human",
+        "wayfinder:task"
+      ]
+    },
+    {
+      "number": 67,
+      "title": "Wayfinder · Xác định custody của command descendants trước publication",
+      "state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/67",
+      "labels": [
+        "wayfinder:research"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "blocked": 3,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 4,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 5,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 6,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 7,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 7,
+      "blocker": 22,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/22"
+    },
+    {
+      "blocked": 8,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 9,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 9,
+      "blocker": 4,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/4"
+    },
+    {
+      "blocked": 9,
+      "blocker": 8,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8"
+    },
+    {
+      "blocked": 9,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 9,
+      "blocker": 3,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/3"
+    },
+    {
+      "blocked": 9,
+      "blocker": 17,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/17"
+    },
+    {
+      "blocked": 9,
+      "blocker": 18,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/18"
+    },
+    {
+      "blocked": 10,
+      "blocker": 9,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/9"
+    },
+    {
+      "blocked": 10,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 11,
+      "blocker": 9,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/9"
+    },
+    {
+      "blocked": 11,
+      "blocker": 3,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/3"
+    },
+    {
+      "blocked": 11,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 11,
+      "blocker": 7,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/7"
+    },
+    {
+      "blocked": 12,
+      "blocker": 11,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/11"
+    },
+    {
+      "blocked": 12,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 12,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 12,
+      "blocker": 16,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/16"
+    },
+    {
+      "blocked": 12,
+      "blocker": 19,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/19"
+    },
+    {
+      "blocked": 12,
+      "blocker": 20,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/20"
+    },
+    {
+      "blocked": 13,
+      "blocker": 12,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/12"
+    },
+    {
+      "blocked": 13,
+      "blocker": 7,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/7"
+    },
+    {
+      "blocked": 13,
+      "blocker": 8,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8"
+    },
+    {
+      "blocked": 13,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 13,
+      "blocker": 9,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/9"
+    },
+    {
+      "blocked": 13,
+      "blocker": 11,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/11"
+    },
+    {
+      "blocked": 14,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 14,
+      "blocker": 8,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8"
+    },
+    {
+      "blocked": 14,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 14,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 14,
+      "blocker": 7,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/7"
+    },
+    {
+      "blocked": 14,
+      "blocker": 11,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/11"
+    },
+    {
+      "blocked": 14,
+      "blocker": 9,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/9"
+    },
+    {
+      "blocked": 14,
+      "blocker": 16,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/16"
+    },
+    {
+      "blocked": 14,
+      "blocker": 20,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/20"
+    },
+    {
+      "blocked": 14,
+      "blocker": 21,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/21"
+    },
+    {
+      "blocked": 14,
+      "blocker": 67,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/67"
+    },
+    {
+      "blocked": 15,
+      "blocker": 8,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8"
+    },
+    {
+      "blocked": 15,
+      "blocker": 14,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/14"
+    },
+    {
+      "blocked": 15,
+      "blocker": 4,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/4"
+    },
+    {
+      "blocked": 15,
+      "blocker": 13,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/13"
+    },
+    {
+      "blocked": 15,
+      "blocker": 12,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/12"
+    },
+    {
+      "blocked": 15,
+      "blocker": 23,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/23"
+    },
+    {
+      "blocked": 16,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 17,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 18,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 18,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 18,
+      "blocker": 24,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/24"
+    },
+    {
+      "blocked": 18,
+      "blocker": 25,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/25"
+    },
+    {
+      "blocked": 18,
+      "blocker": 26,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/26"
+    },
+    {
+      "blocked": 18,
+      "blocker": 27,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/27"
+    },
+    {
+      "blocked": 18,
+      "blocker": 28,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/28"
+    },
+    {
+      "blocked": 18,
+      "blocker": 29,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/29"
+    },
+    {
+      "blocked": 18,
+      "blocker": 30,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/30"
+    },
+    {
+      "blocked": 18,
+      "blocker": 31,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/31"
+    },
+    {
+      "blocked": 18,
+      "blocker": 32,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/32"
+    },
+    {
+      "blocked": 18,
+      "blocker": 33,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/33"
+    },
+    {
+      "blocked": 18,
+      "blocker": 34,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/34"
+    },
+    {
+      "blocked": 18,
+      "blocker": 35,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/35"
+    },
+    {
+      "blocked": 18,
+      "blocker": 36,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/36"
+    },
+    {
+      "blocked": 18,
+      "blocker": 37,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/37"
+    },
+    {
+      "blocked": 18,
+      "blocker": 38,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/38"
+    },
+    {
+      "blocked": 18,
+      "blocker": 39,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/39"
+    },
+    {
+      "blocked": 18,
+      "blocker": 40,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/40"
+    },
+    {
+      "blocked": 18,
+      "blocker": 41,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/41"
+    },
+    {
+      "blocked": 18,
+      "blocker": 42,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/42"
+    },
+    {
+      "blocked": 18,
+      "blocker": 43,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/43"
+    },
+    {
+      "blocked": 18,
+      "blocker": 44,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/44"
+    },
+    {
+      "blocked": 18,
+      "blocker": 45,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/45"
+    },
+    {
+      "blocked": 18,
+      "blocker": 46,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/46"
+    },
+    {
+      "blocked": 18,
+      "blocker": 47,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/47"
+    },
+    {
+      "blocked": 18,
+      "blocker": 48,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/48"
+    },
+    {
+      "blocked": 18,
+      "blocker": 49,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/49"
+    },
+    {
+      "blocked": 18,
+      "blocker": 50,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/50"
+    },
+    {
+      "blocked": 18,
+      "blocker": 51,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/51"
+    },
+    {
+      "blocked": 18,
+      "blocker": 52,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/52"
+    },
+    {
+      "blocked": 18,
+      "blocker": 53,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/53"
+    },
+    {
+      "blocked": 18,
+      "blocker": 54,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/54"
+    },
+    {
+      "blocked": 18,
+      "blocker": 55,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/55"
+    },
+    {
+      "blocked": 18,
+      "blocker": 56,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/56"
+    },
+    {
+      "blocked": 18,
+      "blocker": 57,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/57"
+    },
+    {
+      "blocked": 18,
+      "blocker": 58,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/58"
+    },
+    {
+      "blocked": 18,
+      "blocker": 59,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/59"
+    },
+    {
+      "blocked": 18,
+      "blocker": 60,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/60"
+    },
+    {
+      "blocked": 18,
+      "blocker": 61,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/61"
+    },
+    {
+      "blocked": 18,
+      "blocker": 62,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/62"
+    },
+    {
+      "blocked": 18,
+      "blocker": 63,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/63"
+    },
+    {
+      "blocked": 18,
+      "blocker": 64,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/64"
+    },
+    {
+      "blocked": 18,
+      "blocker": 65,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/65"
+    },
+    {
+      "blocked": 19,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 19,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 19,
+      "blocker": 11,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/11"
+    },
+    {
+      "blocked": 19,
+      "blocker": 16,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/16"
+    },
+    {
+      "blocked": 19,
+      "blocker": 21,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/21"
+    },
+    {
+      "blocked": 19,
+      "blocker": 23,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/23"
+    },
+    {
+      "blocked": 19,
+      "blocker": 66,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/66"
+    },
+    {
+      "blocked": 20,
+      "blocker": 17,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/17"
+    },
+    {
+      "blocked": 20,
+      "blocker": 18,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/18"
+    },
+    {
+      "blocked": 20,
+      "blocker": 10,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/10"
+    },
+    {
+      "blocked": 21,
+      "blocker": 16,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/16"
+    },
+    {
+      "blocked": 22,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 22,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 23,
+      "blocker": 8,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/8"
+    },
+    {
+      "blocked": 23,
+      "blocker": 2,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/2"
+    },
+    {
+      "blocked": 24,
+      "blocker": 17,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/17"
+    },
+    {
+      "blocked": 24,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 24,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 25,
+      "blocker": 24,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/24"
+    },
+    {
+      "blocked": 25,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 25,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 25,
+      "blocker": 17,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/17"
+    },
+    {
+      "blocked": 26,
+      "blocker": 5,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/5"
+    },
+    {
+      "blocked": 26,
+      "blocker": 6,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/6"
+    },
+    {
+      "blocked": 26,
+      "blocker": 24,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/24"
+    },
+    {
+      "blocked": 29,
+      "blocker": 28,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/28"
+    },
+    {
+      "blocked": 31,
+      "blocker": 30,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/30"
+    },
+    {
+      "blocked": 32,
+      "blocker": 31,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/31"
+    },
+    {
+      "blocked": 33,
+      "blocker": 32,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/32"
+    },
+    {
+      "blocked": 34,
+      "blocker": 33,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/33"
+    },
+    {
+      "blocked": 35,
+      "blocker": 34,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/34"
+    },
+    {
+      "blocked": 36,
+      "blocker": 35,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/35"
+    },
+    {
+      "blocked": 37,
+      "blocker": 36,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/36"
+    },
+    {
+      "blocked": 38,
+      "blocker": 37,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/37"
+    },
+    {
+      "blocked": 39,
+      "blocker": 38,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/38"
+    },
+    {
+      "blocked": 41,
+      "blocker": 40,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/40"
+    },
+    {
+      "blocked": 44,
+      "blocker": 43,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/43"
+    },
+    {
+      "blocked": 45,
+      "blocker": 44,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/44"
+    },
+    {
+      "blocked": 46,
+      "blocker": 45,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/45"
+    },
+    {
+      "blocked": 48,
+      "blocker": 44,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/44"
+    },
+    {
+      "blocked": 48,
+      "blocker": 45,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/45"
+    },
+    {
+      "blocked": 48,
+      "blocker": 47,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/47"
+    },
+    {
+      "blocked": 49,
+      "blocker": 47,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/47"
+    },
+    {
+      "blocked": 49,
+      "blocker": 48,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/48"
+    },
+    {
+      "blocked": 50,
+      "blocker": 48,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/48"
+    },
+    {
+      "blocked": 50,
+      "blocker": 49,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/49"
+    },
+    {
+      "blocked": 51,
+      "blocker": 50,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/50"
+    },
+    {
+      "blocked": 52,
+      "blocker": 51,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/51"
+    },
+    {
+      "blocked": 53,
+      "blocker": 52,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/52"
+    },
+    {
+      "blocked": 54,
+      "blocker": 53,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/53"
+    },
+    {
+      "blocked": 55,
+      "blocker": 54,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/54"
+    },
+    {
+      "blocked": 56,
+      "blocker": 55,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/55"
+    },
+    {
+      "blocked": 57,
+      "blocker": 56,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/56"
+    },
+    {
+      "blocked": 58,
+      "blocker": 57,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/57"
+    },
+    {
+      "blocked": 59,
+      "blocker": 58,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/58"
+    },
+    {
+      "blocked": 61,
+      "blocker": 60,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/60"
+    },
+    {
+      "blocked": 62,
+      "blocker": 61,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/61"
+    },
+    {
+      "blocked": 63,
+      "blocker": 62,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/62"
+    },
+    {
+      "blocked": 64,
+      "blocker": 63,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/63"
+    },
+    {
+      "blocked": 67,
+      "blocker": 18,
+      "blocker_state": "closed",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/18"
+    }
+  ],
+  "mapped_decisions": 66,
+  "closed_mapped_decisions": 66,
+  "open_mapped_decisions": 0,
+  "open_dependency_blockers": 0,
+  "all_native_dependency_endpoints_read": true,
+  "status": "verified tracker decision graph, not product qualification"
+}

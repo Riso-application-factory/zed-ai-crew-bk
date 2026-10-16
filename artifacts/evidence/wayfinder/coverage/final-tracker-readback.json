@@ -1,0 +1,71 @@
+{
+  "checked_at_utc": "2026-10-15T18:32:38.274982+00:00",
+  "issues": {
+    "1": {
+      "state": "closed",
+      "exact_body_verified": true,
+      "open_blockers": 0,
+      "body_sha256": "c0b0f5d48e1f96a98cb09bfeaab26346fa7b897c12be8d81d43a62fa3a5dbae9",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/1"
+    },
+    "15": {
+      "state": "closed",
+      "exact_body_verified": true,
+      "open_blockers": 0,
+      "body_sha256": "ec15283205265086c322239f387a8e0191e61e622ba6e40ce3e162bd589cd12a",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/15"
+    },
+    "14": {
+      "state": "closed",
+      "exact_body_verified": true,
+      "open_blockers": 0,
+      "body_sha256": "332ee2f64b356c4cfc7bb180b1f5b1ba71c8c9964dc2168f288ad044bdad1ff8",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/14"
+    },
+    "67": {
+      "state": "closed",
+      "exact_body_verified": true,
+      "open_blockers": 0,
+      "body_sha256": "bcb5a594308b2434d08e50c111c7667e2e1235a7f23e926124cb334c3c02536e",
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/67"
+    }
+  },
+  "archives": [
+    {
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/67#issuecomment-6199155102",
+      "exact_body_verified": true,
+      "exact_files_verified": 17
+    },
+    {
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/15#issuecomment-6199332121",
+      "exact_body_verified": true,
+      "exact_files_verified": 4
+    },
+    {
+      "url": "https://github.com/Riso-application-factory/zed-ai-crew/issues/1#issuecomment-6199381450",
+      "exact_body_verified": true,
+      "exact_files_verified": 1
+    }
+  ],
+  "map_subissue_summary": {
+    "total": 66,
+    "completed": 66,
+    "percent_completed": 100
+  },
+  "amended_closed_contracts_verified": [
+    10,
+    11,
+    18,
+    20
+  ],
+  "status": "Wayfinder planning complete; product delivery/qualification not claimed",
+  "mapped_children_verified": 66,
+  "closed_children_verified": 66,
+  "native_edges_verified": 155,
+  "open_dependency_blockers": 0,
+  "head_unchanged": "de4ca3f4d415da54fe002f06656f2ded9fb1fcf0",
+  "readme_review_marker_preserved": true,
+  "production_source_unchanged": true,
+  "canonical_coverage": "https://github.com/Riso-application-factory/zed-ai-crew/issues/15#issuecomment-6199349480",
+  "canonical_architecture": "https://github.com/Riso-application-factory/zed-ai-crew/issues/14#issuecomment-6199166196"
+}
