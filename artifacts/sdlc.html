@@ -332,6 +332,17 @@
         font-weight: 700;
         letter-spacing: 0.04em;
       }
+      .account-badge {
+        display: inline-block;
+        padding: 1px 7px;
+        border: 1px solid #c8dbe3;
+        border-radius: 999px;
+        background: #f3f9fb;
+        color: #20576b;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
       .model-reason {
         color: var(--muted);
         font-size: 12px;
@@ -440,17 +451,27 @@
         <div id="cross-roles" class="cross-roles"></div>
       </section>
       <section class="role-matrix" aria-labelledby="role-matrix-heading">
-        <div class="eyebrow">Model routing · cập nhật 15/10/2026</div>
+        <div class="eyebrow">Model routing · cập nhật 16/10/2026</div>
         <h2 id="role-matrix-heading">
           Bảng tổng hợp Role &amp; 2 Model đề xuất (Primary &amp; Cross-Provider Fallback)
         </h2>
         <p>
           Mỗi role được gán <strong>Model đề xuất 1</strong> theo chất lượng phù hợp
           nhất với tác vụ, và <strong>Model đề xuất 2</strong> từ một provider khác
-          để chuyển đổi khi chạm quota / rate-limit. Nhãn <strong>Effort</strong> là
-          mức suy luận khuyến nghị để ưu tiên chất lượng. Antigravity là nền tảng: model
-          Claude 5.5 yêu cầu Google AI Pro trả phí hoặc cao hơn; Gemini 4 Argon chỉ
-          có trên Ultra/Enterprise và không có trong Antigravity IDE.
+          để chuyển đổi khi chạm quota / rate-limit. Ưu tiên hạn mức:
+          <strong>Antigravity Ultra &gt; Claude Pro = Codex Plus</strong>. Vì vậy,
+          Antigravity Ultra xử lý tác vụ nặng/dài; Claude Pro chỉ dùng trước cho điều
+          phối. Nhãn <strong>Effort</strong> là mức suy luận khuyến nghị để ưu tiên
+          chất lượng. Antigravity là nền tảng: model
+          Claude 5.5 yêu cầu Google AI Pro trả phí hoặc cao hơn; Gemini 4 Argon có
+          trên Pro trả phí/Ultra/Enterprise nhưng không có trong Antigravity IDE.
+        </p>
+        <p>
+          <strong>Cycle routing:</strong> mỗi lần giao việc, bộ chọn cân lại mức dùng
+          theo tỷ trọng Ultra 60% · Codex Plus 30% · Claude Pro 10%. Việc nặng không
+          được đưa vào Claude; nếu một provider hết quota, lượt đó tự chuyển sang
+          provider còn lại có mức tải thấp hơn. Nhờ vậy một cycle luôn dùng ít nhất
+          Antigravity và Codex, còn Claude giữ cho các điểm điều phối.
         </p>
         <div class="table-wrap" tabindex="0" role="region" aria-label="Bảng danh sách role và model đề xuất">
           <table class="role-table">
@@ -471,7 +492,7 @@
         một người có thể kiêm nhiều role. Kết thúc vòng đời gồm thông báo,
         migration, tắt dịch vụ và xử lý dữ liệu theo nghĩa vụ đã xác minh. Người
         điều phối được bổ sung làm đầu mối cho Human, không phải accountability
-        chính thức của Scrum. Mapping model được rà soát ngày 15/10/2026 theo
+        chính thức của Scrum. Mapping model được rà soát ngày 16/10/2026 theo
         tài liệu chính thức của Anthropic, OpenAI và Google Antigravity; quyền
         truy cập model vẫn phụ thuộc gói tài khoản và hạn mức thực tế.
       </footer>
@@ -982,20 +1003,125 @@
           },
         },
       };
+      const ultraFirstRoles = Object.keys(roleModels).filter(
+        (identifier) => !["coordinator", "sm", "coach"].includes(identifier),
+      );
+      ultraFirstRoles.forEach((identifier) => {
+        const isHighVolumeSupport = identifier === "support";
+        roleModels[identifier].primary = {
+          provider: "Antigravity",
+          model: isHighVolumeSupport
+            ? "Gemini 3.8 Flash · High"
+            : "Gemini 4 Argon · High",
+          reason: isHighVolumeSupport
+            ? "Ưu tiên Antigravity Ultra cho khối lượng ticket lớn; Gemini 3.8 Flash High tối ưu vòng lặp phân loại và tổng hợp nhanh."
+            : "Ưu tiên Antigravity Ultra (hạn mức cao nhất) với Gemini 4 Argon High cho suy luận sâu, ngữ cảnh lớn và tác vụ thực thi dài.",
+        };
+      });
+      roleModels.coordinator = {
+        ...roleModels.coordinator,
+        primary: {
+          provider: "Anthropic",
+          model: "Claude Opus 5.5",
+          reason:
+            "Dành Claude Pro cho điều phối: giữ mạch mục tiêu, phân rã yêu cầu và viết brief chính xác; không giao các batch thực thi dài.",
+        },
+        fallback: {
+          provider: "Antigravity",
+          model: "Gemini 4 Argon · High",
+          reason:
+            "Chuyển sang Ultra khi việc điều phối cần đọc nhiều artifact hoặc tạo lộ trình đa bước dài.",
+        },
+      };
+      ["sm", "coach"].forEach((identifier) => {
+        roleModels[identifier].primary = {
+          provider: "Anthropic",
+          model: "Claude Opus 5.5",
+          reason:
+            "Dành Claude Pro cho facilitation, tổng hợp quyết định và phản hồi ngắn có sắc thái; chuyển việc phân tích dài sang Ultra.",
+        };
+        roleModels[identifier].fallback = {
+          provider: "Antigravity",
+          model: "Gemini 4 Argon · High",
+          reason:
+            "Tuyến Ultra cho transcript, log hoặc phân tích cải tiến có khối lượng lớn.",
+        };
+      });
+      const cycleRoutingPolicy = Object.freeze({
+        targetShare: { Antigravity: 0.6, OpenAI: 0.3, Anthropic: 0.1 },
+        coordinatorRoles: new Set(["coordinator", "sm", "coach"]),
+      });
+      function cycleRecommendation(provider, identifier) {
+        const isSupport = identifier === "support";
+        if (provider === "Antigravity") {
+          return {
+            provider,
+            model: isSupport ? "Gemini 3.8 Flash · High" : "Gemini 4 Argon · High",
+            reason: "Được chọn bởi cycle router theo quota Ultra còn lại và chất lượng yêu cầu.",
+          };
+        }
+        if (provider === "OpenAI") {
+          return {
+            provider,
+            model: "GPT-6 Astra · xhigh",
+            reason: "Được chọn bởi cycle router để cân tải sang Codex Plus mà vẫn giữ chất lượng reasoning/coding cao.",
+          };
+        }
+        return {
+          provider,
+          model: "Claude Opus 5.5",
+          reason: "Được chọn cho điều phối hoặc facilitation ngắn; không dùng cho batch thực thi dài.",
+        };
+      }
+      function selectCycleRoute(identifier, cycleUsage = {}, availableProviders) {
+        const isCoordinator = cycleRoutingPolicy.coordinatorRoles.has(identifier);
+        const allowed = (availableProviders || ["Antigravity", "OpenAI", "Anthropic"])
+          .filter((provider) => isCoordinator || provider !== "Anthropic")
+          .filter((provider) => cycleRoutingPolicy.targetShare[provider] !== undefined);
+        if (!allowed.length) throw new Error("No provider with available quota");
+        const totalUsage = Object.values(cycleUsage).reduce(
+          (sum, value) => sum + value,
+          0,
+        );
+        const targetTotal = allowed.reduce(
+          (sum, provider) => sum + cycleRoutingPolicy.targetShare[provider],
+          0,
+        );
+        const provider = allowed
+          .map((candidate) => ({
+            candidate,
+            deficit:
+              cycleRoutingPolicy.targetShare[candidate] / targetTotal -
+              (cycleUsage[candidate] || 0) / Math.max(1, totalUsage),
+          }))
+          .sort((left, right) => right.deficit - left.deficit)[0].candidate;
+        return {
+          recommendation: cycleRecommendation(provider, identifier),
+          provider,
+          nextUsage: {
+            ...cycleUsage,
+            [provider]: (cycleUsage[provider] || 0) + 1,
+          },
+        };
+      }
       function normalizeModelEffort(recommendation) {
         if (recommendation.provider === "OpenAI") {
           const [, model, effort] = recommendation.model.match(
             /^(.*?) · (high|xhigh)$/,
           ) || [null, recommendation.model, "xhigh"];
-          return { ...recommendation, model, effort };
+          return { ...recommendation, model, effort, account: "Codex Plus" };
         }
         if (recommendation.provider === "Antigravity") {
           const [, model, effort] = recommendation.model.match(
             /^(.*?) · (High)$/,
           ) || [null, recommendation.model, "High"];
-          return { ...recommendation, model, effort };
+          return { ...recommendation, model, effort, account: "Antigravity Ultra" };
         }
-        return { ...recommendation, effort: "Thinking · high" };
+        return {
+          ...recommendation,
+          effort: "Thinking · high",
+          account: "Claude Pro",
+        };
       }
       function renderModelCell(recommendation) {
         recommendation = normalizeModelEffort(recommendation);
@@ -1014,7 +1140,10 @@
         const effort = document.createElement("span");
         effort.className = "effort-badge";
         effort.textContent = `Effort: ${recommendation.effort}`;
-        header.append(badge, name, effort);
+        const account = document.createElement("span");
+        account.className = "account-badge";
+        account.textContent = recommendation.account;
+        header.append(badge, name, effort, account);
         const reason = document.createElement("div");
         reason.className = "model-reason";
         reason.textContent = recommendation.reason;
